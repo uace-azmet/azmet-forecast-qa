@@ -6,6 +6,10 @@
 
 The goal of azmet-qaqc is to ...
 
+## Notes
+
+For now, notes are published as markdown [here](azmet-qaqc.md)
+
 
 ## Collaboration guidelines
 
