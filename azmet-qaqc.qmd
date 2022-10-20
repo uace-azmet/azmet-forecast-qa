@@ -302,3 +302,43 @@ temp_roll_test |>
   geom_ribbon(aes(ymin = lower99, ymax = upper99), alpha = 0.3) +
   facet_wrap(~meta_station_name)
 ```
+
+## Forecasting
+
+```{r}
+library(feasts)
+library(fable)
+library(tibble)
+library(dplyr)
+```
+
+```{r}
+daily_ts_sub <-
+  daily_ts |> 
+  filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) 
+daily_ts_sub |> autoplot(temp_air_meanC)
+```
+
+```{r}
+daily_ts_sub |> gg_season(temp_air_meanC)
+```
+
+```{r}
+daily_ts_sub |> 
+  ACF(temp_air_meanC, lag_max = 6*30) |>
+  autoplot() + 
+  scale_x_continuous()
+
+```
+
+`STL()` can't handle missing values.
+Need to choose uninterrupted timeseries
+
+```{r}
+daily_ts_sub |> 
+  model(STL(temp_air_meanC ~ season(window = "periodic")))
+```
+
+```{r}
+daily_ts_sub |> features(temp_air_meanC, feature_set(tags = "stl"))
+```
