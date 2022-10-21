@@ -20,6 +20,9 @@ library(azmetr)
 library(tsibble)
 library(tidyverse)
 library(lubridate)
+library(feasts)
+library(fable)
+library(slider)
 ```
 
 # Problem Definition
@@ -164,6 +167,7 @@ I'll use a rolling, centered, 6-month window to calculate upper and lower 95% an
 Anything outside of the rolling 99% quantile is an "extreme" value, which @faybishenko2021 assumed was bad data, and anything between the 95% and 99% quantile is an "outlier" which is suspect, but not necessarily bad.
 
 In the plots below, I only show a few stations for clarity.
+
 ### Mean Air Temp
 
 ```{r}
@@ -234,7 +238,6 @@ temp_roll_test |>
 
 ```{r}
 #| code-fold: true
-library(slider)
 
 sol_roll_test <-
   daily_ts |> 
@@ -370,8 +373,5 @@ precip_roll_test |>
 ## Forecasting
 
 ```{r}
-library(feasts)
-library(fable)
-library(tibble)
-library(dplyr)
+
 ```
