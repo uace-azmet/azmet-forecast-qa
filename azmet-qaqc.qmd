@@ -9,9 +9,7 @@ editor: visual
 bibliography: references.bib
 ---
 
-## Load packages
-
-```{r}
+```{r setup}
 #| echo: true
 #| code-fold: false
 #| warning: false
@@ -24,25 +22,57 @@ library(tidyverse)
 library(lubridate)
 ```
 
-## Get Data
+# Problem Definition
 
-Get some data to play around with
+We want to use forecasts to do quality assurance of AZMet weather data.
+Use the existing timeseries available from the API (and possibly also historical data not on the API) to forecast the current day's (or hour's) data with confidence intervals.
+Data that falls outside of those forecast CIs will get flagged as extreme values and possibly interpolated.
+Variables that need QA include:
+
+-   
+
+# Gathering Information
+
+## Retrieve Data
+
+Download all the daily data available from the API.
 
 ```{r import-data}
 #| cache: true
 #| code-fold: false
 
-daily <- az_daily(start_date = "2019-01-01")
-min(daily$datetime)
+#get data from start until today (2022-10-19)
+# daily <- az_daily(start_date = "2019-01-01", end_date = "2022-10-19")
+# 
+# #save these data
+# write_rds(daily, "data/daily-2022-10-19.rds")
+
+# Read in already existing data, extract last date, retrieve data since that date
+
+daily_old <- read_rds("data/daily-2022-10-19.rds")
+lastdate <- max(daily_old$datetime)
+
+daily_new <- az_daily(start_date = lastdate + 1)
+
+daily <- bind_rows(daily_old, daily_new)
+
 ```
 
-## Basic exploration
+We may also need to get historical data from AzMet website.
+
 
 Convert to tsibble for exploration
 
 ```{r}
 #| code-fold: false
 daily_ts <- as_tsibble(daily, key = c(meta_station_id, meta_station_name), index = datetime)
+```
+
+
+Any rows marked as needing review?
+
+```{r}
+daily_ts |> filter(meta_needs_review != 0)
 ```
 
 Any gaps in the data?
@@ -69,19 +99,42 @@ daily_ts |>
   facet_wrap(~meta_station_id)
 ```
 
-Any rows marked as needing review?
+
+
+# Preliminary (exploratory) analysis
+
+I'll start by looking at a subset of sites just to make visualization easier.
 
 ```{r}
-daily_ts |> filter(meta_needs_review != 0)
+daily_ts_sub <-
+  daily_ts |> 
+  filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa"))
 ```
 
-Any duplicates?
+
+## Mean Air Temp
 
 ```{r}
-daily_ts |> is_duplicated(key = meta_station_id, index = datetime)
+daily_ts_sub |> autoplot(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
 ```
 
-Check solar radiation.
+```{r}
+daily_ts_sub |> gg_season(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
+```
+
+
+
+## Solar Radiation
+
+```{r}
+daily_ts_sub |> autoplot(sol_rad_total) + labs(title = "Total Solar Radiation")
+```
+
+```{r}
+daily_ts_sub |> gg_season(sol_rad_total) + labs(title = "Total Solar Radiation")
+```
+Definitely some weird zeroes.  Maybe a super cloudy day, but probably errors.
+
 
 ```{r}
 #| code-fold: true
@@ -91,7 +144,17 @@ daily_ts |>
   arrange(sol_rad_total)
 ```
 
-Seems like too many 0s for solar radiation, and none are marked as needing review.
+## Precipitation
+
+```{r}
+daily_ts_sub |> autoplot(precip_total_mm) + labs(title = "Precip (mm)")
+```
+
+```{r}
+daily_ts_sub |> gg_season(precip_total_mm) + labs(title = "Precip (mm)")
+```
+
+# Choosing and fitting models
 
 ## Sliding windows
 
@@ -101,6 +164,71 @@ I'll use a rolling, centered, 6-month window to calculate upper and lower 95% an
 Anything outside of the rolling 99% quantile is an "extreme" value, which @faybishenko2021 assumed was bad data, and anything between the 95% and 99% quantile is an "outlier" which is suspect, but not necessarily bad.
 
 In the plots below, I only show a few stations for clarity.
+### Mean Air Temp
+
+```{r}
+#| code-fold: true
+temp_roll_test <-
+  daily_ts |> 
+  select(temp_air_meanC) |> 
+  group_by_key() |> 
+  mutate(
+    rolling_median = slide_dbl(
+      temp_air_meanC,
+      median,
+      .before = 90,
+      .after  = 90,
+      .complete = TRUE
+    )
+  ) |>
+  mutate(upper95 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.975), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |>
+  mutate(lower95 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.025), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(upper99 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.999), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(lower99 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.001), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(QA = case_when(
+    temp_air_meanC > lower99 & temp_air_meanC < lower95 ~ "outlier",
+    temp_air_meanC > upper95 & temp_air_meanC < upper99 ~ "outlier",
+    temp_air_meanC < lower99 ~ "extreme",
+    temp_air_meanC > upper99 ~ "extreme",
+    is.na(temp_air_meanC) ~ NA_character_
+  )) 
+```
+
+```{r}
+#| code-fold: true
+temp_roll_test |> 
+ filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
+  ggplot(aes(x = datetime)) +
+  geom_point(aes(y = temp_air_meanC, color = QA), size = 0.5, alpha = 0.5) +
+  geom_line(aes(y = rolling_median)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.3) +
+  geom_ribbon(aes(ymin = lower99, ymax = upper99), alpha = 0.3) +
+  facet_wrap(~meta_station_name)
+```
 
 ### Solar radiation
 
@@ -237,71 +365,7 @@ precip_roll_test |>
   facet_wrap(~meta_station_name)
 ```
 
-### Temperature
 
-```{r}
-#| code-fold: true
-temp_roll_test <-
-  daily_ts |> 
-  select(temp_air_meanC) |> 
-  group_by_key() |> 
-  mutate(
-    rolling_median = slide_dbl(
-      temp_air_meanC,
-      median,
-      .before = 90,
-      .after  = 90,
-      .complete = TRUE
-    )
-  ) |>
-  mutate(upper95 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.975), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |>
-  mutate(lower95 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.025), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(upper99 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.999), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(lower99 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.001), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(QA = case_when(
-    temp_air_meanC > lower99 & temp_air_meanC < lower95 ~ "outlier",
-    temp_air_meanC > upper95 & temp_air_meanC < upper99 ~ "outlier",
-    temp_air_meanC < lower99 ~ "extreme",
-    temp_air_meanC > upper99 ~ "extreme",
-    is.na(temp_air_meanC) ~ NA_character_
-  )) 
-```
-
-```{r}
-#| code-fold: true
-temp_roll_test |> 
- filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
-  ggplot(aes(x = datetime)) +
-  geom_point(aes(y = temp_air_meanC, color = QA), size = 0.5, alpha = 0.5) +
-  geom_line(aes(y = rolling_median)) +
-  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.3) +
-  geom_ribbon(aes(ymin = lower99, ymax = upper99), alpha = 0.3) +
-  facet_wrap(~meta_station_name)
-```
 
 ## Forecasting
 
@@ -310,35 +374,4 @@ library(feasts)
 library(fable)
 library(tibble)
 library(dplyr)
-```
-
-```{r}
-daily_ts_sub <-
-  daily_ts |> 
-  filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) 
-daily_ts_sub |> autoplot(temp_air_meanC)
-```
-
-```{r}
-daily_ts_sub |> gg_season(temp_air_meanC)
-```
-
-```{r}
-daily_ts_sub |> 
-  ACF(temp_air_meanC, lag_max = 6*30) |>
-  autoplot() + 
-  scale_x_continuous()
-
-```
-
-`STL()` can't handle missing values.
-Need to choose uninterrupted timeseries
-
-```{r}
-daily_ts_sub |> 
-  model(STL(temp_air_meanC ~ season(window = "periodic")))
-```
-
-```{r}
-daily_ts_sub |> features(temp_air_meanC, feature_set(tags = "stl"))
 ```
