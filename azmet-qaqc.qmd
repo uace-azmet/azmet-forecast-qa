@@ -42,20 +42,20 @@ Download all the daily data available from the API.
 #| code-fold: false
 
 #get data from start until today (2022-10-19)
-# daily <- az_daily(start_date = "2019-01-01", end_date = "2022-10-19")
-# 
-# #save these data
-# write_rds(daily, "data/daily-2022-10-19.rds")
+if(!file.exists("data/daily-2022-10-19.rds")) {
+  daily <- az_daily(start_date = "2019-01-01", end_date = "2022-10-19")
+  
+  #save these data
+  write_rds(daily, "data/daily-2022-10-19.rds")
+}
 
 # Read in already existing data, extract last date, retrieve data since that date
-
 daily_old <- read_rds("data/daily-2022-10-19.rds")
 lastdate <- max(daily_old$datetime)
 
 daily_new <- az_daily(start_date = lastdate + 1)
 
 daily <- bind_rows(daily_old, daily_new)
-
 ```
 
 We may also need to get historical data from AzMet website.
