@@ -28,11 +28,18 @@ library(slider)
 # Problem Definition
 
 We want to use forecasts to do quality assurance of AZMet weather data.
-Use the existing timeseries available from the API (and possibly also historical data not on the API) to forecast the current day's (or hour's) data with confidence intervals.
-Data that falls outside of those forecast CIs will get flagged as extreme values and possibly interpolated.
+Use the existing timeseries available from the API (and possibly also historical data not on the API) to forecast the current day's (or hour's) data with prediction interval(s).
+Data that falls outside of those prediction interval(s) will get flagged as extreme values and possibly interpolated.
 Variables that need QA include:
 
--   
+-   precipitation
+-   air temperature
+-   soil temperature
+-   solar radiation
+-   wind speed
+-   humidity
+
+Other variables are (probably?) derived
 
 # Gathering Information
 
@@ -63,14 +70,12 @@ daily <- bind_rows(daily_old, daily_new)
 
 We may also need to get historical data from AzMet website.
 
-
 Convert to tsibble for exploration
 
 ```{r}
 #| code-fold: false
 daily_ts <- as_tsibble(daily, key = c(meta_station_id, meta_station_name), index = datetime)
 ```
-
 
 Any rows marked as needing review?
 
@@ -102,8 +107,6 @@ daily_ts |>
   facet_wrap(~meta_station_id)
 ```
 
-
-
 # Preliminary (exploratory) analysis
 
 I'll start by looking at a subset of sites just to make visualization easier.
@@ -113,7 +116,6 @@ daily_ts_sub <-
   daily_ts |> 
   filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa"))
 ```
-
 
 ## Mean Air Temp
 
@@ -125,8 +127,6 @@ daily_ts_sub |> autoplot(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
 daily_ts_sub |> gg_season(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
 ```
 
-
-
 ## Solar Radiation
 
 ```{r}
@@ -136,8 +136,9 @@ daily_ts_sub |> autoplot(sol_rad_total) + labs(title = "Total Solar Radiation")
 ```{r}
 daily_ts_sub |> gg_season(sol_rad_total) + labs(title = "Total Solar Radiation")
 ```
-Definitely some weird zeroes.  Maybe a super cloudy day, but probably errors.
 
+Definitely some weird zeroes.
+Maybe a super cloudy day, but probably errors.
 
 ```{r}
 #| code-fold: true
@@ -155,6 +156,37 @@ daily_ts_sub |> autoplot(precip_total_mm) + labs(title = "Precip (mm)")
 
 ```{r}
 daily_ts_sub |> gg_season(precip_total_mm) + labs(title = "Precip (mm)")
+```
+
+## Combinations of variables
+
+Is total solar radiation largely a function of precipitation?
+
+```{r}
+daily_ts_sub |> 
+  ggplot(aes(x = precip_total_mm, y = sol_rad_total)) +
+  geom_point() +
+  facet_wrap(~meta_station_id + meta_station_name)
+```
+
+Not much relationship
+
+```{r}
+#| warning: false
+#| message: false
+daily_ts_sub |>
+  GGally::ggpairs(
+    columns = c(
+      "eto_pen_mon_in",
+      "precip_total_mm",
+      "sol_rad_total",
+      "temp_air_meanC"#,
+      # "temp_soil_50cm_meanC",
+      # "vp_actual_mean",
+      # "wind_spd_mean_mph"
+    )
+  )
+
 ```
 
 # Choosing and fitting models
@@ -367,8 +399,6 @@ precip_roll_test |>
   geom_ribbon(aes(ymin = precip_lower99, ymax = precip_upper99), alpha = 0.3) +
   facet_wrap(~meta_station_name)
 ```
-
-
 
 ## Forecasting
 
