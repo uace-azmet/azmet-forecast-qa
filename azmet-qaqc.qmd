@@ -123,8 +123,18 @@ daily_ts_sub <-
 daily_ts_sub |> autoplot(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
 ```
 
+Seasonality
+
 ```{r}
 daily_ts_sub |> gg_season(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
+```
+
+Autocorrelation
+
+```{r}
+daily_ts_sub |>
+  ACF(temp_air_meanC, lag_max = 180) |> 
+  autoplot()
 ```
 
 ## Solar Radiation
@@ -132,6 +142,8 @@ daily_ts_sub |> gg_season(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
 ```{r}
 daily_ts_sub |> autoplot(sol_rad_total) + labs(title = "Total Solar Radiation")
 ```
+
+Seasonality
 
 ```{r}
 daily_ts_sub |> gg_season(sol_rad_total) + labs(title = "Total Solar Radiation")
@@ -148,14 +160,32 @@ daily_ts |>
   arrange(sol_rad_total)
 ```
 
+Autocorrelation
+
+```{r}
+daily_ts_sub |>
+  ACF(sol_rad_total, lag_max = 180) |> 
+  autoplot()
+```
+
 ## Precipitation
 
 ```{r}
 daily_ts_sub |> autoplot(precip_total_mm) + labs(title = "Precip (mm)")
 ```
 
+Seasonality
+
 ```{r}
 daily_ts_sub |> gg_season(precip_total_mm) + labs(title = "Precip (mm)")
+```
+
+Autocorrelation
+
+```{r}
+daily_ts_sub |>
+  ACF(precip_total_mm, lag_max = 180) |> 
+  autoplot()
 ```
 
 ## Combinations of variables
