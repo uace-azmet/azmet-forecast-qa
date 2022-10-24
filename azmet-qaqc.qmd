@@ -245,36 +245,6 @@ daily_ts_sub |>
   autoplot()
 ```
 
-## Combinations of variables
-
-Is total solar radiation largely a function of precipitation?
-
-```{r}
-daily_ts_sub |> 
-  ggplot(aes(x = precip_total_mm, y = sol_rad_total)) +
-  geom_point() +
-  facet_wrap(~meta_station_id + meta_station_name)
-```
-
-Not much relationship
-
-```{r}
-#| warning: false
-#| message: false
-daily_ts_sub |>
-  GGally::ggpairs(
-    columns = c(
-      "eto_pen_mon_in",
-      "precip_total_mm",
-      "sol_rad_total",
-      "temp_air_meanC"#,
-      # "temp_soil_50cm_meanC",
-      # "vp_actual_mean",
-      # "wind_spd_mean_mph"
-    )
-  )
-
-```
 
 # Choosing and fitting models
 
