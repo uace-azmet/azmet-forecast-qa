@@ -29,6 +29,7 @@ library(here)
 We want to use forecasts to do quality assurance of AZMet weather data.
 Use the existing timeseries available from the API (and possibly also historical data not on the API) to forecast the current day's (or hour's) data with prediction interval(s).
 Data that falls outside of those prediction interval(s) will get flagged as extreme values and possibly interpolated.
+
 Variables that need QA include:
 
 -   precipitation
