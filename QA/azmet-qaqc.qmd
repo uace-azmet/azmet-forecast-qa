@@ -1,7 +1,7 @@
 ---
 title: "azmet-qaqc"
 format: 
-  gfm:
+  html:
     toc: true
     number-sections: true
     
@@ -455,6 +455,7 @@ Seems a little overzealous with precip.
 Likely because an emprical distribution is not really appropriate for precip data.
 
 ## Forecasting
+
 
 ### Timeseries decomposition
 
