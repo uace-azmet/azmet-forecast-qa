@@ -13,6 +13,11 @@ The goal of azmet-qaqc is to create scripts to run QA/QC on AZMet data.
 - `QA/` contains quarto documents of notes / analysis.  `sliding-windows.qmd` is an exploration of a sliding-window quantile approach that is probably not going to work for us.  `azmet-qaqc.qmd` is an exploration of QA by forecasting.
 - `renv/` is necessary for the `renv` package to work (see below)
 
+Rendered reports available as well:
+
+- [QA by Forecasting](https://cct-datascience.github.io/azmet-qaqc/QA/azmet-qaqc.html)
+- [Sliding Window Quantiles](https://cct-datascience.github.io/azmet-qaqc/QA/sliding-window.html)
+
 ## Collaboration guidelines
 
 This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) for package management. When opening this repo as an RStudio Project for the first time, `renv` should automatically install itself and prompt you to run `renv::restore()` to install all package dependencies.
