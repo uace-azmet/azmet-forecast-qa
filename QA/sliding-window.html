@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>azmet-qaqc</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="sliding-window_files/libs/clipboard/clipboard.min.js"></script>
+<script src="sliding-window_files/libs/quarto-html/quarto.js"></script>
+<script src="sliding-window_files/libs/quarto-html/popper.min.js"></script>
+<script src="sliding-window_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="sliding-window_files/libs/quarto-html/anchor.min.js"></script>
+<link href="sliding-window_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="sliding-window_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="sliding-window_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="sliding-window_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="sliding-window_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#problem-definition" id="toc-problem-definition" class="nav-link active" data-scroll-target="#problem-definition"> <span class="header-section-number">1</span> Problem Definition</a></li>
+  <li><a href="#gathering-information" id="toc-gathering-information" class="nav-link" data-scroll-target="#gathering-information"> <span class="header-section-number">2</span> Gathering Information</a>
+  <ul class="collapse">
+  <li><a href="#retrieve-data" id="toc-retrieve-data" class="nav-link" data-scroll-target="#retrieve-data"> <span class="header-section-number">2.1</span> Retrieve Data</a></li>
+  </ul></li>
+  <li><a href="#sliding-windows" id="toc-sliding-windows" class="nav-link" data-scroll-target="#sliding-windows"> <span class="header-section-number">3</span> Sliding windows</a>
+  <ul class="collapse">
+  <li><a href="#mean-air-temp" id="toc-mean-air-temp" class="nav-link" data-scroll-target="#mean-air-temp"> <span class="header-section-number">3.1</span> Mean Air Temp</a></li>
+  <li><a href="#solar-radiation" id="toc-solar-radiation" class="nav-link" data-scroll-target="#solar-radiation"> <span class="header-section-number">3.2</span> Solar radiation</a></li>
+  <li><a href="#precipitation" id="toc-precipitation" class="nav-link" data-scroll-target="#precipitation"> <span class="header-section-number">3.3</span> Precipitation</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">azmet-qaqc</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remotes::install_github("cct-datascience/azmetr")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(azmetr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tsibble)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(slider)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="problem-definition" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Problem Definition</h1>
+<p>We want to use forecasts to do quality assurance of AZMet weather data. Use the existing timeseries available from the API (and possibly also historical data not on the API) to forecast the current day’s (or hour’s) data with prediction interval(s). Data that falls outside of those prediction interval(s) will get flagged as extreme values and possibly interpolated. Variables that need QA include:</p>
+<ul>
+<li>precipitation</li>
+<li>air temperature</li>
+<li>soil temperature</li>
+<li>solar radiation</li>
+<li>wind speed</li>
+<li>humidity</li>
+</ul>
+<p>Other variables are (probably?) derived</p>
+</section>
+<section id="gathering-information" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Gathering Information</h1>
+<section id="retrieve-data" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="retrieve-data"><span class="header-section-number">2.1</span> Retrieve Data</h2>
+<p>Download all the daily data available from the API.</p>
+<div class="cell" data-hash="sliding-window_cache/html/import-data_3c82d0398fc61b774627b6345c2028c8">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read in historic data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>daily_hist <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"daily_hist.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 177749 Columns: 30
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (2): meta_station_id, meta_station_name
+dbl  (27): date_year, date_doy, temp_air_maxC, temp_air_minC, temp_air_meanC...
+date  (1): datetime
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get data from end of historic data until 2022-10-19</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"daily-2022-10-19.rds"</span>))) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  daily <span class="ot">&lt;-</span> <span class="fu">az_daily</span>(<span class="at">start_date =</span> <span class="fu">max</span>(daily_hist<span class="sc">$</span>datetime) <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">end_date =</span> <span class="st">"2022-10-19"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#save these data</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_rds</span>(daily, <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"daily-2022-10-19.rds"</span>))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in already existing data, extract last date, retrieve data since that date</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>daily_old <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"daily-2022-10-19.rds"</span>))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>lastdate <span class="ot">&lt;-</span> <span class="fu">max</span>(daily_old<span class="sc">$</span>datetime)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>daily_new <span class="ot">&lt;-</span> <span class="fu">az_daily</span>(<span class="at">start_date =</span> lastdate <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>daily <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(daily_old, daily_new)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#join to historic data</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>daily <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(daily_hist, daily) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Find and resolve duplicates</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">duplicates</span>(daily, <span class="at">key =</span> <span class="fu">c</span>(meta_station_id, meta_station_name), <span class="at">index =</span> datetime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 170 × 69
+   date_year date_doy datetime   temp_…¹ temp_…² temp_…³ relat…⁴ relat…⁵ relat…⁶
+       &lt;dbl&gt;    &lt;dbl&gt; &lt;date&gt;       &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1      2006      365 2006-12-31    17.8    -1.9     6     100      25.8    74.1
+ 2      2006      365 2006-12-31    17.8    -1.9     6     100      25.8    74.1
+ 3      2006      365 2006-12-31    19.8     1.7     9.6    69.9    21.4    48.1
+ 4      2006      365 2006-12-31    19.8     1.7     9.6    69.9    21.4    48.1
+ 5      2006      365 2006-12-31    20.3     0.9     9.3    78.7    18      50.8
+ 6      2006      365 2006-12-31    20.3     0.9     9.3    78.7    18      50.8
+ 7      2006      365 2006-12-31    15.1    -5.7     3.7    90.8    26.1    59.7
+ 8      2006      365 2006-12-31    15.1    -5.7     3.7    90.8    26.1    59.7
+ 9      2018      220 2018-08-08    36.7    24      29      66.1    24.5    46.7
+10      2018      220 2018-08-08    36.7    24      29      66.1    24.5    46.7
+# … with 160 more rows, 60 more variables: vp_deficit_mean &lt;dbl&gt;,
+#   sol_rad_total &lt;dbl&gt;, precip_total_mm &lt;dbl&gt;, temp_soil_10cm_maxC &lt;dbl&gt;,
+#   temp_soil_10cm_minC &lt;dbl&gt;, temp_soil_10cm_meanC &lt;dbl&gt;,
+#   temp_soil_50cm_maxC &lt;dbl&gt;, temp_soil_50cm_minC &lt;dbl&gt;,
+#   temp_soil_50cm_meanC &lt;dbl&gt;, wind_spd_mean_mps &lt;dbl&gt;,
+#   wind_vector_magnitude &lt;dbl&gt;, wind_vector_dir &lt;dbl&gt;,
+#   wind_vector_dir_stand_dev &lt;dbl&gt;, wind_spd_max_mps &lt;dbl&gt;, eto_azmet &lt;dbl&gt;, …</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>daily <span class="ot">&lt;-</span> daily <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">are_duplicated</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    daily,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">key =</span> <span class="fu">c</span>(meta_station_id, meta_station_name),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">index =</span> datetime</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Convert to tsibble for exploration</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="ot">&lt;-</span> <span class="fu">as_tsibble</span>(daily, <span class="at">key =</span> <span class="fu">c</span>(meta_station_id, meta_station_name), <span class="at">index =</span> datetime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Any rows marked as needing review?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="sc">|&gt;</span> <span class="fu">filter</span>(meta_needs_review <span class="sc">!=</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 131 x 69 [1D]
+# Key:       meta_station_id, meta_station_name [29]
+   date_year date_doy datetime   temp_…¹ temp_…² temp_…³ relat…⁴ relat…⁵ relat…⁶
+       &lt;dbl&gt;    &lt;dbl&gt; &lt;date&gt;       &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1      2022       94 2022-04-04    27.2   10.5     20.0    61.6   15.8     34.0
+ 2      2022       95 2022-04-05    31.0   10.2     21.7    61.3   13.0     31.1
+ 3      2022       96 2022-04-06    31.2   11.3     22.7    57.2    9.5     25.5
+ 4      2022       97 2022-04-07    33.4    7.70    20.9    47.7    3.32    17.4
+ 5      2022       98 2022-04-08    34.3    6.79    21.4    45.2    2.55    17.2
+ 6      2022       99 2022-04-09    33.6    9.42    23.8    36.6    3.76    12.7
+ 7      2022      100 2022-04-10    30.9   16.2     24.0    36.0    9       20.1
+ 8      2022      101 2022-04-11    29.9   17.6     23.5    40.8   12.7     26.7
+ 9      2022      174 2022-06-23    42.3   25.6     31.6    47.6   13.9     32.6
+10      2022       67 2022-03-08    21.3    5.96    13.7    55.5    8.71    23.4
+# … with 121 more rows, 60 more variables: vp_deficit_mean &lt;dbl&gt;,
+#   sol_rad_total &lt;dbl&gt;, precip_total_mm &lt;dbl&gt;, temp_soil_10cm_maxC &lt;dbl&gt;,
+#   temp_soil_10cm_minC &lt;dbl&gt;, temp_soil_10cm_meanC &lt;dbl&gt;,
+#   temp_soil_50cm_maxC &lt;dbl&gt;, temp_soil_50cm_minC &lt;dbl&gt;,
+#   temp_soil_50cm_meanC &lt;dbl&gt;, wind_spd_mean_mps &lt;dbl&gt;,
+#   wind_vector_magnitude &lt;dbl&gt;, wind_vector_dir &lt;dbl&gt;,
+#   wind_vector_dir_stand_dev &lt;dbl&gt;, wind_spd_max_mps &lt;dbl&gt;, eto_azmet &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<p>Check extreme values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="sc">|&gt;</span> <span class="fu">filter</span>(temp_air_meanC <span class="sc">&gt;</span> <span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 67 x 69 [1D]
+# Key:       meta_station_id, meta_station_name [13]
+   date_year date_doy datetime   temp_…¹ temp_…² temp_…³ relat…⁴ relat…⁵ relat…⁶
+       &lt;dbl&gt;    &lt;dbl&gt; &lt;date&gt;       &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1      2015       14 2015-01-14   999       999     999     999     999     999
+ 2      2015       15 2015-01-15    19.4     999     999     999     999     999
+ 3      2017      204 2017-07-23   999       999     999     999     999     999
+ 4      2017      205 2017-07-24   999       999     999     999     999     999
+ 5      2017      206 2017-07-25   999       999     999     999     999     999
+ 6      2017      207 2017-07-26   999       999     999     999     999     999
+ 7      2017      208 2017-07-27   999       999     999     999     999     999
+ 8      2016      357 2016-12-22   999       999     999     999     999     999
+ 9      2016      358 2016-12-23   999       999     999     999     999     999
+10      2016      359 2016-12-24   999       999     999     999     999     999
+# … with 57 more rows, 60 more variables: vp_deficit_mean &lt;dbl&gt;,
+#   sol_rad_total &lt;dbl&gt;, precip_total_mm &lt;dbl&gt;, temp_soil_10cm_maxC &lt;dbl&gt;,
+#   temp_soil_10cm_minC &lt;dbl&gt;, temp_soil_10cm_meanC &lt;dbl&gt;,
+#   temp_soil_50cm_maxC &lt;dbl&gt;, temp_soil_50cm_minC &lt;dbl&gt;,
+#   temp_soil_50cm_meanC &lt;dbl&gt;, wind_spd_mean_mps &lt;dbl&gt;,
+#   wind_vector_magnitude &lt;dbl&gt;, wind_vector_dir &lt;dbl&gt;,
+#   wind_vector_dir_stand_dev &lt;dbl&gt;, wind_spd_max_mps &lt;dbl&gt;, eto_azmet &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<p>Looks like historic data uses 999 for NA probably. I’ll set those to <code>NA</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="ot">&lt;-</span> daily_ts <span class="sc">|&gt;</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">if_else</span>(x <span class="sc">==</span> <span class="dv">999</span>, <span class="cn">NA_real_</span>, x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Any gaps in the data?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="sc">|&gt;</span> <span class="fu">scan_gaps</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 268 x 3 [1D]
+# Key:       meta_station_id, meta_station_name [13]
+   meta_station_id meta_station_name datetime  
+   &lt;chr&gt;           &lt;chr&gt;             &lt;date&gt;    
+ 1 az04            Safford           2009-01-17
+ 2 az08            Parker            2017-03-05
+ 3 az08            Parker            2017-03-06
+ 4 az08            Parker            2017-03-07
+ 5 az08            Parker            2017-03-08
+ 6 az08            Parker            2017-03-09
+ 7 az08            Parker            2017-03-10
+ 8 az08            Parker            2017-03-11
+ 9 az08            Parker            2019-02-26
+10 az08            Parker            2019-02-27
+# … with 258 more rows</code></pre>
+</div>
+</div>
+<p>yes, let’s make them explicit NAs</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="ot">&lt;-</span> <span class="fu">fill_gaps</span>(daily_ts, <span class="at">.full =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check that gaps were made explicit:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>daily_ts <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(meta_station_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"az23"</span>, <span class="st">"az14"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(datetime) <span class="sc">&gt;</span> <span class="dv">2018</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> datetime, <span class="at">y =</span> sol_rad_total)) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>meta_station_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="sliding-window_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="sliding-windows" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Sliding windows</h1>
+<p>I’ll explore the sliding window quantile approach used in <span class="citation" data-cites="faybishenko2021">(<a href="#ref-faybishenko2021" role="doc-biblioref">Faybishenko et al. 2021</a>)</span>. I’ll use <code>slider</code> because it’s tidyverse-friendly and I want to learn it. I’ll use a rolling, centered, 6-month window to calculate upper and lower 95% and 99% quantiles. Anything outside of the rolling 99% quantile is an “extreme” value, which <span class="citation" data-cites="faybishenko2021">Faybishenko et al. (<a href="#ref-faybishenko2021" role="doc-biblioref">2021</a>)</span> assumed was bad data, and anything between the 95% and 99% quantile is an “outlier” which is suspect, but not necessarily bad.</p>
+<p>In the plots below, I only show a few stations for clarity.</p>
+<section id="mean-air-temp" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="mean-air-temp"><span class="header-section-number">3.1</span> Mean Air Temp</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>temp_roll_test <span class="ot">&lt;-</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  daily_ts <span class="sc">|&gt;</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(temp_air_meanC) <span class="sc">|&gt;</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by_key</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">rolling_median =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>      temp_air_meanC,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>      median,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">upper95 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.975</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lower95 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC,</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.025</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">upper99 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.999</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lower99 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC,</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.001</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">QA =</span> <span class="fu">case_when</span>(</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC <span class="sc">&gt;</span> lower99 <span class="sc">&amp;</span> temp_air_meanC <span class="sc">&lt;</span> lower95 <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC <span class="sc">&gt;</span> upper95 <span class="sc">&amp;</span> temp_air_meanC <span class="sc">&lt;</span> upper99 <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC <span class="sc">&lt;</span> lower99 <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    temp_air_meanC <span class="sc">&gt;</span> upper99 <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(temp_air_meanC) <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>  )) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>temp_roll_test <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">filter</span>(meta_station_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Bowie"</span>, <span class="st">"Harquahala"</span>, <span class="st">"Tucson"</span>, <span class="st">"Maricopa"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> datetime)) <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> temp_air_meanC, <span class="at">color =</span> QA), <span class="at">size =</span> <span class="fl">0.5</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> rolling_median)) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower95, <span class="at">ymax =</span> upper95), <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower99, <span class="at">ymax =</span> upper99), <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>meta_station_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 604 rows containing missing values (geom_point).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 787 row(s) containing missing values (geom_path).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="sliding-window_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="solar-radiation" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="solar-radiation"><span class="header-section-number">3.2</span> Solar radiation</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sol_roll_test <span class="ot">&lt;-</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  daily_ts <span class="sc">|&gt;</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by_key</span>() <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sol_rad_total) <span class="sc">|&gt;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">sol_rolling_median =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>      sol_rad_total,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>      median,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sol_upper95 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    sol_rad_total,</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.975</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sol_lower95 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    sol_rad_total,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.025</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sol_upper99 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    sol_rad_total,</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.999</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sol_lower99 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    sol_rad_total,</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.001</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">QA =</span> <span class="fu">case_when</span>(</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&gt;</span> sol_lower99 <span class="sc">&amp;</span> sol_rad_total <span class="sc">&lt;</span> sol_lower95 <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&gt;</span> sol_upper95 <span class="sc">&amp;</span> sol_rad_total <span class="sc">&lt;</span> sol_upper99 <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&lt;</span> sol_lower99 <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&gt;</span> sol_upper99 <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(sol_rad_total) <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a>  )) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Adding missing grouping variables: `meta_station_id`, `meta_station_name`</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sol_roll_test <span class="sc">|&gt;</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">filter</span>(meta_station_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Bowie"</span>, <span class="st">"Harquahala"</span>, <span class="st">"Tucson"</span>, <span class="st">"Maricopa"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> datetime)) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> sol_rad_total, <span class="at">color =</span> QA), <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> sol_rolling_median)) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> sol_lower95, <span class="at">ymax =</span> sol_upper95), <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> sol_lower99, <span class="at">ymax =</span> sol_upper99), <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>meta_station_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 602 rows containing missing values (geom_point).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 787 row(s) containing missing values (geom_path).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="sliding-window_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="precipitation" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="precipitation"><span class="header-section-number">3.3</span> Precipitation</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>precip_roll_test <span class="ot">&lt;-</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  daily_ts <span class="sc">|&gt;</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(precip_total_mm) <span class="sc">|&gt;</span> </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by_key</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">precip_rolling_median =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>      precip_total_mm,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>      median,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">precip_upper95 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    precip_total_mm,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.975</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">precip_lower95 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>    precip_total_mm,</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.025</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">precip_upper99 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>    precip_total_mm,</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.999</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">precip_lower99 =</span> <span class="fu">slide_dbl</span>(</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    precip_total_mm,</span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">quantile</span>(x, <span class="fu">c</span>(<span class="fl">0.001</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">90</span>,</span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after  =</span> <span class="dv">90</span>,</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">QA =</span> <span class="fu">case_when</span>(</span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>    precip_total_mm <span class="sc">&gt;</span> precip_lower99 <span class="sc">&amp;</span> precip_total_mm <span class="sc">&lt;</span> precip_lower95 <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>    precip_total_mm <span class="sc">&gt;</span> precip_upper95 <span class="sc">&amp;</span> precip_total_mm <span class="sc">&lt;</span> precip_upper99 <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>    precip_total_mm <span class="sc">&lt;</span> precip_lower99 <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>    precip_total_mm <span class="sc">&gt;</span> precip_upper99 <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(precip_total_mm) <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>  )) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>precip_roll_test <span class="sc">|&gt;</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">filter</span>(meta_station_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Bowie"</span>, <span class="st">"Harquahala"</span>, <span class="st">"Tucson"</span>, <span class="st">"Maricopa"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> datetime)) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> precip_total_mm, <span class="at">color =</span> QA), <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_line(aes(y = precip_rolling_median)) +</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> precip_lower95, <span class="at">ymax =</span> precip_upper95), <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> precip_lower99, <span class="at">ymax =</span> precip_upper99), <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>meta_station_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 602 rows containing missing values (geom_point).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="sliding-window_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Seems a little overzealous with precip. Likely because an emprical distribution is not really appropriate for precip data.</p>
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-faybishenko2021" class="csl-entry" role="doc-biblioentry">
+Faybishenko, Boris, Roelof Versteeg, Gilberto Pastorello, Dipankar Dwivedi, Charuleka Varadharajan, and Deb Agarwal. 2021. <em>Quality Assurance and Quality Control (QA/QC) of Meteorological Time Series Data for Billy Barr, East River, Colorado USA</em>. Environmental System Science Data Infrastructure for a Virtual Ecosystem. <a href="https://doi.org/10.15485/1823516">https://doi.org/10.15485/1823516</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

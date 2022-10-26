@@ -1,5 +1,5 @@
 ---
-title: "azmet-qaqc"
+title: "QA by Forecasting"
 format: 
   html:
     toc: true
@@ -22,7 +22,7 @@ library(tidyverse)
 library(lubridate)
 library(feasts)
 library(fable)
-library(slider)
+library(here)
 ```
 
 # Problem Definition
@@ -52,19 +52,19 @@ Download all the daily data available from the API.
 #| code-fold: false
 
 #read in historic data
-daily_hist <- read_csv("data/daily_hist.csv")
+daily_hist <- read_csv(here("data", "daily_hist.csv"))
 
 #get data from end of historic data until 2022-10-19
-if(!file.exists("data/daily-2022-10-19.rds")) {
+if(!file.exists(here("data", "daily-2022-10-19.rds"))) {
   daily <- az_daily(start_date = max(daily_hist$datetime) + 1,
                     end_date = "2022-10-19")
   
   #save these data
-  write_rds(daily, "data/daily-2022-10-19.rds")
+  write_rds(daily, here("data", "daily-2022-10-19.rds"))
 }
 
 # Read in already existing data, extract last date, retrieve data since that date
-daily_old <- read_rds("data/daily-2022-10-19.rds")
+daily_old <- read_rds(here("data", "daily-2022-10-19.rds"))
 lastdate <- max(daily_old$datetime)
 
 daily_new <- az_daily(start_date = lastdate + 1)
@@ -240,224 +240,69 @@ daily_ts_sub |>
   autoplot()
 ```
 
-# Choosing and fitting models
+# QA workflow
 
-## Sliding windows
+0.  Choose and validate models for each variable (see @sec-forecasting)
 
-I'll explore the sliding window quantile approach used in [@faybishenko2021].
-I'll use `slider` because it's tidyverse-friendly and I want to learn it.
-I'll use a rolling, centered, 6-month window to calculate upper and lower 95% and 99% quantiles.
-Anything outside of the rolling 99% quantile is an "extreme" value, which @faybishenko2021 assumed was bad data, and anything between the 95% and 99% quantile is an "outlier" which is suspect, but not necessarily bad.
-
-In the plots below, I only show a few stations for clarity.
-
-### Mean Air Temp
+1.  Fit model to all data but most recent day
 
 ```{r}
-#| code-fold: true
-temp_roll_test <-
-  daily_ts |> 
-  select(temp_air_meanC) |> 
-  group_by_key() |> 
+sol_hist <- 
+  daily_ts_sub |> 
+  select(sol_rad_total) |> 
+  filter(datetime < max(datetime))
+
+sol_new <-
+  daily_ts_sub |> 
+  select(sol_rad_total) |> 
+  filter(datetime == max(datetime))
+
+sol_fit <- #TODO construct for a list of variables 
+  sol_hist |> 
+  model(sol = SNAIVE(sol_rad_total ~ lag("1 year")))
+
+```
+
+2.  Forecast to new data
+
+```{r}
+sol_fc <- 
+  sol_fit |> 
+  forecast(sol_new, bootstrap = TRUE)
+```
+
+3.  Check if data is inside prediction intervals
+
+```{r}
+flags <-
+  left_join(as_tibble(sol_new), as_tibble(sol_fc |> hilo() |> select(-sol_rad_total))) |> 
+  # make an outlier for testing
+  mutate(sol_rad_total = if_else(meta_station_id == "az01", 10, sol_rad_total)) |> 
   mutate(
-    rolling_median = slide_dbl(
-      temp_air_meanC,
-      median,
-      .before = 90,
-      .after  = 90,
-      .complete = TRUE
-    )
-  ) |>
-  mutate(upper95 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.975), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |>
-  mutate(lower95 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.025), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(upper99 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.999), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(lower99 = slide_dbl(
-    temp_air_meanC,
-    \(x) quantile(x, c(0.001), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(QA = case_when(
-    temp_air_meanC > lower99 & temp_air_meanC < lower95 ~ "outlier",
-    temp_air_meanC > upper95 & temp_air_meanC < upper99 ~ "outlier",
-    temp_air_meanC < lower99 ~ "extreme",
-    temp_air_meanC > upper99 ~ "extreme",
-    is.na(temp_air_meanC) ~ NA_character_
-  )) 
+    outlier = if_else(sol_rad_total < `80%`$lower | sol_rad_total > `80%`$upper,
+                      "sol_rad_total",
+                      NA_character_),
+    extreme = if_else(sol_rad_total < `95%`$lower | sol_rad_total > `95%`$upper,
+                      "sol_rad_total",
+                      NA_character_)
+         ) |> 
+  select(meta_station_id, meta_station_name, datetime, sol_rad_total, outlier, extreme)
+flags
 ```
+
+4.  Join back into data??
+
+Here we'd need to deal with the possibility of multiple flags per observation
 
 ```{r}
-#| code-fold: true
-temp_roll_test |> 
- filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
-  ggplot(aes(x = datetime)) +
-  geom_point(aes(y = temp_air_meanC, color = QA), size = 0.5, alpha = 0.5) +
-  geom_line(aes(y = rolling_median)) +
-  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.3) +
-  geom_ribbon(aes(ymin = lower99, ymax = upper99), alpha = 0.3) +
-  facet_wrap(~meta_station_name)
+left_join(daily_ts_sub, flags, by = c("meta_station_id", "meta_station_name", "datetime")) |> 
+  arrange(desc(datetime)) |> 
+  select(outlier, extreme, everything())
 ```
 
-### Solar radiation
+# Learning about forecasting {#sec-forecasting}
 
-```{r}
-#| code-fold: true
-
-sol_roll_test <-
-  daily_ts |> 
-  group_by_key() |>
-  select(sol_rad_total) |>
-  mutate(
-    sol_rolling_median = slide_dbl(
-      sol_rad_total,
-      median,
-      .before = 90,
-      .after  = 90,
-      .complete = TRUE
-    )
-  ) |>
-  mutate(sol_upper95 = slide_dbl(
-    sol_rad_total,
-    \(x) quantile(x, c(0.975), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |>
-  mutate(sol_lower95 = slide_dbl(
-    sol_rad_total,
-    \(x) quantile(x, c(0.025), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(sol_upper99 = slide_dbl(
-    sol_rad_total,
-    \(x) quantile(x, c(0.999), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(sol_lower99 = slide_dbl(
-    sol_rad_total,
-    \(x) quantile(x, c(0.001), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(QA = case_when(
-    sol_rad_total > sol_lower99 & sol_rad_total < sol_lower95 ~ "outlier",
-    sol_rad_total > sol_upper95 & sol_rad_total < sol_upper99 ~ "outlier",
-    sol_rad_total < sol_lower99 ~ "extreme",
-    sol_rad_total > sol_upper99 ~ "extreme",
-    is.na(sol_rad_total) ~ NA_character_
-  )) 
-
-```
-
-```{r}
-#| code-fold: true
-sol_roll_test |> 
- filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
-  ggplot(aes(x = datetime)) +
-  geom_point(aes(y = sol_rad_total, color = QA), size = 0.5) +
-  geom_line(aes(y = sol_rolling_median)) +
-  geom_ribbon(aes(ymin = sol_lower95, ymax = sol_upper95), alpha = 0.3) +
-  geom_ribbon(aes(ymin = sol_lower99, ymax = sol_upper99), alpha = 0.3) +
-  facet_wrap(~meta_station_name)
-```
-
-### Precipitation
-
-```{r}
-#| code-fold: true
-precip_roll_test <-
-  daily_ts |> 
-  select(precip_total_mm) |> 
-  group_by_key() |> 
-  mutate(
-    precip_rolling_median = slide_dbl(
-      precip_total_mm,
-      median,
-      .before = 90,
-      .after  = 90,
-      .complete = TRUE
-    )
-  ) |>
-  mutate(precip_upper95 = slide_dbl(
-    precip_total_mm,
-    \(x) quantile(x, c(0.975), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |>
-  mutate(precip_lower95 = slide_dbl(
-    precip_total_mm,
-    \(x) quantile(x, c(0.025), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(precip_upper99 = slide_dbl(
-    precip_total_mm,
-    \(x) quantile(x, c(0.999), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(precip_lower99 = slide_dbl(
-    precip_total_mm,
-    \(x) quantile(x, c(0.001), na.rm = TRUE),
-    .before = 90,
-    .after  = 90,
-    .complete = TRUE
-  )) |> 
-  mutate(QA = case_when(
-    precip_total_mm > precip_lower99 & precip_total_mm < precip_lower95 ~ "outlier",
-    precip_total_mm > precip_upper95 & precip_total_mm < precip_upper99 ~ "outlier",
-    precip_total_mm < precip_lower99 ~ "extreme",
-    precip_total_mm > precip_upper99 ~ "extreme",
-    is.na(precip_total_mm) ~ NA_character_
-  )) 
-```
-
-```{r}
-#| code-fold: true
-precip_roll_test |> 
- filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
-  ggplot(aes(x = datetime)) +
-  geom_point(aes(y = precip_total_mm, color = QA), size = 0.5) +
-  # geom_line(aes(y = precip_rolling_median)) +
-  geom_ribbon(aes(ymin = precip_lower95, ymax = precip_upper95), alpha = 0.3) +
-  geom_ribbon(aes(ymin = precip_lower99, ymax = precip_upper99), alpha = 0.3) +
-  facet_wrap(~meta_station_name)
-```
-
-Seems a little overzealous with precip.
-Likely because an emprical distribution is not really appropriate for precip data.
-
-## Forecasting
-
-
-### Timeseries decomposition
+## Timeseries decomposition
 
 Timeseries decomposition doesn't work when there is missing data.
 There are `NA`s for Harquahala and Bowie stations, so I guess I'll have to omit those until I figure out how to do this with missing data.
@@ -469,16 +314,12 @@ daily_ts_sub |> filter(is.na(sol_rad_total))
 ```{r}
 dcmp <- 
   daily_ts_sub |> 
-  # filter(meta_station_id == first(meta_station_id)) |> 
-  model(stl = STL(sol_rad_total~season("1_year"), iterations = 3)) |> 
+  filter(meta_station_id == first(meta_station_id)) |> #just use one station for now
+  model(stl = STL(sol_rad_total ~ season("1_year"))) |> 
   filter(meta_station_id %in% c("az01", "az06"))
 components(dcmp)
 ```
 
-::: callout-note
-`STL()` is only one possible algorithm (?) for timeseries decomposition.
-`fable::ETS()` is another example.
-:::
 
 ```{r}
 components(dcmp) |>
@@ -490,20 +331,8 @@ components(dcmp) |>
 components(dcmp) |> autoplot()
 ```
 
-Other STL variations
 
-```{r}
-daily_ts_sub |> 
-  filter(meta_station_id == first(meta_station_id)) |>
-  model(
-    STL(sol_rad_total ~ trend() + 
-                        season(period = "1_year"), 
-        robust = TRUE)) |> 
-  components() |> 
-  autoplot()
-```
-
-### Timeseries Features
+## Timeseries Features
 
 ```{r}
 daily_ts_sub |> 
@@ -522,7 +351,7 @@ daily_ts_sub |>
 
 ```
 
-### Forecasting
+## Timeseries Models
 
 Train a model.
 IN this case, a simple timeseries linear model (TSLM)
@@ -532,6 +361,7 @@ fit_tslm <- daily_ts_sub |>
   model(TSLM(sol_rad_total~ trend())) 
 fit_tslm
 ```
+
 A slightly fancier model: seasonal naïve
 
 ```{r}
@@ -540,6 +370,20 @@ fit_snaive <- daily_ts_sub |>
 fit_snaive
 ```
 
+
+A model including timeseries decomposition:
+
+```{r}
+fit_dcmp <-
+  daily_ts_sub |> 
+  model(stlf = decomposition_model(
+    STL(sol_rad_total ~ season(period = "1 year")),
+    NAIVE(season_adjust)
+  ))
+```
+
+
+## Forecasting methods
 
 Produce forecasts
 
@@ -584,28 +428,24 @@ residuals are autocorrelated and they shouldn't be!
 ```{r}
 fit_snaive |> filter(meta_station_id == "az01") |> gg_tsresiduals()
 ```
+
 Could use bootstrapped residuals.
 
 ```{r}
 fc <- fit_snaive |> forecast(h = "1 month", bootstrap = TRUE)
 fc
 ```
+
 ```{r}
 fc |> 
   filter(meta_station_name == "Tucson") |> 
   autoplot(daily_ts_sub |> filter(year(datetime)>2021))
 ```
 
-
 Can do forecasting after decomposition
 
 ```{r}
-fit_dcmp <-
-  daily_ts_sub |> 
-  model(stlf = decomposition_model(
-    STL(sol_rad_total ~ season(period = "1 year")),
-    NAIVE(season_adjust)
-  ))
+
 fit_dcmp |> 
   forecast(h = "1 month") |> 
   filter(meta_station_id ==  "az01") |> 
@@ -619,6 +459,8 @@ fit_dcmp |> filter(meta_station_id == "az01") |> gg_tsresiduals()
 Better??
 
 Let's find out
+
+## Model/forecast diagnostics
 
 ```{r}
 sol_rad_train <- 
@@ -657,65 +499,3 @@ accuracy(fc, sol_rad_test, list(winkler = winkler_score), level = 80)
 ```
 
 best method here is seasonal naive
-
-
-# QA workflow
-
-0. Choose and validate models for each variable (see [#Forecasting])
-
-1. Fit model to all data but most recent day
-
-```{r}
-sol_hist <- 
-  daily_ts_sub |> 
-  select(sol_rad_total) |> 
-  filter(datetime < max(datetime))
-
-sol_new <-
-  daily_ts_sub |> 
-  select(sol_rad_total) |> 
-  filter(datetime == max(datetime))
-
-sol_fit <- #TODO construct for a list of variables 
-  sol_hist |> 
-  model(sol = SNAIVE(sol_rad_total ~ lag("1 year")))
-
-```
-
-2. Forecast to new data
-
-```{r}
-sol_fc <- 
-  sol_fit |> 
-  forecast(sol_new, bootstrap = TRUE)
-```
-
-3. Check if data is inside prediction intervals
-
-```{r}
-flags <-
-  left_join(as_tibble(sol_new), as_tibble(sol_fc |> hilo() |> select(-sol_rad_total))) |> 
-  # make an outlier for testing
-  mutate(sol_rad_total = if_else(meta_station_id == "az01", 10, sol_rad_total)) |> 
-  mutate(
-    outlier = if_else(sol_rad_total < `80%`$lower | sol_rad_total > `80%`$upper,
-                      "sol_rad_total",
-                      NA_character_),
-    extreme = if_else(sol_rad_total < `95%`$lower | sol_rad_total > `95%`$upper,
-                      "sol_rad_total",
-                      NA_character_)
-         ) |> 
-  select(meta_station_id, meta_station_name, datetime, sol_rad_total, outlier, extreme)
-flags
-```
-
-4.  Join back into data??
-
-Here we'd need to deal with the possibility of multiple flags per observation
-
-```{r}
-left_join(daily_ts_sub, flags, by = c("meta_station_id", "meta_station_name", "datetime")) |> 
-  arrange(desc(datetime)) |> 
-  select(outlier, extreme, everything())
-```
-
