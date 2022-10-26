@@ -102,21 +102,19 @@ Any rows marked as needing review?
 daily_ts |> filter(meta_needs_review != 0)
 ```
 
-
 Check extreme values:
 
 ```{r}
 daily_ts |> filter(temp_air_meanC > 200)
 ```
 
-Looks like historic data uses 999 for NA probably. I'll set those to `NA`
+Looks like historic data uses 999 for NA probably.
+I'll set those to `NA`
 
 ```{r}
 daily_ts <- daily_ts |> 
   mutate(across(where(is.numeric), \(x) if_else(x == 999, NA_real_, x)))
 ```
-
-
 
 Any gaps in the data?
 
@@ -129,7 +127,6 @@ yes, let's make them explicit NAs
 ```{r}
 daily_ts <- fill_gaps(daily_ts, .full = TRUE)
 ```
-
 
 Check that gaps were made explicit:
 
@@ -169,8 +166,6 @@ daily_ts_sub |>
 
 Some variables are incomplete or have a short time gap.
 This may make forecasting difficult.
-
-
 
 ## Mean Air Temp
 
@@ -244,7 +239,6 @@ daily_ts_sub |>
   ACF(precip_total_mm, lag_max = 180) |> 
   autoplot()
 ```
-
 
 # Choosing and fitting models
 
@@ -456,8 +450,9 @@ precip_roll_test |>
   geom_ribbon(aes(ymin = precip_lower99, ymax = precip_upper99), alpha = 0.3) +
   facet_wrap(~meta_station_name)
 ```
-Seems a little overzealous with precip.  Likely because an emprical distribution is not really appropriate for precip data.
 
+Seems a little overzealous with precip.
+Likely because an emprical distribution is not really appropriate for precip data.
 
 ## Forecasting
 
@@ -474,10 +469,15 @@ daily_ts_sub |> filter(is.na(sol_rad_total))
 dcmp <- 
   daily_ts_sub |> 
   # filter(meta_station_id == first(meta_station_id)) |> 
-  model(stl = STL(sol_rad_total, iterations = 3)) |> 
+  model(stl = STL(sol_rad_total~season("1_year"), iterations = 3)) |> 
   filter(meta_station_id %in% c("az01", "az06"))
 components(dcmp)
 ```
+
+::: callout-note
+`STL()` is only one possible algorithm (?) for timeseries decomposition.
+`fable::ETS()` is another example.
+:::
 
 ```{r}
 components(dcmp) |>
@@ -489,11 +489,232 @@ components(dcmp) |>
 components(dcmp) |> autoplot()
 ```
 
-Hmm... I feel like trend should be smoother and `season_week` should be `season_month` or something instead.
+Other STL variations
 
 ```{r}
-components(dcmp) |> 
-  as_tsibble() |> 
-  autoplot(sol_rad_total, color = "grey")
-  
+daily_ts_sub |> 
+  filter(meta_station_id == first(meta_station_id)) |>
+  model(
+    STL(sol_rad_total ~ trend() + 
+                        season(period = "1_year"), 
+        robust = TRUE)) |> 
+  components() |> 
+  autoplot()
 ```
+
+### Timeseries Features
+
+```{r}
+daily_ts_sub |> 
+  features(sol_rad_total, list(
+    mean = \(x) mean(x, na.rm = TRUE)
+  )) |> arrange(mean)
+```
+
+```{r}
+daily_ts_sub |> features(sol_rad_total, feat_acf)
+daily_ts_sub |> features(sol_rad_total, feat_stl) 
+
+#can't figure out how to set period correctly
+daily_ts_sub |> 
+  features(sol_rad_total, features = list(\(x) feat_stl(x, .period = "1 year")))
+
+```
+
+### Forecasting
+
+Train a model.
+IN this case, a simple timeseries linear model (TSLM)
+
+```{r}
+fit_tslm <- daily_ts_sub |> 
+  model(TSLM(sol_rad_total~ trend())) 
+fit_tslm
+```
+A slightly fancier model: seasonal naïve
+
+```{r}
+fit_snaive <- daily_ts_sub |> 
+  model(SNAIVE(sol_rad_total ~ lag("1 year")))
+fit_snaive
+```
+
+
+Produce forecasts
+
+```{r}
+fit_tslm |> forecast(h = "3 months")
+fit_tslm |> 
+  forecast(h = "3 months") |> 
+  filter(meta_station_name == "Tucson") |> 
+  autoplot(daily_ts_sub |> filter(year(datetime)>2021))
+```
+
+A very bad forecast because there is no trend here.
+
+What about "seasonal naïve"
+
+```{r}
+fit_snaive |> 
+  forecast(h = "1 month") |> 
+  filter(meta_station_name == "Tucson") |> 
+  autoplot(daily_ts_sub |> filter(year(datetime)>2021))
+```
+
+OOf, those prediction inteverals are WIDE.
+
+Check residuals
+
+```{r}
+augment(fit_snaive) |> 
+  ggplot(aes(.innov)) +
+  geom_histogram()
+```
+
+residuals are leptokurtic and should be normal!
+
+```{r}
+augment(fit_snaive) |> 
+  ACF(.innov) |> autoplot()
+```
+
+residuals are autocorrelated and they shouldn't be!
+
+```{r}
+fit_snaive |> filter(meta_station_id == "az01") |> gg_tsresiduals()
+```
+Could use bootstrapped residuals.
+
+```{r}
+fc <- fit_snaive |> forecast(h = "1 month", bootstrap = TRUE)
+fc
+```
+```{r}
+fc |> 
+  filter(meta_station_name == "Tucson") |> 
+  autoplot(daily_ts_sub |> filter(year(datetime)>2021))
+```
+
+
+Can do forecasting after decomposition
+
+```{r}
+fit_dcmp <-
+  daily_ts_sub |> 
+  model(stlf = decomposition_model(
+    STL(sol_rad_total ~ season(period = "1 year")),
+    NAIVE(season_adjust)
+  ))
+fit_dcmp |> 
+  forecast(h = "1 month") |> 
+  filter(meta_station_id ==  "az01") |> 
+  autoplot(daily_ts_sub |> filter(year(datetime)>2021))
+```
+
+```{r}
+fit_dcmp |> filter(meta_station_id == "az01") |> gg_tsresiduals()
+```
+
+Better??
+
+Let's find out
+
+```{r}
+sol_rad_train <- 
+  daily_ts_sub |> 
+  filter(meta_station_id == "az01") |> 
+  filter(year(datetime) < 2022) |> 
+  select(sol_rad_total)
+
+sol_rad_test <- 
+  daily_ts_sub |> 
+  filter(meta_station_id == "az01") |> 
+  filter(year(datetime) >= 2022) |> 
+  select(sol_rad_total)
+
+fit_compare <- 
+  sol_rad_train |> 
+  model(
+    mean = MEAN(sol_rad_total),
+    naive = NAIVE(sol_rad_total),
+    snaive = SNAIVE(sol_rad_total ~ lag("1 year")),
+    drift = RW(sol_rad_total ~ drift()),
+    stlf = decomposition_model(
+      STL(sol_rad_total ~ season(period = "1 year")),
+      NAIVE(season_adjust)
+    )
+  )
+
+fc <- fit_compare |> forecast(sol_rad_test)
+fc |> 
+  autoplot(bind_rows(sol_rad_train, sol_rad_test) |> filter(year(datetime)>=2021), level = NULL)
+accuracy(fc, sol_rad_test)
+
+#winkler score evaluates prediction interval accuracy
+
+accuracy(fc, sol_rad_test, list(winkler = winkler_score), level = 80)
+```
+
+best method here is seasonal naive
+
+
+# QA workflow
+
+0. Choose and validate models for each variable (see [#Forecasting])
+
+1. Fit model to all data but most recent day
+
+```{r}
+sol_hist <- 
+  daily_ts_sub |> 
+  select(sol_rad_total) |> 
+  filter(datetime < max(datetime))
+
+sol_new <-
+  daily_ts_sub |> 
+  select(sol_rad_total) |> 
+  filter(datetime == max(datetime))
+
+sol_fit <- #TODO construct for a list of variables 
+  sol_hist |> 
+  model(sol = SNAIVE(sol_rad_total ~ lag("1 year")))
+
+```
+
+2. Forecast to new data
+
+```{r}
+sol_fc <- 
+  sol_fit |> 
+  forecast(sol_new, bootstrap = TRUE)
+```
+
+3. Check if data is inside prediction intervals
+
+```{r}
+flags <-
+  left_join(as_tibble(sol_new), as_tibble(sol_fc |> hilo() |> select(-sol_rad_total))) |> 
+  # make an outlier for testing
+  mutate(sol_rad_total = if_else(meta_station_id == "az01", 10, sol_rad_total)) |> 
+  mutate(
+    outlier = if_else(sol_rad_total < `80%`$lower | sol_rad_total > `80%`$upper,
+                      "sol_rad_total",
+                      NA_character_),
+    extreme = if_else(sol_rad_total < `95%`$lower | sol_rad_total > `95%`$upper,
+                      "sol_rad_total",
+                      NA_character_)
+         ) |> 
+  select(meta_station_id, meta_station_name, datetime, sol_rad_total, outlier, extreme)
+flags
+```
+
+4.  Join back into data??
+
+Here we'd need to deal with the possibility of multiple flags per observation
+
+```{r}
+left_join(daily_ts_sub, flags, by = c("meta_station_id", "meta_station_name", "datetime")) |> 
+  arrange(desc(datetime)) |> 
+  select(outlier, extreme, everything())
+```
+
