@@ -334,10 +334,15 @@
     },
     "distributional": {
       "Package": "distributional",
-      "Version": "0.3.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "be08f142d0b48ff1c8cfe39e1e3ac1c8",
+      "Version": "0.3.1.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "mitchelloharawild",
+      "RemoteRepo": "distributional",
+      "RemoteRef": "master",
+      "RemoteSha": "1a228040f3849f2b28e332a8fb616addef59f214",
+      "Hash": "3ab4a4c722cf0131bec89bdbeca41729",
       "Requirements": [
         "digest",
         "farver",
@@ -425,10 +430,16 @@
     },
     "fabletools": {
       "Package": "fabletools",
-      "Version": "0.3.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c63fb3d5a3377aec8e4cfa56b94f3d8d",
+      "Version": "0.3.2.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "tidyverts",
+      "RemoteRepo": "fabletools",
+      "RemoteRef": "master",
+      "RemoteSha": "f8a8baab1e40f2978958fd02c35f42a43abc0cd2",
+      "Remotes": "mitchelloharawild/distributional",
+      "Hash": "968cc4e04fe21efb05991538f7a2dd9b",
       "Requirements": [
         "R6",
         "distributional",
@@ -640,6 +651,16 @@
         "tibble",
         "tidyselect",
         "vctrs"
+      ]
+    },
+    "here": {
+      "Package": "here",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "24b224366f9c2e7534d2344d10d59211",
+      "Requirements": [
+        "rprojroot"
       ]
     },
     "highr": {
@@ -1074,6 +1095,14 @@
         "xfun",
         "yaml"
       ]
+    },
+    "rprojroot": {
+      "Package": "rprojroot",
+      "Version": "2.0.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1de7ab598047a87bba48434ba35d497d",
+      "Requirements": []
     },
     "rstudioapi": {
       "Package": "rstudioapi",
