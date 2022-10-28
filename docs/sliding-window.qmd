@@ -36,9 +36,8 @@ In the plots below, I only show a few stations for clarity.
 # Load Data
 
 ```{r}
-tar_load(daily)
+targets::tar_load(daily)
 ```
-
 
 ## Mean Air Temp
 

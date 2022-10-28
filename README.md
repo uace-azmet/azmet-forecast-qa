@@ -16,7 +16,7 @@ The goal of azmet-qaqc is to create scripts to run QA/QC on AZMet data.
 Rendered reports available as well:
 
 - [QA by Forecasting](https://cct-datascience.github.io/azmet-qaqc/QA/azmet-qaqc.html)
-- [Sliding Window Quantiles](https://cct-datascience.github.io/azmet-qaqc/QA/sliding-window.html)
+- [Sliding Window Quantiles](https://cct-datascience.github.io/azmet-qaqc/docs/sliding-window.html)
 
 ## Collaboration guidelines
 

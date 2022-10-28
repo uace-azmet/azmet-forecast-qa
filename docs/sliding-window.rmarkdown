@@ -1,0 +1,253 @@
+---
+title: "Sliding window approach"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    
+editor: visual
+bibliography: references.bib
+---
+
+```{r setup}
+#| echo: true
+#| code-fold: false
+#| warning: false
+#| message: false
+
+# remotes::install_github("cct-datascience/azmetr")
+library(azmetr)
+library(tsibble)
+library(tidyverse)
+library(lubridate)
+library(slider)
+library(here)
+```
+
+
+# Sliding windows
+
+I'll explore the sliding window quantile approach used in [@faybishenko2021].
+I'll use `slider` because it's tidyverse-friendly and I want to learn it.
+I'll use a rolling, centered, 6-month window to calculate upper and lower 95% and 99% quantiles.
+Anything outside of the rolling 99% quantile is an "extreme" value, which @faybishenko2021 assumed was bad data, and anything between the 95% and 99% quantile is an "outlier" which is suspect, but not necessarily bad.
+
+In the plots below, I only show a few stations for clarity.
+
+# Load Data
+
+
+```{r}
+targets::tar_load(daily)
+```
+
+
+## Mean Air Temp
+
+
+```{r}
+#| code-fold: true
+temp_roll_test <-
+  daily |> 
+  select(temp_air_meanC) |> 
+  group_by_key() |> 
+  mutate(
+    rolling_median = slide_dbl(
+      temp_air_meanC,
+      median,
+      .before = 90,
+      .after  = 90,
+      .complete = TRUE
+    )
+  ) |>
+  mutate(upper95 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.975), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |>
+  mutate(lower95 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.025), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(upper99 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.999), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(lower99 = slide_dbl(
+    temp_air_meanC,
+    \(x) quantile(x, c(0.001), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(QA = case_when(
+    temp_air_meanC > lower99 & temp_air_meanC < lower95 ~ "outlier",
+    temp_air_meanC > upper95 & temp_air_meanC < upper99 ~ "outlier",
+    temp_air_meanC < lower99 ~ "extreme",
+    temp_air_meanC > upper99 ~ "extreme",
+    is.na(temp_air_meanC) ~ NA_character_
+  )) 
+```
+
+```{r}
+#| code-fold: true
+temp_roll_test |> 
+ filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
+  ggplot(aes(x = datetime)) +
+  geom_point(aes(y = temp_air_meanC, color = QA), size = 0.5, alpha = 0.5) +
+  geom_line(aes(y = rolling_median)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.3) +
+  geom_ribbon(aes(ymin = lower99, ymax = upper99), alpha = 0.3) +
+  facet_wrap(~meta_station_name)
+```
+
+
+## Solar radiation
+
+
+```{r}
+#| code-fold: true
+
+sol_roll_test <-
+  daily |> 
+  group_by_key() |>
+  select(sol_rad_total) |>
+  mutate(
+    sol_rolling_median = slide_dbl(
+      sol_rad_total,
+      median,
+      .before = 90,
+      .after  = 90,
+      .complete = TRUE
+    )
+  ) |>
+  mutate(sol_upper95 = slide_dbl(
+    sol_rad_total,
+    \(x) quantile(x, c(0.975), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |>
+  mutate(sol_lower95 = slide_dbl(
+    sol_rad_total,
+    \(x) quantile(x, c(0.025), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(sol_upper99 = slide_dbl(
+    sol_rad_total,
+    \(x) quantile(x, c(0.999), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(sol_lower99 = slide_dbl(
+    sol_rad_total,
+    \(x) quantile(x, c(0.001), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(QA = case_when(
+    sol_rad_total > sol_lower99 & sol_rad_total < sol_lower95 ~ "outlier",
+    sol_rad_total > sol_upper95 & sol_rad_total < sol_upper99 ~ "outlier",
+    sol_rad_total < sol_lower99 ~ "extreme",
+    sol_rad_total > sol_upper99 ~ "extreme",
+    is.na(sol_rad_total) ~ NA_character_
+  )) 
+
+```
+
+```{r}
+#| code-fold: true
+sol_roll_test |> 
+ filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
+  ggplot(aes(x = datetime)) +
+  geom_point(aes(y = sol_rad_total, color = QA), size = 0.5) +
+  geom_line(aes(y = sol_rolling_median)) +
+  geom_ribbon(aes(ymin = sol_lower95, ymax = sol_upper95), alpha = 0.3) +
+  geom_ribbon(aes(ymin = sol_lower99, ymax = sol_upper99), alpha = 0.3) +
+  facet_wrap(~meta_station_name)
+```
+
+
+## Precipitation
+
+
+```{r}
+#| code-fold: true
+precip_roll_test <-
+  daily |> 
+  select(precip_total_mm) |> 
+  group_by_key() |> 
+  mutate(
+    precip_rolling_median = slide_dbl(
+      precip_total_mm,
+      median,
+      .before = 90,
+      .after  = 90,
+      .complete = TRUE
+    )
+  ) |>
+  mutate(precip_upper95 = slide_dbl(
+    precip_total_mm,
+    \(x) quantile(x, c(0.975), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |>
+  mutate(precip_lower95 = slide_dbl(
+    precip_total_mm,
+    \(x) quantile(x, c(0.025), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(precip_upper99 = slide_dbl(
+    precip_total_mm,
+    \(x) quantile(x, c(0.999), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(precip_lower99 = slide_dbl(
+    precip_total_mm,
+    \(x) quantile(x, c(0.001), na.rm = TRUE),
+    .before = 90,
+    .after  = 90,
+    .complete = TRUE
+  )) |> 
+  mutate(QA = case_when(
+    precip_total_mm > precip_lower99 & precip_total_mm < precip_lower95 ~ "outlier",
+    precip_total_mm > precip_upper95 & precip_total_mm < precip_upper99 ~ "outlier",
+    precip_total_mm < precip_lower99 ~ "extreme",
+    precip_total_mm > precip_upper99 ~ "extreme",
+    is.na(precip_total_mm) ~ NA_character_
+  )) 
+```
+
+```{r}
+#| code-fold: true
+precip_roll_test |> 
+ filter(meta_station_name %in% c("Bowie", "Harquahala", "Tucson", "Maricopa")) |>
+  ggplot(aes(x = datetime)) +
+  geom_point(aes(y = precip_total_mm, color = QA), size = 0.5) +
+  # geom_line(aes(y = precip_rolling_median)) +
+  geom_ribbon(aes(ymin = precip_lower95, ymax = precip_upper95), alpha = 0.3) +
+  geom_ribbon(aes(ymin = precip_lower99, ymax = precip_upper99), alpha = 0.3) +
+  facet_wrap(~meta_station_name)
+```
+
+
+Seems a little overzealous with precip.
+Likely because an emprical distribution is not really appropriate for precip data.
+
