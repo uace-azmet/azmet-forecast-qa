@@ -14,6 +14,8 @@ update_daily <- function(daily_hist, daily_recent) {
     )) 
   
   # convert to tsibble
-  as_tsibble(daily, key = c(meta_station_id, meta_station_name), index = datetime)
+  as_tsibble(daily, key = c(meta_station_id, meta_station_name), index = datetime) |> 
+    #make gaps explicit
+    fill_gaps(.full = TRUE)
   
 }
