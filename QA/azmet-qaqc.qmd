@@ -4,7 +4,6 @@ format:
   html:
     toc: true
     number-sections: true
-    
 editor: visual
 bibliography: references.bib
 ---
@@ -45,58 +44,12 @@ To see a rough "sketch" of the QA workflow, skip to @sec-qa-workflow.
 
 # Gathering Information
 
-## Retrieve Data
-
-Download all the daily data available from the API.
-
-```{r import-data}
-#| cache: true
-#| code-fold: false
-
-#read in historic data
-daily_hist <- read_csv(here("data", "daily_hist.csv"))
-
-#get data from end of historic data until 2022-10-19
-if(!file.exists(here("data", "daily-2022-10-19.rds"))) {
-  daily <- az_daily(start_date = max(daily_hist$datetime) + 1,
-                    end_date = "2022-10-19")
-  
-  #save these data
-  write_rds(daily, here("data", "daily-2022-10-19.rds"))
-}
-
-# Read in already existing data, extract last date, retrieve data since that date
-daily_old <- read_rds(here("data", "daily-2022-10-19.rds"))
-lastdate <- max(daily_old$datetime)
-
-daily_new <- az_daily(start_date = lastdate + 1)
-
-daily <- bind_rows(daily_old, daily_new)
-
-#join to historic data
-
-daily <- bind_rows(daily_hist, daily) 
-```
-
-Find and resolve duplicates
+Load data
 
 ```{r}
-duplicates(daily, key = c(meta_station_id, meta_station_name), index = datetime)
-
-daily <- daily |>
-  filter(!are_duplicated(
-    daily,
-    key = c(meta_station_id, meta_station_name),
-    index = datetime
-  ))
+tar_load(daily)
 ```
 
-Convert to tsibble for exploration
-
-```{r}
-#| code-fold: false
-daily_ts <- as_tsibble(daily, key = c(meta_station_id, meta_station_name), index = datetime)
-```
 
 Any rows marked as needing review?
 

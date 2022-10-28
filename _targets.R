@@ -5,11 +5,11 @@
 
 # Load packages required to define the pipeline:
 library(targets)
-# library(tarchetypes) # Load other packages as needed. # nolint
+library(tarchetypes) # Load other packages as needed. # nolint
 
 # Set target options:
 tar_option_set(
-  packages = c("tibble"), # packages that your targets need to run
+  packages = c("tibble", "tidyverse", "azmetr", "tsibble"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -26,13 +26,8 @@ tar_source()
 
 # Replace the target list below with your own:
 tar_plan(
-  tar_target(
-    name = data,
-    command = tibble(x = rnorm(100), y = rnorm(100))
-#   format = "feather" # efficient storage of large data frames # nolint
-  ),
-  tar_target(
-    name = model,
-    command = coefficients(lm(y ~ x, data = data))
-  )
+  tar_file(hist_file, "data/daily_hist.csv"),
+  daily_hist = read_csv(hist_file),
+  daily_recent = get_daily_recent(daily_hist),
+  daily = update_daily(daily_hist, daily_recent)
 )
