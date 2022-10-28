@@ -9,7 +9,17 @@ library(tarchetypes) # Load other packages as needed. # nolint
 
 # Set target options:
 tar_option_set(
-  packages = c("tibble", "tidyverse", "azmetr", "tsibble"), # packages that your targets need to run
+  packages = c(
+    "tibble",
+    "tidyverse",
+    "azmetr",
+    "tsibble",
+    "quarto",
+    "lubridate",
+    "fable",
+    "fabletools",
+    "feasts"
+  ), 
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -26,8 +36,27 @@ tar_source()
 
 # Replace the target list below with your own:
 tar_plan(
+
+# Read and wrangle data ---------------------------------------------------
   tar_file(hist_file, "data/daily_hist.csv"),
   daily_hist = read_wrangle_hist(hist_file),
   daily_recent = get_daily_recent(daily_hist),
-  daily = update_daily(daily_hist, daily_recent)
+  daily = update_daily(daily_hist, daily_recent),
+  daily_train = daily |> filter(datetime < max(datetime)), 
+  daily_test = daily |> filter(datetime == max(datetime)),
+
+# Modeling ----------------------------------------------------------------
+
+  ts_sol_rad = fit_ts_sol_rad(daily_train),
+  # ts_temp = ,
+  # ts_precip = ,
+
+# Forecasting -------------------------------------------------------------
+
+  fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
+
+# Reports -----------------------------------------------------------------
+  # tar_quarto(sliding_window, "docs/sliding-window.qmd"),
+  
+  
 )

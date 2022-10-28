@@ -545,6 +545,30 @@
       "Hash": "7c89603d81793f0d5486d91ab1fc6f1d",
       "Requirements": []
     },
+    "future": {
+      "Package": "future",
+      "Version": "1.28.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f3e26a942d4ee32cec9403e1ddd7000b",
+      "Requirements": [
+        "digest",
+        "globals",
+        "listenv",
+        "parallelly"
+      ]
+    },
+    "future.callr": {
+      "Package": "future.callr",
+      "Version": "0.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "d56e31f531c20af2415a3971ca0b3c3c",
+      "Requirements": [
+        "callr",
+        "future"
+      ]
+    },
     "gargle": {
       "Package": "gargle",
       "Version": "1.2.1",
@@ -588,6 +612,16 @@
         "scales",
         "tibble",
         "withr"
+      ]
+    },
+    "globals": {
+      "Package": "globals",
+      "Version": "0.16.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e14798793892c6bebdbe2f144aacf6e6",
+      "Requirements": [
+        "codetools"
       ]
     },
     "glue": {
@@ -824,6 +858,14 @@
         "rlang"
       ]
     },
+    "listenv": {
+      "Package": "listenv",
+      "Version": "0.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0bde42ee282efb18c7c4e63822f5b4f7",
+      "Requirements": []
+    },
     "lubridate": {
       "Package": "lubridate",
       "Version": "1.8.0",
@@ -927,6 +969,14 @@
       "Requirements": [
         "askpass"
       ]
+    },
+    "parallelly": {
+      "Package": "parallelly",
+      "Version": "1.32.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9e3d8d65cb9c5ca5966340a6bfec60b2",
+      "Requirements": []
     },
     "pillar": {
       "Package": "pillar",
