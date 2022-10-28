@@ -57,6 +57,6 @@ tar_plan(
 
 # Reports -----------------------------------------------------------------
   # tar_quarto(sliding_window, "docs/sliding-window.qmd"),
-  
+  tar_quarto(report, "docs/report.qmd")
   
 )
