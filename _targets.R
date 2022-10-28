@@ -27,7 +27,7 @@ tar_source()
 # Replace the target list below with your own:
 tar_plan(
   tar_file(hist_file, "data/daily_hist.csv"),
-  daily_hist = read_csv(hist_file),
+  daily_hist = read_wrangle_hist(hist_file),
   daily_recent = get_daily_recent(daily_hist),
   daily = update_daily(daily_hist, daily_recent)
 )
