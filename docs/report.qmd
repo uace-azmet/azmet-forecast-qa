@@ -14,10 +14,20 @@ tar_load(c(
   ))
 ```
 
+What would be cool here is a table with variable name and check or red x for pass or fail QA.  These would have links to relevant sections below with plots and tables.
+
+
 ```{r}
-x <- fc_sol_rad |> hilo(c(95, 99)) |> select(-sol_rad_total, -.model) |> 
+x <- 
+  fc_sol_rad |>
+  hilo(c(95, 99)) |> 
+  select(-sol_rad_total, -.model) |> 
   mutate(across(where(~inherits(., "hilo")), ~round(., 3)))
-y <-tar_read(daily_test) |> select(sol_rad_total)
+
+y <-
+  tar_read(daily_test) |>
+  select(sol_rad_total)
+
 right_join(x,y, by = c("meta_station_id", "meta_station_name", "datetime")) |> 
   select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean)
 ```

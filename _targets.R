@@ -54,6 +54,8 @@ tar_plan(
 # Forecasting -------------------------------------------------------------
 
   fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
+  # fc_remp = ,
+  # fc_precip = ,
 
 # Reports -----------------------------------------------------------------
   # tar_quarto(sliding_window, "docs/sliding-window.qmd"),
