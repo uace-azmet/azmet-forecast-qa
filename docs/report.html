@@ -157,21 +157,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(x,y, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"meta_station_id"</span>, <span class="st">"meta_station_name"</span>, <span class="st">"datetime"</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(meta_station_id, meta_station_name, datetime, sol_rad_total, <span class="at">forecast =</span> .mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 37 x 5 [?]
-# Key:       meta_station_id, meta_station_name [37]
+<pre><code># A tsibble: 28 x 5 [?]
+# Key:       meta_station_id, meta_station_name [28]
    meta_station_id meta_station_name datetime   sol_rad_total forecast
    &lt;chr&gt;           &lt;chr&gt;             &lt;date&gt;             &lt;dbl&gt;    &lt;dbl&gt;
  1 az01            Tucson            2022-10-31          17.8     16.8
  2 az02            Yuma Valley       2022-10-31          15.7     15.5
- 3 az03            Yuma Mesa         2022-10-31          NA       NA  
- 4 az04            Safford           2022-10-31          16.6     16.1
- 5 az05            Coolidge          2022-10-31          17.3     16.4
- 6 az06            Maricopa          2022-10-31          16.6     16.3
- 7 az07            Aguila            2022-10-31          16.5     16.2
- 8 az08            Parker            2022-10-31          11.8     15.4
- 9 az09            Bonita            2022-10-31          17.3     16.6
-10 az10            Citrus Farm       2022-10-31          NA       NA  
-# … with 27 more rows</code></pre>
+ 3 az04            Safford           2022-10-31          16.6     16.1
+ 4 az05            Coolidge          2022-10-31          17.3     16.4
+ 5 az06            Maricopa          2022-10-31          16.6     16.3
+ 6 az07            Aguila            2022-10-31          16.5     16.2
+ 7 az08            Parker            2022-10-31          11.8     15.4
+ 8 az09            Bonita            2022-10-31          17.3     16.6
+ 9 az12            Phoenix Greenway  2022-10-31          16.2     15.8
+10 az14            Yuma N.Gila       2022-10-31          16.4     15.8
+# … with 18 more rows</code></pre>
 </div>
 </div>
 
