@@ -4,7 +4,6 @@ format:
   html:
     toc: true
     number-sections: true
-    
 editor: visual
 bibliography: references.bib
 ---
@@ -41,60 +40,16 @@ Variables that need QA include:
 
 Other variables are (probably?) derived
 
+To see a rough "sketch" of the QA workflow, skip to @sec-qa-workflow.
+
 # Gathering Information
 
-## Retrieve Data
-
-Download all the daily data available from the API.
-
-```{r import-data}
-#| cache: true
-#| code-fold: false
-
-#read in historic data
-daily_hist <- read_csv(here("data", "daily_hist.csv"))
-
-#get data from end of historic data until 2022-10-19
-if(!file.exists(here("data", "daily-2022-10-19.rds"))) {
-  daily <- az_daily(start_date = max(daily_hist$datetime) + 1,
-                    end_date = "2022-10-19")
-  
-  #save these data
-  write_rds(daily, here("data", "daily-2022-10-19.rds"))
-}
-
-# Read in already existing data, extract last date, retrieve data since that date
-daily_old <- read_rds(here("data", "daily-2022-10-19.rds"))
-lastdate <- max(daily_old$datetime)
-
-daily_new <- az_daily(start_date = lastdate + 1)
-
-daily <- bind_rows(daily_old, daily_new)
-
-#join to historic data
-
-daily <- bind_rows(daily_hist, daily) 
-```
-
-Find and resolve duplicates
+Load data
 
 ```{r}
-duplicates(daily, key = c(meta_station_id, meta_station_name), index = datetime)
-
-daily <- daily |>
-  filter(!are_duplicated(
-    daily,
-    key = c(meta_station_id, meta_station_name),
-    index = datetime
-  ))
+tar_load(daily)
 ```
 
-Convert to tsibble for exploration
-
-```{r}
-#| code-fold: false
-daily_ts <- as_tsibble(daily, key = c(meta_station_id, meta_station_name), index = datetime)
-```
 
 Any rows marked as needing review?
 
@@ -240,64 +195,78 @@ daily_ts_sub |>
   autoplot()
 ```
 
-# QA workflow
+# QA workflow {#sec-qa-workflow}
 
 0.  Choose and validate models for each variable (see @sec-forecasting)
 
 1.  Fit model to all data but most recent day
 
 ```{r}
+#| warning: false
+#split data into historical...
 sol_hist <- 
   daily_ts_sub |> 
   select(sol_rad_total) |> 
   filter(datetime < max(datetime))
 
+#and most recent data...
 sol_new <-
   daily_ts_sub |> 
   select(sol_rad_total) |> 
+   # make an outlier for testing
+  mutate(sol_rad_total = if_else(meta_station_id == "az01", 5, sol_rad_total)) |> 
   filter(datetime == max(datetime))
 
-sol_fit <- #TODO construct for a list of variables 
+#fit model(s) for variables
+sol_fit <- 
   sol_hist |> 
-  model(sol = SNAIVE(sol_rad_total ~ lag("1 year")))
+  model(sol = SNAIVE(sol_rad_total ~ lag("1 year"))) #seasonal naieve model, for example
 
 ```
 
 2.  Forecast to new data
 
 ```{r}
+#| warning: false
 sol_fc <- 
   sol_fit |> 
   forecast(sol_new, bootstrap = TRUE)
+```
+
+```{r}
+autoplot(
+  sol_fc, 
+  sol_hist |> 
+    filter(datetime > ymd("2022-09-01")),
+  level = c(95, 99)
+) +
+  geom_point(data = sol_new, aes(y = sol_rad_total), shape = "triangle", size = 0.7, color = "red") +
+  labs(caption= "blue dot = forecast point, red triangle = actual data")
 ```
 
 3.  Check if data is inside prediction intervals
 
 ```{r}
 flags <-
-  left_join(as_tibble(sol_new), as_tibble(sol_fc |> hilo() |> select(-sol_rad_total))) |> 
-  # make an outlier for testing
-  mutate(sol_rad_total = if_else(meta_station_id == "az01", 10, sol_rad_total)) |> 
+  left_join(as_tibble(sol_new), as_tibble(sol_fc |> hilo(c(95, 99)) |> select(-sol_rad_total))) |> 
   mutate(
-    outlier = if_else(sol_rad_total < `80%`$lower | sol_rad_total > `80%`$upper,
+    outlier = if_else(sol_rad_total < `95%`$lower | sol_rad_total > `95%`$upper,
                       "sol_rad_total",
                       NA_character_),
-    extreme = if_else(sol_rad_total < `95%`$lower | sol_rad_total > `95%`$upper,
+    extreme = if_else(sol_rad_total < `99%`$lower | sol_rad_total > `99%`$upper,
                       "sol_rad_total",
                       NA_character_)
          ) |> 
-  select(meta_station_id, meta_station_name, datetime, sol_rad_total, outlier, extreme)
+  select(meta_station_id, meta_station_name, datetime, forecast = .mean, outlier, extreme)
 flags
 ```
 
-4.  Join back into data??
-
-Here we'd need to deal with the possibility of multiple flags per observation
+4.  Create report with flags and imputed (forecast) data for extreme values
 
 ```{r}
-left_join(daily_ts_sub, flags, by = c("meta_station_id", "meta_station_name", "datetime")) |> 
+left_join(daily_ts_sub |> as_tibble(), flags, by = c("datetime", "meta_station_id")) |> 
   arrange(desc(datetime)) |> 
-  select(outlier, extreme, everything())
+  select(datetime, meta_station_id, sol_rad_total, outlier, extreme, forecast)
 ```
 
 # Learning about forecasting {#sec-forecasting}
@@ -320,7 +289,6 @@ dcmp <-
 components(dcmp)
 ```
 
-
 ```{r}
 components(dcmp) |>
   as_tsibble() |>
@@ -331,8 +299,9 @@ components(dcmp) |>
 components(dcmp) |> autoplot()
 ```
 
-
 ## Timeseries Features
+
+Similar to `summarise()`
 
 ```{r}
 daily_ts_sub |> 
@@ -341,15 +310,29 @@ daily_ts_sub |>
   )) |> arrange(mean)
 ```
 
-```{r}
-daily_ts_sub |> features(sol_rad_total, feat_acf)
-daily_ts_sub |> features(sol_rad_total, feat_stl) 
+But for specialized functions, can take seasonality into account.
+For example, autocorrelation:
 
-#can't figure out how to set period correctly
+```{r}
+daily_ts_sub |>
+  features(sol_rad_total, feat_acf, .period = "1 year")
+```
+
+-   ACF1 (first autocorrelation coefficient) is high, which I think means there is unaccounted-for variation
+-   ACF10 (sum of squares of first 10 autocorrelation coefficients??)
+
+Or seasonal timeseries decomposition
+
+```{r}
 daily_ts_sub |> 
-  features(sol_rad_total, features = list(\(x) feat_stl(x, .period = "1 year")))
+  features(sol_rad_total, feat_stl, .period = "1 year")
 
 ```
+
+-   Trend strength is low (makes sense)
+-   seasonal strength is high (makes sense)
+-   the peak (most hours of sun) is on DOY 171 in most sites (makes sense)
+-   the trough (least hours of sun) is on DOY 350 in most sites (make sense)
 
 ## Timeseries Models
 
@@ -370,7 +353,6 @@ fit_snaive <- daily_ts_sub |>
 fit_snaive
 ```
 
-
 A model including timeseries decomposition:
 
 ```{r}
@@ -381,7 +363,6 @@ fit_dcmp <-
     NAIVE(season_adjust)
   ))
 ```
-
 
 ## Forecasting methods
 
@@ -403,7 +384,7 @@ What about "seasonal naïve"
 fit_snaive |> 
   forecast(h = "1 month") |> 
   filter(meta_station_name == "Tucson") |> 
-  autoplot(daily_ts_sub |> filter(year(datetime)>2021))
+  autoplot(daily_ts_sub |> filter(year(datetime)>2021), level = c(95, 99))
 ```
 
 OOf, those prediction inteverals are WIDE.
@@ -411,23 +392,9 @@ OOf, those prediction inteverals are WIDE.
 Check residuals
 
 ```{r}
-augment(fit_snaive) |> 
-  ggplot(aes(.innov)) +
-  geom_histogram()
-```
-
-residuals are leptokurtic and should be normal!
-
-```{r}
-augment(fit_snaive) |> 
-  ACF(.innov) |> autoplot()
-```
-
-residuals are autocorrelated and they shouldn't be!
-
-```{r}
 fit_snaive |> filter(meta_station_id == "az01") |> gg_tsresiduals()
 ```
+Residuals are autocorelated (bad) and not normal (bad).
 
 Could use bootstrapped residuals.
 
@@ -449,7 +416,7 @@ Can do forecasting after decomposition
 fit_dcmp |> 
   forecast(h = "1 month") |> 
   filter(meta_station_id ==  "az01") |> 
-  autoplot(daily_ts_sub |> filter(year(datetime)>2021))
+  autoplot(daily_ts_sub |> filter(year(datetime)>2021), level = c(95, 99))
 ```
 
 ```{r}
@@ -485,7 +452,8 @@ fit_compare <-
     stlf = decomposition_model(
       STL(sol_rad_total ~ season(period = "1 year")),
       NAIVE(season_adjust)
-    )
+    ),
+    arima = ARIMA(sol_rad_total)
   )
 
 fc <- fit_compare |> forecast(sol_rad_test)
@@ -498,4 +466,88 @@ accuracy(fc, sol_rad_test)
 accuracy(fc, sol_rad_test, list(winkler = winkler_score), level = 80)
 ```
 
-best method here is seasonal naive
+Best method here is seasonal naive.
+I guess this isn't terribly surprising for these type of data?
+I feel like it should be *smoother* though.
+
+```{r}
+fc |> 
+  filter(.model %in% c("arima", "snaive")) |> 
+  autoplot(sol_rad_train |> filter(year(datetime)>=2021), level = c(95, 99)) +
+  geom_line(data = sol_rad_test, aes(y = sol_rad_total), alpha = 0.3, linetype = 2)
+
+```
+
+Surprised that ARIMA did poorly.
+Maybe I'm not understanding it well?
+Maybe I have to specify seasonality since I know it?
+
+```{r}
+fit_arima <- sol_rad_train |> 
+  model(ARIMA(sol_rad_total))
+report(fit_arima)
+```
+
+```{r}
+sol_rad_train |> 
+  gg_tsdisplay(difference(sol_rad_total, 365), plot_type = "partial", lag = 365*2)
+```
+
+Strong spike at lag 1 suggests non-seasonal MA(1).
+Strong spike at a year ago indicates seasonal MA(1) component.
+So ARIMA(0,1,1)(0,1,1)~12~ (first difference, non-seasonal MA(2), seasonal MA(1)
+
+p = order of the autoregressive part
+
+d = degree of first differencing involved
+
+q = order of the moving average part
+
+```{r}
+fit_arima2 <- sol_rad_train |> 
+  model(
+    # arima011011 = ARIMA(sol_rad_total ~ pdq(0,1,1) + PDQ(0,1,1, period = "1 year")),
+    # arima111011 = ARIMA(sol_rad_total ~ pdq(1,1,1) + PDQ(0,1,1, period = "1 year")),
+    # auto = ARIMA(sol_rad_total ~ pdq(0:5, 0:2, 0:5) + PDQ(0:2, 0:1, 0:2, period = "1 year"), stepwise = FALSE, approximation = FALSE)
+  )
+#stepwise = FALSE and approximation = FALSE makes R work harder to find a good solution
+```
+
+```{r}
+fit_arima2 |> pivot_longer(everything(), names_to = "Model name", values_to = "Orders")
+glance(fit_arima2) |> arrange(AIC) |> select(.model:BIC)
+
+accuracy(fit_arima2 |> forecast(sol_rad_test), sol_rad_test)
+fit_arima2 |> select(auto) |> forecast(sol_rad_test) |> autoplot()
+```
+
+It's getting seasonality wrong.
+I think the \[7\] means 7 days.
+It should be a seasonality of 365!
+
+```{r}
+fit_arima2 |> select(auto) |> forecast() |> autoplot(sol_rad_test)
+fit_arima2 |> select(auto) |> gg_tsresiduals()
+fit_arima2 |> select(arima111011) |> gg_tsresiduals()
+fit_arima2 |> select(arima011011) |> gg_tsresiduals()
+```
+
+big acf 2, resids are leptokurtic
+
+```{r}
+sol_rad_train |> 
+  model(
+    auto_repl = ARIMA(sol_rad_total ~ 1 + pdq(1,0,1) + PDQ(1,0,0))
+  )
+```
+
+How does it do on other variables?
+
+```{r}
+fit_temp <- 
+  daily_ts_sub |> 
+  model(
+    auto = ARIMA(temp_air_meanC)
+  )
+fit_temp
+```
