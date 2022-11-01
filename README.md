@@ -18,10 +18,12 @@ management. When opening this repo as an RStudio Project for the first
 time, `renv` should automatically install itself and prompt you to run
 `renv::restore()` to install all package dependencies.
 
+This project uses the [`targets`
+package](https://docs.ropensci.org/targets/) for workflow management.
 Run `targets::tar_make()` from the console to run the workflow and
 reproduce all results.
 
-Targets workflow:
+**Targets workflow:**
 
 ``` mermaid
 graph LR

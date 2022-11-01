@@ -15,9 +15,9 @@ The goal of azmet-qaqc is to create scripts to run QA/QC on AZMet data.
 
 This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) for package management. When opening this repo as an RStudio Project for the first time, `renv` should automatically install itself and prompt you to run `renv::restore()` to install all package dependencies.
 
-Run `targets::tar_make()` from the console to run the workflow and reproduce all results.
+This project uses the [`targets` package](https://docs.ropensci.org/targets/) for workflow management. Run `targets::tar_make()` from the console to run the workflow and reproduce all results.
 
-Targets workflow:
+**Targets workflow:**
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 cat(
