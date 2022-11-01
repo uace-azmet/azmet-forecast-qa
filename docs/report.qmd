@@ -32,3 +32,4 @@ right_join(x,y, by = c("meta_station_id", "meta_station_name", "datetime")) |>
   select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean)
 ```
 
+

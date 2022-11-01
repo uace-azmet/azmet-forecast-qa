@@ -11,7 +11,16 @@ update_daily <- function(daily_hist, daily_recent) {
       daily,
       key = c(meta_station_id, meta_station_name),
       index = datetime
-    )) 
+    )) |> 
+    #make station names consistent
+    mutate(meta_station_name = case_when(
+      meta_station_id == "az12" ~ "Phoenix Greenway",
+      meta_station_id == "az14" ~ "Yuma N.Gila",
+      meta_station_id == "az15" ~ "Phoenix Encanto",
+      meta_station_id == "az28" ~ "Mohave-2",
+      TRUE ~ meta_station_name
+    )) |> 
+    filter(meta_station_id != "az99") #remove test station
   
   # convert to tsibble
   build_tsibble(

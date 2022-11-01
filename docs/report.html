@@ -142,28 +142,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  daily_test</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>What would be cool here is a table with variable name and check or red x for pass or fail QA. These would have links to relevant sections below with plots and tables.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> fc_sol_rad <span class="sc">|&gt;</span> <span class="fu">hilo</span>(<span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">99</span>)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>sol_rad_total, <span class="sc">-</span>.model) <span class="sc">|&gt;</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(<span class="sc">~</span><span class="fu">inherits</span>(., <span class="st">"hilo"</span>)), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span><span class="fu">tar_read</span>(daily_test) <span class="sc">|&gt;</span> <span class="fu">select</span>(sol_rad_total)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(x,y, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"meta_station_id"</span>, <span class="st">"meta_station_name"</span>, <span class="st">"datetime"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(meta_station_id, meta_station_name, datetime, sol_rad_total, <span class="at">forecast =</span> .mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  fc_sol_rad <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hilo</span>(<span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">99</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sol_rad_total, <span class="sc">-</span>.model) <span class="sc">|&gt;</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(<span class="sc">~</span><span class="fu">inherits</span>(., <span class="st">"hilo"</span>)), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tar_read</span>(daily_test) <span class="sc">|&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sol_rad_total)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(x,y, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"meta_station_id"</span>, <span class="st">"meta_station_name"</span>, <span class="st">"datetime"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(meta_station_id, meta_station_name, datetime, sol_rad_total, <span class="at">forecast =</span> .mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 42 x 5 [?]
-# Key:       meta_station_id, meta_station_name [42]
+<pre><code># A tsibble: 37 x 5 [?]
+# Key:       meta_station_id, meta_station_name [37]
    meta_station_id meta_station_name datetime   sol_rad_total forecast
    &lt;chr&gt;           &lt;chr&gt;             &lt;date&gt;             &lt;dbl&gt;    &lt;dbl&gt;
- 1 az01            Tucson            2022-10-27          18.1     18.1
- 2 az02            Yuma Valley       2022-10-27          16.6     16.3
- 3 az03            Yuma Mesa         2022-10-27          NA       NA  
- 4 az04            Safford           2022-10-27          17.3     17.5
- 5 az05            Coolidge          2022-10-27          17.7     17.4
- 6 az06            Maricopa          2022-10-27          17.0     17.3
- 7 az07            Aguila            2022-10-27          17.2     16.9
- 8 az08            Parker            2022-10-27          12.8     16.3
- 9 az09            Bonita            2022-10-27          17.9     18.0
-10 az10            Citrus Farm       2022-10-27          NA       NA  
-# … with 32 more rows</code></pre>
+ 1 az01            Tucson            2022-10-31          17.8     16.8
+ 2 az02            Yuma Valley       2022-10-31          15.7     15.5
+ 3 az03            Yuma Mesa         2022-10-31          NA       NA  
+ 4 az04            Safford           2022-10-31          16.6     16.1
+ 5 az05            Coolidge          2022-10-31          17.3     16.4
+ 6 az06            Maricopa          2022-10-31          16.6     16.3
+ 7 az07            Aguila            2022-10-31          16.5     16.2
+ 8 az08            Parker            2022-10-31          11.8     15.4
+ 9 az09            Bonita            2022-10-31          17.3     16.6
+10 az10            Citrus Farm       2022-10-31          NA       NA  
+# … with 27 more rows</code></pre>
 </div>
 </div>
 
