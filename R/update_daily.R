@@ -27,7 +27,7 @@ update_daily <- function(daily_hist, daily_recent) {
     daily,
     key = c(meta_station_id, meta_station_name),
     index = datetime,
-    interval = new_interval(year = 1)
+    # interval = new_interval(year = 1) #TODO figure out how to get this right
   ) |> 
     #make gaps explicit
     fill_gaps(.full = TRUE)
