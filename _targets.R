@@ -58,7 +58,7 @@ tar_plan(
   # fc_precip = ,
 
 # Reports -----------------------------------------------------------------
-  # tar_quarto(sliding_window, "docs/sliding-window.qmd"),
-  tar_quarto(report, "docs/report.qmd")
+  tar_quarto(report, "docs/report.qmd"),
+  tar_quarto(readme, "README.qmd")
   
 )

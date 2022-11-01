@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|c6f708f1fcc72dc4|||||||||||||||
+.Random.seed|object|2f046e2e98c2de2e|||||||||||||||
 daily|stem|7b9827781a1d27e4|134223e518d34216|ea151e4cf107ea97|-758949561||t19297.6030993731s|d91bd329861598b7|11558210|rds|local|vector|||2.433||
 daily_hist|stem|3c7f915cb156141a|f9a5a3a5e501fd9b|99696642e489be2f|-1213188871||t19297.6027837672s|8930382939d843ba|6102445|rds|local|vector|||1.271||
 daily_recent|stem|e6a6fbba953895ad|f1cca0f54472790e|271010621ea756a7|-2067017894||t19297.6030437621s|1519bef7f6675b2f|3683392|rds|local|vector|||21.987||
@@ -16,7 +16,8 @@ hist_file|stem|09ca2de57b0c6e5a|3ae4a94fad047550|ef46db3751d8e999|1076905581|dat
 model|stem|1a929ccb9017306d|ae83bc723fe2997c|0b1fc8698311f123|1816327236||t19293.7789741911s|241bf920421d9078|105|rds|local|vector|||0.014||
 read_update_historic|function|737b6f23316631c8|||||||||||||||
 read_wrangle_hist|function|dbb4d18b844226b6|||||||||||||||
-report|stem|dd21c579c48cd05a|576b83cc40e22934|f6d806397b72faf3|-237041703|docs/report.html*docs/report.qmd|t19297.6032296001s|186ad44fbbc36fce|15383|file|local|vector|||4.782||
+readme|stem|54c562dfcbf4ef24|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19297.6165668187s|bcebdf9fd7f44308|6774|file|local|vector|||7.038||
+report|stem|dd21c579c48cd05a|576b83cc40e22934|f6d806397b72faf3|-237041703|docs/report.html*docs/report.qmd|t19297.6115232725s|186ad44fbbc36fce|15383|file|local|vector|||4.782||
 sliding_window|stem||a04148703701cc3c|4f38eb2c4d1a90cc|-641477393||t19293.8142210546s||0|file|local|vector|||5.515||33m39m System command quarto failed
 ts_sol_rad|stem|b71da8bb96a124e5|efbe62b57d96bb46|27eb47b38ebf56e4|-801868184||t19297.6031699203s|8734ba280eb21cc5|13773933|rds|local|vector|||0.566||
 update_daily|function|9d946ac78453f240|||||||||||||||
