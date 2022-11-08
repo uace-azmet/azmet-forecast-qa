@@ -1,0 +1,96 @@
+---
+title: "Report"
+format: 
+  html:
+    code-fold: true
+    toc: true
+editor: visual
+---
+
+```{r}
+library(targets)
+library(tidyverse)
+library(fabletools)
+library(lubridate)
+tar_load(c(
+  fc_sol_rad,
+  daily_test,
+  daily_train
+))
+```
+
+Let's pretend there is an outlier in the data
+
+```{r}
+daily_test <- 
+daily_test |> select(meta_station_id, everything()) |> 
+  mutate(sol_rad_total = if_else(meta_station_id == "az01", 30, sol_rad_total))
+```
+
+What would be cool here is a table with variable name and check or red x for pass or fail QA.
+These would have links to relevant sections below with plots and tables.
+
+## Solar Radiation
+
+```{r}
+sol_fc <- 
+  fc_sol_rad |>
+  hilo(c(95, 99)) |> 
+  select(-sol_rad_total, -.model) |> 
+  mutate(across(where(~inherits(., "hilo")), ~round(., 3)))
+sol_test <- daily_test |>
+  select(sol_rad_total)
+sol_train <- daily_train |> 
+  select(sol_rad_total)
+
+sol_qa <- 
+  right_join(
+  sol_fc,
+  sol_test,
+  by = c("meta_station_id", "meta_station_name", "datetime")
+) |> 
+  mutate(flag = case_when(
+    sol_rad_total < `99%`$lower ~ "extreme",
+    sol_rad_total > `99%`$upper ~ "extreme",
+    sol_rad_total < `95%`$lower ~ "outlier",
+    sol_rad_total > `95%`$upper ~ "outlier"
+  )) |> 
+    select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean, flag)
+
+sol_qa |> filter(!is.na(flag))
+```
+
+Filter by stations with flags and only plot those.
+Or maybe embed a simple shiny app that lets you view different stations?
+
+```{r}
+#extract stations with flags
+sol_qa_stations <- 
+  sol_qa |> 
+  filter(!is.na(flag)) |> 
+  pull(meta_station_id)
+
+
+
+# filter forecast
+fc_sol_rad |> 
+  filter(meta_station_id %in% sol_qa_stations) |> 
+  autoplot(
+    #with training data
+    sol_train |>
+      #filter to show only past few weeks of data
+      filter(datetime > max(datetime) - weeks(3)),
+    level = c(95, 99)
+  ) +
+  geom_point(
+    data = sol_test  |> 
+      #filter stations
+      filter(meta_station_id %in% sol_qa_stations),
+    aes(y = sol_rad_total), shape = "triangle", size = 1, color = "red"
+  ) +
+  labs(caption= "blue dot = forecast point, red triangle = actual data")
+```
+
+## Temperature
+
+repeat with temperature
