@@ -100,10 +100,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#solar-radiation" id="toc-solar-radiation" class="nav-link active" data-scroll-target="#solar-radiation">Solar Radiation</a></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -124,8 +132,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(targets)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
 ✔ ggplot2 3.3.6      ✔ purrr   0.3.5 
@@ -136,44 +147,106 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()</code></pre>
 </div>
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fabletools)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tar_load</span>(<span class="fu">c</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  fc_sol_rad,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  daily_test</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lubridate'
+
+The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tar_load</span>(<span class="fu">c</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  fc_sol_rad,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  daily_test,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  daily_train</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>What would be cool here is a table with variable name and check or red x for pass or fail QA. These would have links to relevant sections below with plots and tables.</p>
+<section id="solar-radiation" class="level2">
+<h2 class="anchored" data-anchor-id="solar-radiation">Solar Radiation</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  fc_sol_rad <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hilo</span>(<span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">99</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sol_rad_total, <span class="sc">-</span>.model) <span class="sc">|&gt;</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(<span class="sc">~</span><span class="fu">inherits</span>(., <span class="st">"hilo"</span>)), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tar_read</span>(daily_test) <span class="sc">|&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sol_rad_total)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(x,y, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"meta_station_id"</span>, <span class="st">"meta_station_name"</span>, <span class="st">"datetime"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(meta_station_id, meta_station_name, datetime, sol_rad_total, <span class="at">forecast =</span> .mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sol_fc <span class="ot">&lt;-</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  fc_sol_rad <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hilo</span>(<span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">99</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sol_rad_total, <span class="sc">-</span>.model) <span class="sc">|&gt;</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(<span class="sc">~</span><span class="fu">inherits</span>(., <span class="st">"hilo"</span>)), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>sol_test <span class="ot">&lt;-</span> daily_test <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sol_rad_total)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>sol_train <span class="ot">&lt;-</span> daily_train <span class="sc">|&gt;</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sol_rad_total)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>sol_qa <span class="ot">&lt;-</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  sol_fc,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  sol_test,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"meta_station_id"</span>, <span class="st">"meta_station_name"</span>, <span class="st">"datetime"</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sol_rad_total =</span> <span class="fu">if_else</span>(meta_station_id <span class="sc">==</span> <span class="st">"az01"</span>, <span class="dv">30</span>, sol_rad_total)) <span class="sc">|&gt;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">flag =</span> <span class="fu">case_when</span>(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&lt;</span> <span class="st">`</span><span class="at">99%</span><span class="st">`</span><span class="sc">$</span>lower <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&gt;</span> <span class="st">`</span><span class="at">99%</span><span class="st">`</span><span class="sc">$</span>upper <span class="sc">~</span> <span class="st">"extreme"</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&lt;</span> <span class="st">`</span><span class="at">95%</span><span class="st">`</span><span class="sc">$</span>lower <span class="sc">~</span> <span class="st">"outlier"</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    sol_rad_total <span class="sc">&gt;</span> <span class="st">`</span><span class="at">95%</span><span class="st">`</span><span class="sc">$</span>upper <span class="sc">~</span> <span class="st">"outlier"</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(meta_station_id, meta_station_name, datetime, sol_rad_total, <span class="at">forecast =</span> .mean, flag)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>sol_qa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 28 x 5 [?]
+<pre><code># A tsibble: 28 x 6 [?]
 # Key:       meta_station_id, meta_station_name [28]
-   meta_station_id meta_station_name datetime   sol_rad_total forecast
-   &lt;chr&gt;           &lt;chr&gt;             &lt;date&gt;             &lt;dbl&gt;    &lt;dbl&gt;
- 1 az01            Tucson            2022-10-31          17.8     16.8
- 2 az02            Yuma Valley       2022-10-31          15.7     15.5
- 3 az04            Safford           2022-10-31          16.6     16.1
- 4 az05            Coolidge          2022-10-31          17.3     16.4
- 5 az06            Maricopa          2022-10-31          16.6     16.3
- 6 az07            Aguila            2022-10-31          16.5     16.2
- 7 az08            Parker            2022-10-31          11.8     15.4
- 8 az09            Bonita            2022-10-31          17.3     16.6
- 9 az12            Phoenix Greenway  2022-10-31          16.2     15.8
-10 az14            Yuma N.Gila       2022-10-31          16.4     15.8
+   meta_station_id meta_station_name datetime   sol_rad_total forecast flag   
+   &lt;chr&gt;           &lt;chr&gt;             &lt;date&gt;             &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;  
+ 1 az01            Tucson            2022-11-07          30       15.0 extreme
+ 2 az02            Yuma Valley       2022-11-07          14.4     10.9 &lt;NA&gt;   
+ 3 az04            Safford           2022-11-07          15.5     14.6 &lt;NA&gt;   
+ 4 az05            Coolidge          2022-11-07          15.7     11.8 &lt;NA&gt;   
+ 5 az06            Maricopa          2022-11-07          12.8     12.7 &lt;NA&gt;   
+ 6 az07            Aguila            2022-11-07          15.2     12.5 &lt;NA&gt;   
+ 7 az08            Parker            2022-11-07          14.4     13.3 &lt;NA&gt;   
+ 8 az09            Bonita            2022-11-07          15.4     16.2 &lt;NA&gt;   
+ 9 az12            Phoenix Greenway  2022-11-07          14.4     12.9 &lt;NA&gt;   
+10 az14            Yuma N.Gila       2022-11-07          14.9     11.6 &lt;NA&gt;   
 # … with 18 more rows</code></pre>
 </div>
 </div>
+<p>Filter by stations with flags and only plot those?</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract stations with flags</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sol_qa_stations <span class="ot">&lt;-</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  sol_qa <span class="sc">|&gt;</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(flag)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(meta_station_id)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># filter forecast</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>fc_sol_rad <span class="sc">|&gt;</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(meta_station_id <span class="sc">%in%</span> sol_qa_stations) <span class="sc">|&gt;</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">#with training data</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sol_train |&gt; </span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   filter(datetime &gt; ymd("2022-09-01")),</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">level =</span> <span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">99</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> sol_test, <span class="fu">aes</span>(<span class="at">y =</span> sol_rad_total), <span class="at">shape =</span> <span class="st">"triangle"</span>, <span class="at">size =</span> <span class="fl">0.7</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">caption=</span> <span class="st">"blue dot = forecast point, red triangle = actual data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 
 </main>
 <!-- /main column -->
