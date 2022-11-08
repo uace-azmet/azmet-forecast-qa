@@ -57,7 +57,7 @@ sol_qa <-
   )) |> 
     select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean, flag)
 
-sol_qa |> filtger(!is.na(flag))
+sol_qa |> filter(!is.na(flag))
 ```
 
 Filter by stations with flags and only plot those.
