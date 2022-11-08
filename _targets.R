@@ -41,7 +41,7 @@ tar_plan(
   tar_file(hist_file, "data/daily_hist.csv"),
   daily_hist = read_wrangle_hist(hist_file),
   daily_recent = get_daily_recent(daily_hist),
-  daily = update_daily(daily_hist, daily_recent),
+  daily = update_daily(daily_hist, daily_recent), 
   daily_train = daily |> filter(datetime < max(datetime)), 
   daily_test = daily |> filter(datetime == max(datetime)),
 
@@ -62,3 +62,4 @@ tar_plan(
   tar_quarto(readme, "README.qmd")
   
 )
+

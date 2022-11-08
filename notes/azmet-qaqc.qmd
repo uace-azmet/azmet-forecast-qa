@@ -22,6 +22,7 @@ library(lubridate)
 library(feasts)
 library(fable)
 library(here)
+library(targets)
 ```
 
 # Problem Definition
@@ -47,54 +48,9 @@ To see a rough "sketch" of the QA workflow, skip to @sec-qa-workflow.
 Load data
 
 ```{r}
-tar_load(daily)
+daily_ts <- tar_read(daily)
 ```
 
-
-Any rows marked as needing review?
-
-```{r}
-daily_ts |> filter(meta_needs_review != 0)
-```
-
-Check extreme values:
-
-```{r}
-daily_ts |> filter(temp_air_meanC > 200)
-```
-
-Looks like historic data uses 999 for NA probably.
-I'll set those to `NA`
-
-```{r}
-daily_ts <- daily_ts |> 
-  mutate(across(where(is.numeric), \(x) if_else(x == 999, NA_real_, x)))
-```
-
-Any gaps in the data?
-
-```{r}
-daily_ts |> scan_gaps()
-```
-
-yes, let's make them explicit NAs
-
-```{r}
-daily_ts <- fill_gaps(daily_ts, .full = TRUE)
-```
-
-Check that gaps were made explicit:
-
-```{r}
-#| code-fold: true
-daily_ts |> 
-  filter(meta_station_id %in% c("az23", "az14"))|>
-  filter(year(datetime) > 2018) |> 
-  ggplot(aes(x = datetime, y = sol_rad_total)) +
-  geom_line(na.rm = TRUE, size = 0.1) +
-  geom_point(na.rm = TRUE, size = 0.2) +
-  facet_wrap(~meta_station_id)
-```
 
 # Preliminary (exploratory) analysis
 
@@ -133,7 +89,7 @@ daily_ts_sub |>
 Seasonality
 
 ```{r}
-daily_ts_sub |> gg_season(temp_air_meanC) + labs(title = "Mean Air Temp (ºC)")
+daily_ts_sub |> gg_season(temp_air_meanC, period = "1 year") + labs(title = "Mean Air Temp (ºC)")
 ```
 
 Autocorrelation
@@ -394,6 +350,7 @@ Check residuals
 ```{r}
 fit_snaive |> filter(meta_station_id == "az01") |> gg_tsresiduals()
 ```
+
 Residuals are autocorelated (bad) and not normal (bad).
 
 Could use bootstrapped residuals.
@@ -506,9 +463,9 @@ q = order of the moving average part
 ```{r}
 fit_arima2 <- sol_rad_train |> 
   model(
-    # arima011011 = ARIMA(sol_rad_total ~ pdq(0,1,1) + PDQ(0,1,1, period = "1 year")),
-    # arima111011 = ARIMA(sol_rad_total ~ pdq(1,1,1) + PDQ(0,1,1, period = "1 year")),
-    # auto = ARIMA(sol_rad_total ~ pdq(0:5, 0:2, 0:5) + PDQ(0:2, 0:1, 0:2, period = "1 year"), stepwise = FALSE, approximation = FALSE)
+    arima011011 = ARIMA(sol_rad_total ~ pdq(0,1,1) + PDQ(0,1,1, period = "1 year")),
+    arima111011 = ARIMA(sol_rad_total ~ pdq(1,1,1) + PDQ(0,1,1, period = "1 year")),
+    auto = ARIMA(sol_rad_total ~ pdq(0:5, 0:2, 0:5) + PDQ(0:2, 0:1, 0:2, period = "1 year"), stepwise = FALSE, approximation = FALSE)
   )
 #stepwise = FALSE and approximation = FALSE makes R work harder to find a good solution
 ```
