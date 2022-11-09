@@ -39,9 +39,11 @@ tar_plan(
 
 # Read and wrangle data ---------------------------------------------------
   tar_file(hist_file, "data/daily_hist.csv"),
-  daily_hist = read_wrangle_hist(hist_file),
-  daily_recent = get_daily_recent(daily_hist),
-  daily = update_daily(daily_hist, daily_recent), 
+  daily_hist = read_wrangle_hist(hist_file), #up to 2003
+  daily_recent = update_daily_hist(daily_hist), #up to october 2022
+  # tar_target(data_daily, write_daily_recent(daily_recent), format = "file"),
+  daily = update_daily(daily_recent),
+  # tar_target(daily, update_daily(data_daily), format = "file"), #also writes to data/daily
   daily_train = daily |> filter(datetime < max(datetime)), 
   daily_test = daily |> filter(datetime == max(datetime)),
 

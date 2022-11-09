@@ -1,9 +1,8 @@
-update_daily <- function(daily_hist, daily_recent) {
-  daily_prev <- bind_rows(daily_hist, daily_recent)
-  daily_new <- az_daily(start_date = max(daily_prev$datetime) + 1)
+update_daily <- function(daily_recent) {
+  daily_new <- az_daily(start_date = max(daily_recent$datetime) + 1)
   
   daily <- 
-    bind_rows(daily_prev, daily_new) 
+    bind_rows(daily_recent, daily_new) 
   
   daily <- daily |> 
     #remove duplicates
