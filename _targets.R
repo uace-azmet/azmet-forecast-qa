@@ -18,7 +18,8 @@ tar_option_set(
     "lubridate",
     "fable",
     "fabletools",
-    "feasts"
+    "feasts",
+    "readxl"
   ), 
   format = "rds" # default storage format
   # Set other options as needed.
@@ -44,6 +45,10 @@ tar_plan(
   daily = update_daily(daily_hist, daily_recent), 
   daily_train = daily |> filter(datetime < max(datetime)), 
   daily_test = daily |> filter(datetime == max(datetime)),
+  
+  tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
+  needs_qa_daily = needs_qa(metadata_file, "daily"),
+  needs_qa_hourly = needs_qa(metadata_file, "hourly"),
 
 # Modeling ----------------------------------------------------------------
 
