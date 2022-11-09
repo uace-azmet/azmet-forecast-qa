@@ -18,7 +18,8 @@ tar_option_set(
     "lubridate",
     "fable",
     "fabletools",
-    "feasts"
+    "feasts",
+    "arrow"
   ), 
   format = "rds" # default storage format
   # Set other options as needed.
@@ -38,30 +39,32 @@ tar_source()
 tar_plan(
 
 # Read and wrangle data ---------------------------------------------------
-  tar_file(hist_file, "data/daily_hist.csv"),
-  daily_hist = read_wrangle_hist(hist_file), #up to 2003
-  daily_recent = update_daily_hist(daily_hist), #up to october 2022
-  # tar_target(data_daily, write_daily_recent(daily_recent), format = "file"),
-  daily = update_daily(daily_recent),
-  # tar_target(daily, update_daily(data_daily), format = "file"), #also writes to data/daily
-  daily_train = daily |> filter(datetime < max(datetime)), 
-  daily_test = daily |> filter(datetime == max(datetime)),
+  tar_file(legacy_daily_file, "data/daily_hist.csv"),
+  legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
+  past_daily = update_daily_hist(legacy_daily), #up to october 2022
+  tar_target(db_daily_init, write_daily(past_daily)),
+  #TODO: make this be outdated based on the date I guess.
+  # Easy way: create another target that is Sys.date() and add as dependency to db_daily
+  today = Sys.Date(),
+  tar_target(db_daily, update_daily(db_daily_init, today)), #also writes to data/daily
+  # daily_train = daily |> filter(datetime < max(datetime)), 
+  # daily_test = daily |> filter(datetime == max(datetime)),
 
 # Modeling ----------------------------------------------------------------
 
-  ts_sol_rad = fit_ts_sol_rad(daily_train),
+  # ts_sol_rad = fit_ts_sol_rad(daily_train),
   # ts_temp = ,
   # ts_precip = ,
 
 # Forecasting -------------------------------------------------------------
 
-  fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
+  # fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
   # fc_remp = ,
   # fc_precip = ,
 
 # Reports -----------------------------------------------------------------
-  tar_quarto(report, "docs/report.qmd"),
-  tar_quarto(readme, "README.qmd")
+  # tar_quarto(report, "docs/report.qmd"),
+  # tar_quarto(readme, "README.qmd")
   
 )
 
