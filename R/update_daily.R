@@ -30,16 +30,6 @@ update_daily <- function(db_daily, ...) {
   daily <- 
     bind_rows(daily_current_year, daily_new) 
   
-  
-  # # convert to tsibble
-  # build_tsibble(
-  #   daily,
-  #   key = c(meta_station_id, meta_station_name),
-  #   index = datetime,
-  #   # interval = new_interval(year = 1) #TODO figure out how to get this right
-  # ) |> 
-  #   #make gaps explicit
-  #   fill_gaps(.full = TRUE)
   #overwrite current year
   write_daily(daily, path = db_daily)
   invisible(db_daily)

@@ -43,28 +43,27 @@ tar_plan(
   legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
   past_daily = update_daily_hist(legacy_daily), #up to october 2022
   tar_target(db_daily_init, write_daily(past_daily)),
-  #TODO: make this be outdated based on the date I guess.
-  # Easy way: create another target that is Sys.date() and add as dependency to db_daily
-  today = Sys.Date(),
+  today = Sys.Date(), #this target only exists to invalidate `db_daily` when the date changes
   tar_target(db_daily, update_daily(db_daily_init, today)), #also writes to data/daily
-  # daily_train = daily |> filter(datetime < max(datetime)), 
-  # daily_test = daily |> filter(datetime == max(datetime)),
+  daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
+  daily_train = daily |> filter(datetime < max(datetime)),
+  daily_test = daily |> filter(datetime == max(datetime)),
 
 # Modeling ----------------------------------------------------------------
 
-  # ts_sol_rad = fit_ts_sol_rad(daily_train),
+  ts_sol_rad = fit_ts_sol_rad(daily_train),
   # ts_temp = ,
   # ts_precip = ,
 
 # Forecasting -------------------------------------------------------------
 
-  # fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
+  fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
   # fc_remp = ,
   # fc_precip = ,
 
 # Reports -----------------------------------------------------------------
-  # tar_quarto(report, "docs/report.qmd"),
-  # tar_quarto(readme, "README.qmd")
+  tar_quarto(report, "docs/report.qmd"),
+  tar_quarto(readme, "README.qmd")
   
 )
 
