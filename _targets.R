@@ -43,8 +43,15 @@ tar_plan(
   legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
   past_daily = update_daily_hist(legacy_daily), #up to october 2022
   tar_target(db_daily_init, write_daily(past_daily)),
-  today = Sys.Date(), #this target only exists to invalidate `db_daily` when the date changes
-  tar_target(db_daily, update_daily(db_daily_init, today)), #also writes to data/daily
+  tar_target(
+    db_daily, 
+    update_daily(db_daily_init), #also writes to data/daily
+    #This target becomes invalid if it hasn't been run for a day
+    cue = tarchetypes::tar_cue_age(
+      name = db_daily,
+      age = as.difftime(1, units = "days") 
+    )
+  ), 
   daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
   daily_train = daily |> filter(datetime < max(datetime)),
   daily_test = daily |> filter(datetime == max(datetime)),
