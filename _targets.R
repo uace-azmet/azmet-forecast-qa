@@ -1,14 +1,13 @@
-# Created by use_targets().
-# Follow the comments below to fill in this target script.
-# Then follow the manual to check and run the pipeline:
-#   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline # nolint
+# Follow the manual to check and run the pipeline:
+#   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline 
 
 # Load packages required to define the pipeline:
 library(targets)
-library(tarchetypes) # Load other packages as needed. # nolint
+library(tarchetypes)
 
 # Set target options:
 tar_option_set(
+  # define packages needed for the workflow:
   packages = c(
     "tibble",
     "tidyverse",
@@ -22,7 +21,6 @@ tar_option_set(
     "arrow"
   ), 
   format = "rds" # default storage format
-  # Set other options as needed.
 )
 
 # tar_make_clustermq() configuration (okay to leave alone):
@@ -31,14 +29,14 @@ options(clustermq.scheduler = "multicore")
 # tar_make_future() configuration (okay to leave alone):
 future::plan(future.callr::callr)
 
-# Run the R scripts in the R/ folder with your custom functions:
+# Source the R scripts in the R/ folder with your custom functions:
 tar_source()
-# source("other_functions.R") # Source other scripts as needed. # nolint
 
-# Replace the target list below with your own:
+
+# Define targets:
 tar_plan(
 
-# Read and wrangle data ---------------------------------------------------
+  # Read and wrangle data ---------------------------------------------------
   tar_file(legacy_daily_file, "data/daily_hist.csv"),
   legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
   past_daily = update_daily_hist(legacy_daily), #up to october 2022
@@ -56,19 +54,19 @@ tar_plan(
   daily_train = daily |> filter(datetime < max(datetime)),
   daily_test = daily |> filter(datetime == max(datetime)),
 
-# Modeling ----------------------------------------------------------------
+  # Modeling ----------------------------------------------------------------
 
   ts_sol_rad = fit_ts_sol_rad(daily_train),
   # ts_temp = ,
   # ts_precip = ,
 
-# Forecasting -------------------------------------------------------------
+  # Forecasting -------------------------------------------------------------
 
   fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
   # fc_remp = ,
   # fc_precip = ,
 
-# Reports -----------------------------------------------------------------
+  # Reports -----------------------------------------------------------------
   tar_quarto(report, "docs/report.qmd"),
   tar_quarto(readme, "README.qmd")
   
