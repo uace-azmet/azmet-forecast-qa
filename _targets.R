@@ -48,7 +48,8 @@ tar_plan(
     cue = tarchetypes::tar_cue_age(
       name = db_daily,
       age = as.difftime(1, units = "days") 
-    )
+    ),
+    format = "file" #because it returns a filepath?
   ), 
   daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
   daily_train = daily |> filter(datetime < max(datetime)),
