@@ -15,6 +15,7 @@
 .quarto/xref/INDEX
 .quarto/xref/f10f2f65
 .targets-files
+.targets-runs/
 _targets/meta/process
 _targets/meta/progress
 _targets/objects/daily
