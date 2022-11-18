@@ -26,6 +26,8 @@ _targets/objects/daily_train
 _targets/objects/db_daily_init
 _targets/objects/fc_sol_rad
 _targets/objects/legacy_daily
+_targets/objects/needs_qa_daily
+_targets/objects/needs_qa_hourly
 _targets/objects/past_daily
 _targets/objects/ts_sol_rad
 data/daily/date_year=2003/part-0.parquet
