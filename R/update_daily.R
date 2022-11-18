@@ -1,35 +1,36 @@
-update_daily <- function(daily_hist, daily_recent) {
-  daily_prev <- bind_rows(daily_hist, daily_recent)
-  daily_new <- az_daily(start_date = max(daily_prev$datetime) + 1)
+# library(arrow)
+# library(lubridate)
+
+#' Update daily data from API
+#'
+#' @param db_daily path to the parquet dataset partitioned by year
+#' @param ... used only to add additional dependencies to trigger updates with
+#'   `targets`
+#'
+#' @return invisibly returns the `db_daily` path 
+update_daily <- function(db_daily, ...) {
+  daily_prev <- open_dataset(db_daily)
+  
+  #figure out where previous data left off
+  last_date <- 
+    daily_prev |>
+    pull(datetime, as_vector = TRUE) |>
+    max()
+  
+  #read in the current year only because that's how it's partitioned and only
+  #the most recent year of data will need to get overwritten.
+  daily_current_year <- 
+    daily_prev |> 
+    filter(date_year == year(last_date)) |>
+    collect()
+  
+  #get data since last date in saved data
+  daily_new <- az_daily(start_date = last_date + 1)
   
   daily <- 
-    bind_rows(daily_prev, daily_new) 
+    bind_rows(daily_current_year, daily_new) 
   
-  daily <- daily |> 
-    #remove duplicates
-    filter(!are_duplicated(
-      daily,
-      key = c(meta_station_id, meta_station_name),
-      index = datetime
-    )) |> 
-    #make station names consistent
-    mutate(meta_station_name = case_when(
-      meta_station_id == "az12" ~ "Phoenix Greenway",
-      meta_station_id == "az14" ~ "Yuma N.Gila",
-      meta_station_id == "az15" ~ "Phoenix Encanto",
-      meta_station_id == "az28" ~ "Mohave-2",
-      TRUE ~ meta_station_name
-    )) |> 
-    filter(meta_station_id != "az99") #remove test station
-  
-  # convert to tsibble
-  build_tsibble(
-    daily,
-    key = c(meta_station_id, meta_station_name),
-    index = datetime,
-    # interval = new_interval(year = 1) #TODO figure out how to get this right
-  ) |> 
-    #make gaps explicit
-    fill_gaps(.full = TRUE)
-  
+  #overwrite current year
+  write_daily(daily, path = db_daily)
+  invisible(db_daily)
 }

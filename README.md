@@ -32,43 +32,44 @@ reproduce all results.
 graph LR
   subgraph legend
     x7420bd9270f8d27d([""Up to date""]):::uptodate --- x5b3426b4c7fa7dbc([""Started""]):::started
-    x5b3426b4c7fa7dbc([""Started""]):::started --- x0a52b03877696646([""Outdated""]):::outdated
-    x0a52b03877696646([""Outdated""]):::outdated --- xbf4603d6c2c2ad6b([""Stem""]):::none
+    x5b3426b4c7fa7dbc([""Started""]):::started --- xbf4603d6c2c2ad6b([""Stem""]):::none
     xbf4603d6c2c2ad6b([""Stem""]):::none --- xf0bce276fe2b9d3e>""Function""]:::none
   end
   subgraph Graph
-    x560d2f9acfe7747b(["hist_file"]):::uptodate --> xcb07ddaf135ab507(["daily_hist"]):::uptodate
-    x842666df821db265>"read_wrangle_hist"]:::uptodate --> xcb07ddaf135ab507(["daily_hist"]):::uptodate
+    x78d9cb9ea5afb69c>"write_daily"]:::uptodate --> xed180ed90a78526a>"update_daily"]:::uptodate
     x6233d5fdb54d5242(["daily"]):::uptodate --> x9a0acd6e842eb2f0(["daily_train"]):::uptodate
+    x1e7315e78b59eaeb(["past_daily"]):::uptodate --> x1cab041545db0886(["db_daily_init"]):::uptodate
+    x78d9cb9ea5afb69c>"write_daily"]:::uptodate --> x1cab041545db0886(["db_daily_init"]):::uptodate
+    xff9b736edef41c8b(["legacy_daily"]):::uptodate --> x1e7315e78b59eaeb(["past_daily"]):::uptodate
+    x8b3096a190996662>"update_daily_hist"]:::uptodate --> x1e7315e78b59eaeb(["past_daily"]):::uptodate
     x7b318303b239462b(["daily_test"]):::uptodate --> xe0fba61fbc506510(["report"]):::uptodate
     x9a0acd6e842eb2f0(["daily_train"]):::uptodate --> xe0fba61fbc506510(["report"]):::uptodate
     x2e2c913cb86ee34e(["fc_sol_rad"]):::uptodate --> xe0fba61fbc506510(["report"]):::uptodate
-    xcb07ddaf135ab507(["daily_hist"]):::uptodate --> x6233d5fdb54d5242(["daily"]):::uptodate
-    x84a5bd81bfb0b714(["daily_recent"]):::uptodate --> x6233d5fdb54d5242(["daily"]):::uptodate
-    xed180ed90a78526a>"update_daily"]:::uptodate --> x6233d5fdb54d5242(["daily"]):::uptodate
+    x44bd6feeb3fb18b4(["db_daily"]):::uptodate --> x6233d5fdb54d5242(["daily"]):::uptodate
+    x5618af51994d1c2d>"make_model_data"]:::uptodate --> x6233d5fdb54d5242(["daily"]):::uptodate
     x9a0acd6e842eb2f0(["daily_train"]):::uptodate --> xc9de046aea785dc2(["ts_sol_rad"]):::uptodate
     xcc4a333b0a3d9708>"fit_ts_sol_rad"]:::uptodate --> xc9de046aea785dc2(["ts_sol_rad"]):::uptodate
-    xcb07ddaf135ab507(["daily_hist"]):::uptodate --> x84a5bd81bfb0b714(["daily_recent"]):::uptodate
-    xbc27cd57aa2a1d74>"get_daily_recent"]:::uptodate --> x84a5bd81bfb0b714(["daily_recent"]):::uptodate
+    x1cab041545db0886(["db_daily_init"]):::uptodate --> x44bd6feeb3fb18b4(["db_daily"]):::uptodate
+    xed180ed90a78526a>"update_daily"]:::uptodate --> x44bd6feeb3fb18b4(["db_daily"]):::uptodate
+    x1920bdb737e11d2e(["legacy_daily_file"]):::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
+    x842666df821db265>"read_wrangle_hist"]:::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
     x7b318303b239462b(["daily_test"]):::uptodate --> x2e2c913cb86ee34e(["fc_sol_rad"]):::uptodate
     x9b63e5b64de3fce2>"forecast_sol_rad"]:::uptodate --> x2e2c913cb86ee34e(["fc_sol_rad"]):::uptodate
     xc9de046aea785dc2(["ts_sol_rad"]):::uptodate --> x2e2c913cb86ee34e(["fc_sol_rad"]):::uptodate
-    x3d7b2a2ab5636113(["metadata_file"]):::outdated --> xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated
-    x3d7b2a2ab5636113(["metadata_file"]):::outdated --> xac2ac35653724b54(["needs_qa_hourly"]):::outdated
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xac2ac35653724b54(["needs_qa_hourly"]):::outdated
+    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
+    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
+    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xac2ac35653724b54(["needs_qa_hourly"]):::uptodate
+    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xac2ac35653724b54(["needs_qa_hourly"]):::uptodate
     x6233d5fdb54d5242(["daily"]):::uptodate --> x7b318303b239462b(["daily_test"]):::uptodate
     x6e52cb0f1668cc22(["readme"]):::started --> x6e52cb0f1668cc22(["readme"]):::started
   end
   classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
   classDef started stroke:#000000,color:#000000,fill:#DC863B;
-  classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
   classDef none stroke:#000000,color:#000000,fill:#94a4ac;
   linkStyle 0 stroke-width:0px;
   linkStyle 1 stroke-width:0px;
   linkStyle 2 stroke-width:0px;
-  linkStyle 3 stroke-width:0px;
-  linkStyle 25 stroke-width:0px;
+  linkStyle 28 stroke-width:0px;
 ```
 
 ## Repo Structure
