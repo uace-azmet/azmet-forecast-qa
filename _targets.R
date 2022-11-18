@@ -18,6 +18,7 @@ tar_option_set(
     "fable",
     "fabletools",
     "feasts",
+    "readxl",
     "arrow"
   ), 
   format = "rds" # default storage format
@@ -54,6 +55,10 @@ tar_plan(
   daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
   daily_train = daily |> filter(datetime < max(datetime)),
   daily_test = daily |> filter(datetime == max(datetime)),
+  
+  tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
+  needs_qa_daily = needs_qa(metadata_file, "daily"),
+  needs_qa_hourly = needs_qa(metadata_file, "hourly"),
 
   # Modeling ----------------------------------------------------------------
 

@@ -27,10 +27,17 @@ update_daily <- function(db_daily, ...) {
   #get data since last date in saved data
   daily_new <- az_daily(start_date = last_date + 1)
   
+  if(is.na(daily_new)) {
+    
+    return(invisible(db_daily))
+    
+  } else {
+    
   daily <- 
     bind_rows(daily_current_year, daily_new) 
   
   #overwrite current year
   write_daily(daily, path = db_daily)
-  invisible(db_daily)
+  return(invisible(db_daily))
+  }
 }
