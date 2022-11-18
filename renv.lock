@@ -78,6 +78,24 @@
         "Rcpp"
       ]
     },
+    "arrow": {
+      "Package": "arrow",
+      "Version": "10.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "05f9b803e1f6a5d47ff0a885ed04ebd2",
+      "Requirements": [
+        "R6",
+        "assertthat",
+        "bit64",
+        "cpp11",
+        "glue",
+        "purrr",
+        "rlang",
+        "tidyselect",
+        "vctrs"
+      ]
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
