@@ -16,9 +16,39 @@ library(pointblank)
 tar_load(c(
   fc_sol_rad,
   daily_test,
-  daily_train
+  daily_train,
+  daily
 ))
 ```
+
+# Consistency checks
+
+```{r}
+#create action levels for warnings and errors
+#TODO add notify level
+#TODO pointblank can work with a database object, eg duckdb.  Faster?
+#TODO only validate past few months (?) of data
+al <- action_levels(warn_at = 0.1, stop_at = 1)
+daily |> 
+  as_tibble() |> 
+  create_agent(
+    tbl_name = "Daily measures",
+    label = "Consistency Checks",
+    actions = al
+  ) |> 
+  col_vals_gte(temp_air_meanC, vars(dwpt_mean), na_pass = TRUE) |> 
+  col_vals_lte(temp_air_minC, vars(temp_air_meanC), na_pass = TRUE) |> 
+  col_vals_lte(temp_air_meanC, vars(temp_air_maxC), na_pass = TRUE) |> 
+  col_vals_lte(wind_spd_mean_mps, vars(wind_spd_max_mps), na_pass = TRUE) |> 
+  interrogate()
+
+```
+
+# Timeseries consistency
+
+TODO:
+
+-   make this work with pointblank
 
 Let's pretend there is an outlier in the data
 
@@ -91,7 +121,3 @@ fc_sol_rad |>
   ) +
   labs(caption= "blue dot = forecast point, red triangle = actual data")
 ```
-
-## Temperature
-
-repeat with temperature
