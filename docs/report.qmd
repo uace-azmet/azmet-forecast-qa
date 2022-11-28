@@ -12,6 +12,7 @@ library(targets)
 library(tidyverse)
 library(fabletools)
 library(lubridate)
+library(pointblank)
 tar_load(c(
   fc_sol_rad,
   daily_test,
