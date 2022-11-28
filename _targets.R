@@ -56,6 +56,22 @@ tar_plan(
   daily_train = daily |> filter(datetime < max(datetime)),
   daily_test = daily |> filter(datetime == max(datetime)),
   
+  #hourly
+  hourly_start = "2020-12-30 00",
+  tar_target(
+    db_hourly_init,
+    init_hourly(hourly_start)
+  ),
+  tar_target(
+    db_hourly,
+    update_hourly(db_hourly_init),
+    cue = tarchetypes::tar_cue_age(
+      name = db_hourly,
+      age = as.difftime(1, units = "days")
+    ),
+    format = "file"
+  ),
+  
   tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
   needs_qa_daily = needs_qa(metadata_file, "daily"),
   needs_qa_hourly = needs_qa(metadata_file, "hourly"),

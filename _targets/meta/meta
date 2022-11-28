@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|ce835d29b61d8527|||||||||||||||
+.Random.seed|object|e4b7a2408afe3968|||||||||||||||
 487ba7d29227be45bd59dc0ffe1d6408369046a6|||||||||||||||||
 daily|stem|8d04d89e006e26ce|bd516b6a911698d4|726b11a4ffc24fd9|-758949561||t19324.6803113111s|f3fb3d6bba70489d|5336726|rds|local|vector|||0.772||
 daily_hist|stem|3c7f915cb156141a|f9a5a3a5e501fd9b|99696642e489be2f|-1213188871||t19297.6027837672s|8930382939d843ba|6102445|rds|local|vector|||1.271||
@@ -9,14 +9,18 @@ daily_train|stem|8b065feda09ab5fa|98fab79423e6d910|2c0e8dffc53f6ae6|-504909608||
 dat_hist|stem|09ca2de57b0c6e5a|3ae4a94fad047550|ef46db3751d8e999|1988315334|data/daily_hist.csv|t19286.92957691s|ded1aac1599d1486|27038300|file|local|vector|||0.009||
 data|stem|8a6da5e21b50124d|43fae4011a0626f4|136bf5e07fbd9b1c|1588979285||t19293.7789580905s|28ea73e277bbcf51|1741|rds|local|vector|||0.014||
 data_daily|stem|2c318ffc9621a181|c925d262dcdfc3e3|de286aff1e6fe383|1864822618|./data/daily/|t19305.9021921772s|83978b9cb967381c|14282435|file|local|vector|||0.275||
-db_daily|stem|b0657da64cdea2e8|43e524209fbc3f7c|1bc632e0a93707d6|-1523575140|./data/daily/|t19324.6802928248s|f61852ade2c8a0f3|14055503|file|local|vector|||1.685||
+db_daily|stem|b0657da64cdea2e8|43e524209fbc3f7c|1bc632e0a93707d6|-1523575140|./data/daily/|t19324.6802928248s|f61852ade2c8a0f3|14055503|file|local|vector|||0.717|No data retrieved from API|
 db_daily_init|stem|e67c5f279940e589|b70f07003e479d65|fe3d85869af533e9|-785006229||t19311.8404805271s|93a4d4dc4116d568|64|rds|local|vector|||0.284||
+db_hourly|stem|84297c7b73d51c96|fa6724170b5d508a|a611fd3b90b5eab5|801284518|data/hourly|t19324.8343418262s|f57646f2f241f071|50177322|file|local|vector|||290.808||
+db_hourly_init|stem|2276d5f346da910e|f771e3791492fc45|0ef4fdafe12a8e4c|-694431874||t19324.8161553166s|b2c2d69496a0fbf4|63|rds|local|vector|||1.685||
 fc_sol_rad|stem|c2539288483b6228|ab28bc8d11be4878|1d5fdace431255a8|1094577980||t19324.6803388885s|286e1c6e94c16b47|1665|rds|local|vector|||0.357||
 fit_ts_sol_rad|function|64219347c603a2be|||||||||||||||
 forecast_sol_rad|function|f47386214a9008c3|||||||||||||||
 get_daily_recent|function|d81f39624fbeb50d|||||||||||||||
 hist_data|stem|7396467515f37a32|07512e12acf84c26|9a729df8137a0b77|-946068063||t19293.7831032548s|38e70eecbf2bf4d8|7127057|rds|local|vector|||0.48||
 hist_file|stem|09ca2de57b0c6e5a|3ae4a94fad047550|ef46db3751d8e999|1076905581|data/daily_hist.csv|t19286.92957691s|ded1aac1599d1486|27038300|file|local|vector|||0.009||
+hourly_start|stem|a2c2ecfad67dbaa0|3b3619c635b1bc96|ef46db3751d8e999|-287792142||t19324.8114611589s|1d635f53cb385f1d|65|rds|local|vector|||1.448||
+init_hourly|function|5a2bdb396117e642|||||||||||||||
 legacy_daily|stem|3c7f915cb156141a|ae3e90ae541042c2|e04076b13e933935|-232030807||t19305.9126662106s|8930382939d843ba|6102445|rds|local|vector|||1.279||
 legacy_daily_file|stem|09ca2de57b0c6e5a|3ae4a94fad047550|ef46db3751d8e999|625020582|data/daily_hist.csv|t19286.92957691s|ded1aac1599d1486|27038300|file|local|vector|||1.454||
 make_model_data|function|4a5cc60d864ccfe6|||||||||||||||
@@ -29,12 +33,13 @@ past_daily|stem|c39037325afe11ff|68c34e3789e89120|c6530fb2b4ba3e71|-1021728434||
 read_update_historic|function|737b6f23316631c8|||||||||||||||
 read_wrangle_hist|function|dbb4d18b844226b6|||||||||||||||
 readme|stem|84d46c58c777c9be|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19314.8483031442s|35344f63d599de5b|7864|file|local|vector|||7.931||
-report|stem|db28db2108631ba4|7aa830353ecf96ed|df7f34612aed3a61|-237041703|docs/report.html*docs/report.qmd|t19324.6804294982s|b75c0892734e4065|25431|file|local|vector|||7.851||
+report|stem|db28db2108631ba4|7aa830353ecf96ed|df7f34612aed3a61|-237041703|docs/report.html*docs/report.qmd|t19324.8078251695s|b75c0892734e4065|25431|file|local|vector|||7.851||
 sliding_window|stem||a04148703701cc3c|4f38eb2c4d1a90cc|-641477393||t19293.8142210546s||0|file|local|vector|||5.515||33m39m System command quarto failed
 today|stem|52c8fbb048174015|3106b00d27d060eb|ff0fee3df6865aee|-119430342||t19306.8593414743s|6281f79619f6778a|80|rds|local|vector|||2.079||
 ts_sol_rad|stem|686784ad701de93c|efbe62b57d96bb46|130424f0d746b861|-801868184||t19324.6803346552s|0578c76d12f6811f|6078397|rds|local|vector|||0.183||
 update_daily|function|d5cea41b5b121351|||||||||||||||
 update_daily_hist|function|5d7d52abe34aa135|||||||||||||||
 update_historic|function|fb67eda8c0c75eeb|||||||||||||||
+update_hourly|function|c143dcfe2096dfa3|||||||||||||||
 write_daily|function|5822eaf89adf46ad|||||||||||||||
 write_daily_recent|function|3b9b1201b2867f86|||||||||||||||
