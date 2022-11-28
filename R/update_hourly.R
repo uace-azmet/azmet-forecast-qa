@@ -1,5 +1,11 @@
-# library(tidyverse)
-# library(azmetr)
+#' Update hourly data from API
+#'
+#' @param db_hourly path to hourly data store ("data/hourly")
+#' @param ... used only to add additional dependencies to trigger updates with
+#'   `targets`
+#'
+#' @return invisibly returns the `db_hourly` path 
+#' 
 update_hourly <- function(db_hourly, ...) {
   hourly_prev <- open_dataset(db_hourly)
   
