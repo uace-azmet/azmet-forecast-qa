@@ -27,7 +27,8 @@ update_daily <- function(db_daily, ...) {
   #get data since last date in saved data
   daily_new <- az_daily(start_date = last_date + 1)
   
-  if(is.na(daily_new)) {
+  # if API returns nothing
+  if(nrow(daily_new)==0) {
     
     return(invisible(db_daily))
     
