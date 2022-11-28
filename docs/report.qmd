@@ -18,40 +18,164 @@ library(tidyverse)
 library(fabletools)
 library(lubridate)
 library(pointblank)
+library(arrow)
+library(slider)
 
 tar_load(c(
-  fc_sol_rad,
-  daily_test,
-  daily_train,
-  daily
+#  fc_sol_rad,
+#  daily_test,
+#  daily_train,
+  db_daily,
+  db_hourly,
+  needs_qa_daily,
+  needs_qa_hourly
 ))
+
+#TODO: An alternative to collect() is to convert to duckdb and have pointblank work directly on database.  Might be faster?
+daily <-
+  open_dataset(db_daily) |> 
+  filter(datetime > ymd("2021-01-01")) |>
+  collect() |> 
+  arrange(meta_station_id, desc(datetime))
+
+hourly <-
+  open_dataset(db_hourly) |>
+  filter(date_datetime > ymd("2021-01-01")) |>
+  collect() |> 
+  arrange(meta_station_id, desc(date_datetime))
 ```
 
 # Consistency checks
 
-## Daily Data
-
 ```{r}
 #create action levels for warnings and errors
 #TODO add notify level
-#TODO pointblank can work with a database object, eg duckdb.  Faster?
-#TODO only validate past few months (?) of data
-al <- action_levels(warn_at = 0.1, stop_at = 1)
+
+al <- action_levels(warn_at = 1, stop_at = 0.1)
+```
+
+## Daily Data
+
+```{r}
 daily |> 
-  tibble::as_tibble() |> 
   create_agent(
     tbl_name = "Daily measures",
     label = "Consistency Checks",
     actions = al
   ) |> 
+  # Internal consistency checks from 'NWS (1994) TSP 88-21-R2':
   col_vals_gte(temp_air_meanC, vars(dwpt_mean), na_pass = TRUE) |> 
   col_vals_lte(temp_air_minC, vars(temp_air_meanC), na_pass = TRUE) |> 
   col_vals_lte(temp_air_meanC, vars(temp_air_maxC), na_pass = TRUE) |> 
   col_vals_lte(wind_spd_mean_mps, vars(wind_spd_max_mps), na_pass = TRUE) |> 
+  col_vals_lte(temp_soil_10cm_meanC, vars(temp_soil_10cm_maxC), na_pass = TRUE) |> 
+  col_vals_lte(temp_soil_10cm_minC, vars(temp_soil_10cm_meanC), na_pass = TRUE) |> 
+  col_vals_lte(temp_soil_50cm_meanC, vars(temp_soil_50cm_maxC), na_pass = TRUE) |> 
+  col_vals_lte(temp_soil_50cm_minC, vars(temp_soil_50cm_meanC), na_pass = TRUE) |>
+  col_vals_lte(relative_humidity_mean, vars(relative_humidity_max), na_pass = TRUE) |>
+  col_vals_lte(relative_humidity_min, vars(relative_humidity_mean), na_pass = TRUE) |>
+  
   #TODO calculate max sol radiation based on date and location and check for that
   # col_vals_lt(sol_rad_total, sol_rad_expected, preconditions = ~calc_sol(date))
   interrogate()
 
+```
+
+## Hourly data
+
+```{r}
+hourly |> 
+  create_agent(
+    tbl_name = "Hourly measures",
+    label = "Consistency Checks",
+    actions = al
+  ) |> 
+  # Internal consistency checks from 'NWS (1994) TSP 88-21-R2':
+  col_vals_gte(temp_airC, vars(dwpt), na_pass = TRUE) |> 
+  col_vals_lte(wind_spd_mps, vars(wind_spd_max_mps), na_pass = TRUE) |> 
+  
+  # Temporal consistency checks from 'NWS (1994) TSP 88-21-R2':
+  col_vals_lt(
+    temp_airC_delta,
+    19.4, 
+    na_pass = TRUE,
+    brief = "Expect that |∆`temp_airC`| < 19.4",
+    preconditions = function(x) x |> 
+      group_by(meta_station_id) |> 
+      mutate(temp_airC_delta = abs(temp_airC - lag(temp_airC)),
+             .after = temp_airC) |> 
+      ungroup()
+  ) |> 
+  col_vals_lt(
+    relative_humidity_delta,
+    50,
+    na_pass = TRUE,
+    brief = "Expect that |∆`relative_humidity`| < 50",
+    preconditions = function(x) x |> 
+      group_by(meta_station_id) |> 
+      mutate(relative_humidity_delta = abs(relative_humidity - lag(relative_humidity)),
+             .after = relative_humidity) |> 
+      ungroup()
+  ) |> 
+  col_vals_lt(
+    wind_spd_mps_delta,
+    10.3,
+    na_pass = TRUE,
+    brief = "Expect that |∆`wind_spd_mps`| < 10.3",
+    preconditions = function(x) x |> 
+      group_by(meta_station_id) |> 
+      mutate(wind_spd_mps_delta = abs(wind_spd_mps - lag(wind_spd_mps)),
+             .after = wind_spd_mps) |> 
+      ungroup()
+  ) |> 
+  
+  # Temporal consistency ('persistence') checks:
+  col_vals_equal(
+    sol_rad_total_14,
+    FALSE, #true means < 1 for the past 14 hours
+    na_pass = TRUE,
+    brief = "Expect that sol_rad_total should not be < 1 for more than 14 hours",
+    preconditions = function(x) x |> 
+      group_by(meta_station_id) |> 
+      mutate(
+        sol_rad_total_14 = slider::slide_lgl(
+          sol_rad_total, ~all(.x < 1),
+          .after = 14, #.after because arrange(desc(datetime))
+          .complete = TRUE
+        )
+      ) |> ungroup()
+  ) |> 
+  col_vals_equal(
+    wind_spd_mps_14,
+    FALSE, #true means < 1 for the past 14 hours
+    na_pass = TRUE,
+    brief = "Expect that wind_spd_mps should not be < 1 for more than 14 hours",
+    preconditions = function(x) x |> 
+      group_by(meta_station_id) |> 
+      mutate(
+        wind_spd_mps_14 = slider::slide_lgl(
+          wind_spd_mps, ~all(.x < 1),
+          .after = 14, #.after because arrange(desc(datetime))
+          .complete = TRUE
+        )
+      ) |> ungroup()
+  ) |> 
+  col_vals_equal(
+    wind_vector_dir_14,
+    FALSE, #true means < 1 for the past 14 hours
+    na_pass = TRUE,
+    brief = "Expect that wind_vector_dir should not be < 1 for more than 14 hours",
+    preconditions = function(x) x |> 
+      group_by(meta_station_id) |> 
+      mutate(
+        wind_vector_dir_14 = slider::slide_lgl(
+          wind_vector_dir, ~all(.x < 1),
+          .after = 14, #.after because arrange(desc(datetime))
+          .complete = TRUE
+        )
+      ) |> ungroup()
+  ) |> 
+interrogate()
 ```
 
 # Forecast-based validation
@@ -63,10 +187,10 @@ TODO:
 Let's pretend there is an outlier in the data
 
 ```{r}
-daily_test <-
-  daily_test |> 
-  select(meta_station_id, everything()) |>
-  mutate(sol_rad_total = if_else(meta_station_id == "az01", 30, sol_rad_total))
+# daily_test <-
+#   daily_test |> 
+#   select(meta_station_id, everything()) |>
+#   mutate(sol_rad_total = if_else(meta_station_id == "az01", 30, sol_rad_total))
 ```
 
 What would be cool here is a table with variable name and check or red x for pass or fail QA.
@@ -75,60 +199,60 @@ These would have links to relevant sections below with plots and tables.
 ## Solar Radiation
 
 ```{r}
-sol_fc <-
-  fc_sol_rad |>
-  hilo(c(95, 99)) |>
-  select(-sol_rad_total, -.model) |>
-  mutate(across(where(~inherits(., "hilo")), ~round(., 3)))
-sol_test <- daily_test |>
-  select(sol_rad_total)
-sol_train <- daily_train |>
-  select(sol_rad_total)
-
-sol_qa <-
-  right_join(
-  sol_fc,
-  sol_test,
-  by = c("meta_station_id", "meta_station_name", "datetime")
-) |>
-  mutate(flag = case_when(
-    sol_rad_total < `99%`$lower ~ "extreme",
-    sol_rad_total > `99%`$upper ~ "extreme",
-    sol_rad_total < `95%`$lower ~ "outlier",
-    sol_rad_total > `95%`$upper ~ "outlier"
-  )) |>
-    select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean, flag)
-
-sol_qa |> filter(!is.na(flag))
+# sol_fc <-
+#   fc_sol_rad |>
+#   hilo(c(95, 99)) |>
+#   select(-sol_rad_total, -.model) |>
+#   mutate(across(where(~inherits(., "hilo")), ~round(., 3)))
+# sol_test <- daily_test |>
+#   select(sol_rad_total)
+# sol_train <- daily_train |>
+#   select(sol_rad_total)
+# 
+# sol_qa <-
+#   right_join(
+#   sol_fc,
+#   sol_test,
+#   by = c("meta_station_id", "meta_station_name", "datetime")
+# ) |>
+#   mutate(flag = case_when(
+#     sol_rad_total < `99%`$lower ~ "extreme",
+#     sol_rad_total > `99%`$upper ~ "extreme",
+#     sol_rad_total < `95%`$lower ~ "outlier",
+#     sol_rad_total > `95%`$upper ~ "outlier"
+#   )) |>
+#     select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean, flag)
+# 
+# sol_qa |> filter(!is.na(flag))
 ```
 
 Filter by stations with flags and only plot those.
 Or maybe embed a simple shiny app that lets you view different stations?
 
 ```{r}
-#extract stations with flags
-sol_qa_stations <-
-  sol_qa |>
-  filter(!is.na(flag)) |>
-  pull(meta_station_id)
-
-
-
-# filter forecast
-fc_sol_rad |>
-  filter(meta_station_id %in% sol_qa_stations) |>
-  autoplot(
-    #with training data
-    sol_train |>
-      #filter to show only past few weeks of data
-      filter(datetime > max(datetime) - weeks(3)),
-    level = c(95, 99)
-  ) +
-  geom_point(
-    data = sol_test  |>
-      #filter stations
-      filter(meta_station_id %in% sol_qa_stations),
-    aes(y = sol_rad_total), shape = "triangle", size = 1, color = "red"
-  ) +
-  labs(caption= "blue dot = forecast point, red triangle = actual data")
+# #extract stations with flags
+# sol_qa_stations <-
+#   sol_qa |>
+#   filter(!is.na(flag)) |>
+#   pull(meta_station_id)
+# 
+# 
+# 
+# # filter forecast
+# fc_sol_rad |>
+#   filter(meta_station_id %in% sol_qa_stations) |>
+#   autoplot(
+#     #with training data
+#     sol_train |>
+#       #filter to show only past few weeks of data
+#       filter(datetime > max(datetime) - weeks(3)),
+#     level = c(95, 99)
+#   ) +
+#   geom_point(
+#     data = sol_test  |>
+#       #filter stations
+#       filter(meta_station_id %in% sol_qa_stations),
+#     aes(y = sol_rad_total), shape = "triangle", size = 1, color = "red"
+#   ) +
+#   labs(caption= "blue dot = forecast point, red triangle = actual data")
 ```
