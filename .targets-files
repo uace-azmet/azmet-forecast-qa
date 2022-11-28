@@ -24,7 +24,9 @@ _targets/objects/daily_recent
 _targets/objects/daily_test
 _targets/objects/daily_train
 _targets/objects/db_daily_init
+_targets/objects/db_hourly_init
 _targets/objects/fc_sol_rad
+_targets/objects/hourly_start
 _targets/objects/legacy_daily
 _targets/objects/needs_qa_daily
 _targets/objects/needs_qa_hourly
@@ -50,6 +52,9 @@ data/daily/date_year=2019/part-0.parquet
 data/daily/date_year=2020/part-0.parquet
 data/daily/date_year=2021/part-0.parquet
 data/daily/date_year=2022/part-0.parquet
+data/hourly/date_year=2020/part-0.parquet
+data/hourly/date_year=2021/part-0.parquet
+data/hourly/date_year=2022/part-0.parquet
 README.md
 _targets/meta/meta
 docs/report.html
