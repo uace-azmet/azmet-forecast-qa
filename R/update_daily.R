@@ -17,13 +17,6 @@ update_daily <- function(db_daily, ...) {
     pull(datetime, as_vector = TRUE) |>
     max()
   
-  #read in the current year only because that's how it's partitioned and only
-  #the most recent year of data will need to get overwritten.
-  daily_current_year <- 
-    daily_prev |> 
-    filter(date_year == year(last_date)) |>
-    collect()
-  
   #get data since last date in saved data
   daily_new <- az_daily(start_date = last_date + 1)
   
@@ -35,10 +28,16 @@ update_daily <- function(db_daily, ...) {
   } else {
     
   daily <- 
-    bind_rows(daily_current_year, daily_new) 
+    #arrow doesn't currently have bindings to bind_rows(), so need to collect() first.
+    bind_rows(collect(daily_prev), daily_new) 
   
   #overwrite current year
-  write_daily(daily, path = db_daily)
+  write_dataset(
+    daily,
+    path = db_daily,
+    format = "parquet",
+    partitioning = "date_year"
+  )
   return(invisible(db_daily))
   }
 }
