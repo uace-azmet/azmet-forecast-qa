@@ -65,6 +65,7 @@ tar_plan(
   tar_target(
     db_hourly,
     update_hourly(db_hourly_init),
+    #This target becomes invalid if it hasn't been run for a day
     cue = tarchetypes::tar_cue_age(
       name = db_hourly,
       age = as.difftime(1, units = "days")
