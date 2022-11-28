@@ -7,12 +7,18 @@ format:
 editor: visual
 ---
 
+This could be a parameterized report to change the dates for the QA/QC (e.g. for doing legacy data)
+
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 library(targets)
 library(tidyverse)
 library(fabletools)
 library(lubridate)
 library(pointblank)
+
 tar_load(c(
   fc_sol_rad,
   daily_test,
@@ -23,6 +29,8 @@ tar_load(c(
 
 # Consistency checks
 
+## Daily Data
+
 ```{r}
 #create action levels for warnings and errors
 #TODO add notify level
@@ -30,7 +38,7 @@ tar_load(c(
 #TODO only validate past few months (?) of data
 al <- action_levels(warn_at = 0.1, stop_at = 1)
 daily |> 
-  as_tibble() |> 
+  tibble::as_tibble() |> 
   create_agent(
     tbl_name = "Daily measures",
     label = "Consistency Checks",
@@ -40,11 +48,13 @@ daily |>
   col_vals_lte(temp_air_minC, vars(temp_air_meanC), na_pass = TRUE) |> 
   col_vals_lte(temp_air_meanC, vars(temp_air_maxC), na_pass = TRUE) |> 
   col_vals_lte(wind_spd_mean_mps, vars(wind_spd_max_mps), na_pass = TRUE) |> 
+  #TODO calculate max sol radiation based on date and location and check for that
+  # col_vals_lt(sol_rad_total, sol_rad_expected, preconditions = ~calc_sol(date))
   interrogate()
 
 ```
 
-# Timeseries consistency
+# Forecast-based validation
 
 TODO:
 
@@ -53,8 +63,9 @@ TODO:
 Let's pretend there is an outlier in the data
 
 ```{r}
-daily_test <- 
-daily_test |> select(meta_station_id, everything()) |> 
+daily_test <-
+  daily_test |> 
+  select(meta_station_id, everything()) |>
   mutate(sol_rad_total = if_else(meta_station_id == "az01", 30, sol_rad_total))
 ```
 
@@ -64,28 +75,28 @@ These would have links to relevant sections below with plots and tables.
 ## Solar Radiation
 
 ```{r}
-sol_fc <- 
+sol_fc <-
   fc_sol_rad |>
-  hilo(c(95, 99)) |> 
-  select(-sol_rad_total, -.model) |> 
+  hilo(c(95, 99)) |>
+  select(-sol_rad_total, -.model) |>
   mutate(across(where(~inherits(., "hilo")), ~round(., 3)))
 sol_test <- daily_test |>
   select(sol_rad_total)
-sol_train <- daily_train |> 
+sol_train <- daily_train |>
   select(sol_rad_total)
 
-sol_qa <- 
+sol_qa <-
   right_join(
   sol_fc,
   sol_test,
   by = c("meta_station_id", "meta_station_name", "datetime")
-) |> 
+) |>
   mutate(flag = case_when(
     sol_rad_total < `99%`$lower ~ "extreme",
     sol_rad_total > `99%`$upper ~ "extreme",
     sol_rad_total < `95%`$lower ~ "outlier",
     sol_rad_total > `95%`$upper ~ "outlier"
-  )) |> 
+  )) |>
     select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean, flag)
 
 sol_qa |> filter(!is.na(flag))
@@ -96,16 +107,16 @@ Or maybe embed a simple shiny app that lets you view different stations?
 
 ```{r}
 #extract stations with flags
-sol_qa_stations <- 
-  sol_qa |> 
-  filter(!is.na(flag)) |> 
+sol_qa_stations <-
+  sol_qa |>
+  filter(!is.na(flag)) |>
   pull(meta_station_id)
 
 
 
 # filter forecast
-fc_sol_rad |> 
-  filter(meta_station_id %in% sol_qa_stations) |> 
+fc_sol_rad |>
+  filter(meta_station_id %in% sol_qa_stations) |>
   autoplot(
     #with training data
     sol_train |>
@@ -114,7 +125,7 @@ fc_sol_rad |>
     level = c(95, 99)
   ) +
   geom_point(
-    data = sol_test  |> 
+    data = sol_test  |>
       #filter stations
       filter(meta_station_id %in% sol_qa_stations),
     aes(y = sol_rad_total), shape = "triangle", size = 1, color = "red"
