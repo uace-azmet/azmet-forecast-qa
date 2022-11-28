@@ -40,8 +40,7 @@ tar_plan(
   # Read and wrangle data ---------------------------------------------------
   tar_file(legacy_daily_file, "data/daily_hist.csv"),
   legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
-  past_daily = update_daily_hist(legacy_daily), #up to october 2022
-  tar_target(db_daily_init, write_daily(past_daily)),
+  db_daily_init = update_daily_hist(legacy_daily), #up to october 2022
   tar_target(
     db_daily, 
     update_daily(db_daily_init), #also writes to data/daily
