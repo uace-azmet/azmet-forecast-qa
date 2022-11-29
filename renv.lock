@@ -126,15 +126,15 @@
     },
     "azmetr": {
       "Package": "azmetr",
-      "Version": "0.0.0.9004",
+      "Version": "0.0.0.9005",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteUsername": "cct-datascience",
       "RemoteRepo": "azmetr",
       "RemoteRef": "HEAD",
-      "RemoteSha": "9e4bc74a157c02f688f1fe047690bf5b36a073fe",
+      "RemoteSha": "a70e82ce6cfbdd55705710a3fab8fff5591dbb2d",
       "RemoteHost": "api.github.com",
-      "Hash": "7a573b427c26bd980141c6c0c2a387b1",
+      "Hash": "27909c2d8e74ae8cf79c0b1323de547c",
       "Requirements": [
         "attempt",
         "curl",
