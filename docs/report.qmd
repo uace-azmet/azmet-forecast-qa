@@ -78,7 +78,6 @@ daily |>
   #TODO calculate max sol radiation based on date and location and check for that
   # col_vals_lt(sol_rad_total, sol_rad_expected, preconditions = ~calc_sol(date))
   interrogate()
-
 ```
 
 ## Hourly data
@@ -180,79 +179,59 @@ interrogate()
 
 # Forecast-based validation
 
-TODO:
+::: callout-warning
+WORK IN PROGRESS\
+Currently the same seasonal naïve model is fit to every variable and it is not always appropriate.
+See model diagnostic plots with `tar_read(resid_daily)`.
+:::
 
--   make this work with pointblank
-
-Let's pretend there is an outlier in the data
+Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table
 
 ```{r}
-# daily_test <-
-#   daily_test |> 
-#   select(meta_station_id, everything()) |>
-#   mutate(sol_rad_total = if_else(meta_station_id == "az01", 30, sol_rad_total))
+tar_load(fc_daily)
+create_agent(
+  fc_daily,
+  tbl_name = "Daily Measures",
+  label = "Forecast-Based Validations",
+  actions = al
+) |> 
+  col_vals_between(
+    obs, vars(lower_95), vars(upper_95), segments = vars(varname)
+    ) |> 
+  interrogate()
 ```
 
-What would be cool here is a table with variable name and check or red x for pass or fail QA.
-These would have links to relevant sections below with plots and tables.
-
-## Solar Radiation
+# Timeseries Plots
 
 ```{r}
-# sol_fc <-
-#   fc_sol_rad |>
-#   hilo(c(95, 99)) |>
-#   select(-sol_rad_total, -.model) |>
-#   mutate(across(where(~inherits(., "hilo")), ~round(., 3)))
-# sol_test <- daily_test |>
-#   select(sol_rad_total)
-# sol_train <- daily_train |>
-#   select(sol_rad_total)
-# 
-# sol_qa <-
-#   right_join(
-#   sol_fc,
-#   sol_test,
-#   by = c("meta_station_id", "meta_station_name", "datetime")
-# ) |>
-#   mutate(flag = case_when(
-#     sol_rad_total < `99%`$lower ~ "extreme",
-#     sol_rad_total > `99%`$upper ~ "extreme",
-#     sol_rad_total < `95%`$lower ~ "outlier",
-#     sol_rad_total > `95%`$upper ~ "outlier"
-#   )) |>
-#     select(meta_station_id, meta_station_name, datetime, sol_rad_total, forecast = .mean, flag)
-# 
-# sol_qa |> filter(!is.na(flag))
+library(ggdist)
+varnames <- tar_read(needs_qa_daily)
+daily_long <- daily |> 
+  select(datetime, meta_station_name, meta_station_id, all_of(varnames)) |>
+  pivot_longer(varnames, names_to = "varname")
+
+daily_list <- daily_long |> group_by(varname) |> group_split()
+fc_daily_list <- fc_daily |> group_by(varname) |> group_split()
+
+ts <- daily_list[[6]]
+fc <- fc_daily_list[[6]]
+
+make_plot <- function(ts, fc) {
+  ylab <- ts$varname |> unique()
+  ts |> 
+    filter(datetime > today() - weeks(4)) |> 
+    ggplot(aes(x = datetime, y = value)) +
+    geom_line() +
+    geom_point(data = fc, aes(y = fc_mean), color = "red", shape = 1) +
+    geom_point(data = fc, aes(y = obs), color = "blue") +
+    geom_interval(data = fc, aes(ymin = lower_95, ymax = upper_95, y = fc_mean), alpha = 0.3, color = "red") +
+    geom_interval(data = fc, aes(ymin = lower_99, ymax = upper_99, y = fc_mean), alpha = 0.3, color = "red") +
+    labs(y = ylab) +
+    facet_wrap(~meta_station_id)
+}
+
 ```
 
-Filter by stations with flags and only plot those.
-Or maybe embed a simple shiny app that lets you view different stations?
-
 ```{r}
-# #extract stations with flags
-# sol_qa_stations <-
-#   sol_qa |>
-#   filter(!is.na(flag)) |>
-#   pull(meta_station_id)
-# 
-# 
-# 
-# # filter forecast
-# fc_sol_rad |>
-#   filter(meta_station_id %in% sol_qa_stations) |>
-#   autoplot(
-#     #with training data
-#     sol_train |>
-#       #filter to show only past few weeks of data
-#       filter(datetime > max(datetime) - weeks(3)),
-#     level = c(95, 99)
-#   ) +
-#   geom_point(
-#     data = sol_test  |>
-#       #filter stations
-#       filter(meta_station_id %in% sol_qa_stations),
-#     aes(y = sol_rad_total), shape = "triangle", size = 1, color = "red"
-#   ) +
-#   labs(caption= "blue dot = forecast point, red triangle = actual data")
+purrr::map2(daily_list, fc_daily_list, make_plot)
 ```
