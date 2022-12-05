@@ -83,13 +83,19 @@ tar_plan(
   # ts_precip = ,
 
   # Forecasting -------------------------------------------------------------
-
-  fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
+  #TODO: need to transform variables
+  tar_target(
+    fc_daily,
+    forecast_daily(db_daily, needs_qa_daily),
+    pattern = map(needs_qa_daily),
+    iteration = "list"
+  ),
+  # fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
   # fc_remp = ,
   # fc_precip = ,
 
   # Reports -----------------------------------------------------------------
-  tar_quarto(report, "docs/report.qmd"),
+  # tar_quarto(report, "docs/report.qmd"),
   tar_quarto(readme, "README.qmd")
   
 )

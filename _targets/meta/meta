@@ -1,20 +1,41 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|ad675331bd0764aa|||||||||||||||
+.Random.seed|object|5e93bb57a5fa48b7|||||||||||||||
 487ba7d29227be45bd59dc0ffe1d6408369046a6|||||||||||||||||
-daily|stem|8d04d89e006e26ce|bd516b6a911698d4|ac50ad53c8a90cc8|-758949561||t19324.8434418017s|f3fb3d6bba70489d|5336726|rds|local|vector|||0.546||
+daily|stem|818ee948c321f1b0|bd516b6a911698d4|13614ebb1b3f3c49|-758949561||t19331.6793457002s|d8e4c98d69759ec3|5349761|rds|local|vector|||0.582||
 daily_hist|stem|3c7f915cb156141a|f9a5a3a5e501fd9b|99696642e489be2f|-1213188871||t19297.6027837672s|8930382939d843ba|6102445|rds|local|vector|||1.271||
 daily_recent|stem|e6e7f6ab2d39127f|900e732a4465e96c|3e2f7eb992350606|-2067017894||t19305.8972635115s|a363889f0120a5a4|10008268|rds|local|vector|||21.97||
-daily_test|stem|6540de7e0c1e17d2|6ffe0f4d1524c760|14a523fb9d5174ce|-1600148948||t19324.6803229791s|75bc8419aca36d33|4923|rds|local|vector|||0.014||
-daily_train|stem|8b065feda09ab5fa|98fab79423e6d910|2c0e8dffc53f6ae6|-504909608||t19324.6803227017s|12a4cca3bbf72626|5333846|rds|local|vector|||0.207||
+daily_test|stem|c3861a78a0585505|6ffe0f4d1524c760|c2621aa1c719a795|-1600148948||t19331.6796646529s|d06021fc102b65e2|4904|rds|local|vector|||0.014||
+daily_train|stem|36fbfbf1aa94190f|98fab79423e6d910|85c9499a38b46716|-504909608||t19331.6796643875s|2e4252112a1ad839|5345971|rds|local|vector|||0.201||
 dat_hist|stem|09ca2de57b0c6e5a|3ae4a94fad047550|ef46db3751d8e999|1988315334|data/daily_hist.csv|t19286.92957691s|ded1aac1599d1486|27038300|file|local|vector|||0.009||
 data|stem|8a6da5e21b50124d|43fae4011a0626f4|136bf5e07fbd9b1c|1588979285||t19293.7789580905s|28ea73e277bbcf51|1741|rds|local|vector|||0.014||
 data_daily|stem|2c318ffc9621a181|c925d262dcdfc3e3|de286aff1e6fe383|1864822618|./data/daily/|t19305.9021921772s|83978b9cb967381c|14282435|file|local|vector|||0.275||
-db_daily|stem|5a06387bf853f9eb|43e524209fbc3f7c|7700e30749aa5f0f|-1523575140|data/daily|t19311.8375345925s|b19d791baa880f5c|704|file|local|vector|||2.07||
+db_daily|stem|148550e57042d6d8|43e524209fbc3f7c|7700e30749aa5f0f|-1523575140|data/daily|t19311.8375345925s|b19d791baa880f5c|704|file|local|vector|||0.43|No data retrieved from API|
 db_daily_init|stem|07405a5e081960ce|68c34e3789e89120|a53874ccc7f1cd83|-785006229||t19324.8434023843s|e0224cf10db1a05d|62|rds|local|vector|||24.221||
-db_hourly|stem|84297c7b73d51c96|fa6724170b5d508a|a611fd3b90b5eab5|801284518|data/hourly|t19324.8343373665s|8c237f5c678b0a48|160|file|local|vector|||290.808||
+db_hourly|stem|71c4882fcdd6c77f|fa6724170b5d508a|a611fd3b90b5eab5|801284518|data/hourly|t19324.8343373665s|8c237f5c678b0a48|160|file|local|vector|||1.218|No data retrieved from API|
 db_hourly_init|stem|2276d5f346da910e|f771e3791492fc45|0ef4fdafe12a8e4c|-694431874||t19324.8161553166s|b2c2d69496a0fbf4|63|rds|local|vector|||1.685||
-fc_sol_rad|stem|c2539288483b6228|ab28bc8d11be4878|1d5fdace431255a8|1094577980||t19324.6803388885s|286e1c6e94c16b47|1665|rds|local|vector|||0.357||
+fc_daily|pattern|80267f91d5650ae0|46c19fe6863be087||-316323687||||34085|rds|local|list||fc_daily_4828eb38*fc_daily_c4d3187c*fc_daily_2616b906*fc_daily_740ac7e4*fc_daily_a4c0191e*fc_daily_6daf13ff*fc_daily_894d14d0*fc_daily_c07aad1e*fc_daily_1177e9a3*fc_daily_72f49635*fc_daily_2e3d08c9*fc_daily_db2f96a1*fc_daily_b9f36516*fc_daily_7121c4b4*fc_daily_9dbce86a*fc_daily_de1bc782*fc_daily_772f6063*fc_daily_c1aaf311*fc_daily_03f5c79d|31.603||
+fc_daily_03f5c79d|branch|3eaf09cb9cc34cd4|46c19fe6863be087|dd46f0598143e833|929232613||t19331.7019399286s|f716bd6ac3410f04|1882|rds|local|list|fc_daily||1.774||
+fc_daily_1177e9a3|branch|537cc11dd36a8379|46c19fe6863be087|4ea5241a73aad495|-1917480578||t19331.7017464887s|caffc78dae8c0f55|1768|rds|local|list|fc_daily||1.594|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+fc_daily_2616b906|branch|b239330adc394b42|46c19fe6863be087|2b43059bbcbd6a0a|724078102||t19331.7016284892s|8664451f9c2720ba|1823|rds|local|list|fc_daily||1.391||
+fc_daily_2e3d08c9|branch|df75f0d8e62ca0a0|46c19fe6863be087|d67f2745919fe763|-1994846817||t19331.7017864118s|586723939f2265f8|1772|rds|local|list|fc_daily||1.693|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+fc_daily_4828eb38|branch|f39e244678d636b1|46c19fe6863be087|9f1b97ee4e5637f0|58514990||t19331.7015979026s|ccdde350a69eead0|1371|rds|local|list|fc_daily||2.209|1m22mUsing an external vector in selections was deprecated in tidyselect 1.1.0.36mℹ39m Please use all_of or any_of instead.   Was  data  selectneeds_qa_daily   Now  data  selectall_ofneeds_qa_dailySee httpstidyselect.rlib.orgreferencefaqexternalvector.html.|
+fc_daily_6daf13ff|branch|d29f957c50ef72b3|46c19fe6863be087|01ae93ebdbf918f0|-1840990430||t19331.701684942s|bb18b06eeb41e5f0|1816|rds|local|list|fc_daily||1.756||
+fc_daily_7121c4b4|branch|84b048f78ad9fcf8|46c19fe6863be087|a6eca69a0869dbb5|1372149091||t19331.7018489161s|862df259d4b439af|1776|rds|local|list|fc_daily||1.865|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+fc_daily_72f49635|branch|7be36e4ade8d3eb8|46c19fe6863be087|ea8902ca9438c76a|-1240935985||t19331.7017667193s|862df259d4b439af|1776|rds|local|list|fc_daily||1.74|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+fc_daily_740ac7e4|branch|c1d4ed3fc4a6ff50|46c19fe6863be087|c61d697d3174ddd6|-1152534737||t19331.7016452808s|b6246dfde7dad542|1835|rds|local|list|fc_daily||1.444||
+fc_daily_772f6063|branch|f5b12c6a8066e5e9|46c19fe6863be087|edfe54d8a4fb66c2|-1193682895||t19331.7019015342s|35dd313517250056|1812|rds|local|list|fc_daily||1.521||
+fc_daily_894d14d0|branch|59d38257a0c460ab|46c19fe6863be087|6acf1959f82f4585|-105988183||t19331.7017099285s|1113ca0fca0a89f0|1795|rds|local|list|fc_daily||2.148||
+fc_daily_9dbce86a|branch|89f3c6f2985ccdd5|46c19fe6863be087|4e1a4dd88e962a00|-1232682455||t19331.7018679277s|784b8989b3239423|1765|rds|local|list|fc_daily||1.628||
+fc_daily_a4c0191e|branch|18863f1e246944f9|46c19fe6863be087|bb37ad08a2bff6e9|-1188616920||t19331.7016645216s|7b1aa2f01b98a7cc|1961|rds|local|list|fc_daily||1.655||
+fc_daily_b9f36516|branch|dcaaa5017f4d2f79|46c19fe6863be087|629bac45b83e543e|955350207||t19331.7018272519s|159f8594bfb2f075|1767|rds|local|list|fc_daily||1.623|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+fc_daily_c07aad1e|branch|391c7638c2cd374b|46c19fe6863be087|ae4877ea65a52c75|479659067||t19331.7017279423s|cdb9a12b35d17c7c|1885|rds|local|list|fc_daily||1.545||
+fc_daily_c1aaf311|branch|c3bffb45e7fdc565|46c19fe6863be087|5c21180343f9afca|1863090962||t19331.7019193009s|a1c0a8a9baa3290f|1830|rds|local|list|fc_daily||1.526||
+fc_daily_c4d3187c|branch|947212c8740f14aa|46c19fe6863be087|7031a4a78de1456d|-1578483191||t19331.7016123223s|d0fcb3bbf88f7558|1798|rds|local|list|fc_daily||1.238||
+fc_daily_db2f96a1|branch|6d4eceea3908df36|46c19fe6863be087|8555b03268b55449|1822888367||t19331.7018083828s|ba7c7a896b4ee627|1764|rds|local|list|fc_daily||1.889|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+fc_daily_de1bc782|branch|7ccb4b5d710ad8ff|46c19fe6863be087|56e168e19b32a1bf|-391264269||t19331.7018838027s|d302fe258f16dd01|1889|rds|local|list|fc_daily||1.364||
+fc_sol_rad|stem|b959f7a157a299e2|ab28bc8d11be4878|42adbb7b917b3412|1094577980||t19331.6796822189s|fd3929b022be333a|1667|rds|local|vector|||0.365||
 fit_ts_sol_rad|function|64219347c603a2be|||||||||||||||
+forecast_daily|function|4d0b32038104aa29|||||||||||||||
 forecast_sol_rad|function|f47386214a9008c3|||||||||||||||
 get_daily_recent|function|d81f39624fbeb50d|||||||||||||||
 hist_data|stem|7396467515f37a32|07512e12acf84c26|9a729df8137a0b77|-946068063||t19293.7831032548s|38e70eecbf2bf4d8|7127057|rds|local|vector|||0.48||
@@ -32,11 +53,11 @@ needs_qa_hourly|stem|08dbde39c31f0383|39476934d05583a6|aecf20622feb7718|23900358
 past_daily|stem|c39037325afe11ff|68c34e3789e89120|c6530fb2b4ba3e71|-1021728434||t19305.9355652717s|e46c7f42868ad568|9948056|rds|local|vector|||21.23||
 read_update_historic|function|737b6f23316631c8|||||||||||||||
 read_wrangle_hist|function|dbb4d18b844226b6|||||||||||||||
-readme|stem|84d46c58c777c9be|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19314.8483031442s|35344f63d599de5b|7864|file|local|vector|||7.931||
-report|stem|db28db2108631ba4|1f0467d1330a2570|43f6ac527c0557b8|-237041703|docs/report.html*docs/report.qmd|t19324.8078251695s||25431|file|local|vector|||5.892||33m39m System command quarto failed
+readme|stem|84d46c58c777c9be|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19325.644989144s|35344f63d599de5b|7864|file|local|vector|||7.931||
+report|stem|db28db2108631ba4|d01b8c6a1706c658|3e8680d9f5f2d932|-237041703|docs/report.html*docs/report.qmd|t19324.8078251695s||25431|file|local|vector|||9.787||33m39m System command quarto failed
 sliding_window|stem||a04148703701cc3c|4f38eb2c4d1a90cc|-641477393||t19293.8142210546s||0|file|local|vector|||5.515||33m39m System command quarto failed
 today|stem|52c8fbb048174015|3106b00d27d060eb|ff0fee3df6865aee|-119430342||t19306.8593414743s|6281f79619f6778a|80|rds|local|vector|||2.079||
-ts_sol_rad|stem|686784ad701de93c|efbe62b57d96bb46|130424f0d746b861|-801868184||t19324.6803346552s|0578c76d12f6811f|6078397|rds|local|vector|||0.183||
+ts_sol_rad|stem|461148434250c8d6|efbe62b57d96bb46|b36c9bf1209390d6|-801868184||t19331.6796778935s|0ffe61f1a2408001|6090665|rds|local|vector|||0.315||
 update_daily|function|440655ea5aba5e56|||||||||||||||
 update_daily_hist|function|4b0fcf0e49ebbd7d|||||||||||||||
 update_historic|function|fb67eda8c0c75eeb|||||||||||||||
