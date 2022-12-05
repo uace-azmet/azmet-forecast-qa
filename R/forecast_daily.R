@@ -24,6 +24,6 @@ forecast_daily <- function(ts_daily, db_daily, var) {
            upper_99 = fc_99$upper) |>
     select(-fc_95, -fc_99) |> 
     rename("obs" = {{var}}) |> 
-    mutate(var = {{var}}, .before = obs) |> 
+    mutate(varname = {{var}}, .before = obs) |> 
     as_tibble()
 }
