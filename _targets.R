@@ -85,10 +85,22 @@ tar_plan(
   # Forecasting -------------------------------------------------------------
   #TODO: need to transform variables
   tar_target(
-    fc_daily,
-    forecast_daily(db_daily, needs_qa_daily),
+    ts_daily,
+    fit_ts_daily(db_daily, needs_qa_daily),
     pattern = map(needs_qa_daily),
     iteration = "list"
+  ),
+  tar_target(
+    resid_daily,
+    gg_tsresiduals(ts_daily |> filter(meta_station_id == "az01")) + labs(title = needs_qa_daily),
+    pattern = map(ts_daily, needs_qa_daily), 
+    iteration = "list"
+  ),
+  tar_target(
+    fc_daily,
+    forecast_daily(ts_daily, db_daily, needs_qa_daily),
+    pattern = map(ts_daily, needs_qa_daily),
+    iteration = "vector"
   ),
   # fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
   # fc_remp = ,
@@ -99,4 +111,3 @@ tar_plan(
   tar_quarto(readme, "README.qmd")
   
 )
-
