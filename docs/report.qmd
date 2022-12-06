@@ -57,6 +57,7 @@ al <- action_levels(warn_at = 1, stop_at = 0.1)
 ## Daily Data
 
 ```{r}
+#| column: body-outset
 daily |> 
   create_agent(
     tbl_name = "Daily measures",
@@ -83,6 +84,7 @@ daily |>
 ## Hourly data
 
 ```{r}
+#| column: body-outset
 hourly |> 
   create_agent(
     tbl_name = "Hourly measures",
@@ -188,6 +190,7 @@ See model diagnostic plots with `tar_read(resid_daily)`.
 Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table
 
 ```{r}
+#| column: body-outset
 tar_load(fc_daily)
 create_agent(
   fc_daily,
