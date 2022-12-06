@@ -67,6 +67,18 @@
       "Hash": "e9c08b94391e9f3f97355841229124f2",
       "Requirements": []
     },
+    "V8": {
+      "Package": "V8",
+      "Version": "4.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ebee37dadb0a8f5086663825d2c33076",
+      "Requirements": [
+        "Rcpp",
+        "curl",
+        "jsonlite"
+      ]
+    },
     "anytime": {
       "Package": "anytime",
       "Version": "0.3.9",
@@ -172,6 +184,14 @@
       "Requirements": [
         "backports"
       ]
+    },
+    "bigD": {
+      "Package": "bigD",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "93637e906f3fe962413912c956eb44db",
+      "Requirements": []
     },
     "bit": {
       "Package": "bit",
@@ -838,12 +858,13 @@
     },
     "gt": {
       "Package": "gt",
-      "Version": "0.7.0",
+      "Version": "0.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "b6f71436ae6088b9a773a5253217ade1",
+      "Hash": "d100be8d1f54dc589cc8d63366839287",
       "Requirements": [
         "base64enc",
+        "bigD",
         "bitops",
         "cli",
         "commonmark",
@@ -852,11 +873,11 @@
         "ggplot2",
         "glue",
         "htmltools",
+        "juicyjuice",
         "magrittr",
         "rlang",
         "sass",
         "scales",
-        "stringr",
         "tibble",
         "tidyselect"
       ]
@@ -1023,6 +1044,16 @@
       "Repository": "CRAN",
       "Hash": "2e7ed071fd6bd047fe2366d3adf4fe46",
       "Requirements": []
+    },
+    "juicyjuice": {
+      "Package": "juicyjuice",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "3bcd11943da509341838da9399e18bce",
+      "Requirements": [
+        "V8"
+      ]
     },
     "knitr": {
       "Package": "knitr",
@@ -1281,10 +1312,15 @@
     },
     "pointblank": {
       "Package": "pointblank",
-      "Version": "0.11.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d75b6c6a68228a2a4c5e5032380df1bc",
+      "Version": "0.11.2.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "rich-iannone",
+      "RemoteRepo": "pointblank",
+      "RemoteRef": "main",
+      "RemoteSha": "721d930863f962b15f2a06525cda8ab6b5cef048",
+      "Hash": "c6efef0df06d7664aed67968df3f7de8",
       "Requirements": [
         "DBI",
         "base64enc",
