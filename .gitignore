@@ -10,3 +10,6 @@
 # database
 data/daily/
 data/hourly/
+
+# large non-diffable files
+*.pdf
