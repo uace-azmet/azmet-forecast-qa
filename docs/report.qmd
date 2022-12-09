@@ -22,9 +22,7 @@ library(arrow)
 library(slider)
 
 tar_load(c(
-#  fc_sol_rad,
-#  daily_test,
-#  daily_train,
+  fc_daily,
   db_daily,
   db_hourly,
   needs_qa_daily,
@@ -46,6 +44,12 @@ hourly <-
 ```
 
 # Consistency checks
+
+## Action levels
+
+We can set action levels as a number of observations or a fraction of observations.
+We can also set different action levels for "warn" (yellow in the table below), "stop" (red in the table below), and "notify" (send an email to someone).
+For now I've set the action levels to warn at 1 failing observation and "stop" at 1% observations failing.
 
 ```{r}
 #create action levels for warnings and errors
@@ -82,6 +86,28 @@ daily |>
 ```
 
 ## Hourly data
+
+Some of the validations here take advantage of lags and sliding window functions.
+Validations on variable changes are done by checking that `abs(variable - lag(variable)` is less than some threshold.
+Sliding window functions are used to check that variables are not under a threshold for a certain number of observations in a row.
+This is done with the `slider` package and the `slide_*()` functions.
+For example:\
+
+```{r}
+#| code-fold: show
+#| 
+x <- c(0, 2, 0, 0, 0, 3)
+# For every window of two values, check if x < 1 for the previous two values
+slider::slide(x, ~.x < 1, .before = 2)
+# For every window of two values, check if *all* of the previous two values are < 1
+slider::slide_lgl( #return a logical vector instead of a list
+  x,
+  ~all(.x < 1),
+  .before = 2,
+  .complete = TRUE #return NA if there aren't 2 values in the window
+)
+#only position 5 has all two previous values < 1
+```
 
 ```{r}
 #| column: body-outset
@@ -154,6 +180,7 @@ hourly |>
     preconditions = function(x) x |> 
       group_by(meta_station_id) |> 
       mutate(
+        #slide_lgl turns an anonymous function into a sliding window function
         wind_spd_mps_14 = slider::slide_lgl(
           wind_spd_mps, ~all(.x < 1),
           .after = 14, #.after because arrange(desc(datetime))
@@ -181,17 +208,19 @@ interrogate()
 
 # Forecast-based validation
 
+## Daily
+
 ::: callout-warning
 WORK IN PROGRESS\
 Currently the same seasonal naïve model is fit to every variable and it is not always appropriate.
 See model diagnostic plots with `tar_read(resid_daily)`.
 :::
 
-Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table
+Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table.
+A failed validation means the observed value fell outside of the 99% prediction interval of the forecast.
 
 ```{r}
 #| column: body-outset
-tar_load(fc_daily)
 create_agent(
   fc_daily,
   tbl_name = "Daily Measures",
@@ -199,25 +228,25 @@ create_agent(
   actions = al
 ) |> 
   col_vals_between(
-    obs, vars(lower_95), vars(upper_95), segments = vars(varname)
+    obs, vars(lower_99), vars(upper_99), segments = vars(varname)
     ) |> 
   interrogate()
 ```
 
-# Timeseries Plots
+### Timeseries Plots
 
 ```{r}
 library(ggdist)
 varnames <- tar_read(needs_qa_daily)
 daily_long <- daily |> 
   select(datetime, meta_station_name, meta_station_id, all_of(varnames)) |>
-  pivot_longer(varnames, names_to = "varname")
+  pivot_longer(all_of(varnames), names_to = "varname")
 
 daily_list <- daily_long |> group_by(varname) |> group_split()
 fc_daily_list <- fc_daily |> group_by(varname) |> group_split()
 
-ts <- daily_list[[6]]
-fc <- fc_daily_list[[6]]
+# ts <- daily_list[[6]]
+# fc <- fc_daily_list[[6]]
 
 make_plot <- function(ts, fc) {
   ylab <- ts$varname |> unique()
@@ -227,14 +256,23 @@ make_plot <- function(ts, fc) {
     geom_line() +
     geom_point(data = fc, aes(y = fc_mean), color = "red", shape = 1) +
     geom_point(data = fc, aes(y = obs), color = "blue") +
-    geom_interval(data = fc, aes(ymin = lower_95, ymax = upper_95, y = fc_mean), alpha = 0.3, color = "red") +
-    geom_interval(data = fc, aes(ymin = lower_99, ymax = upper_99, y = fc_mean), alpha = 0.3, color = "red") +
-    labs(y = ylab) +
-    facet_wrap(~meta_station_id)
+    geom_interval(data = fc, aes(ymin = lower_95, ymax = upper_95, y = fc_mean),
+                  alpha = 0.3, color = "red") +
+    geom_interval(data = fc, aes(ymin = lower_99, ymax = upper_99, y = fc_mean),
+                  alpha = 0.3, color = "red") +
+    labs(title = ylab, 
+         y = ylab,
+         x = "Date") +
+    facet_wrap(~meta_station_id, ncol = 4) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
-
+# make_plot(ts, fc)
 ```
 
 ```{r}
-purrr::map2(daily_list, fc_daily_list, make_plot)
+#| fig-height: 8
+#| fig-width: 8
+#| warning: false
+purrr::walk2(daily_list, fc_daily_list, \(.x, .y) make_plot(.x, .y) |> print())
 ```
