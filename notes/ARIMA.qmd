@@ -15,6 +15,7 @@ library(targets)
 library(fable)
 library(tidyverse)
 library(lubridate)
+library(tictoc)
 ```
 
 ## Load data
@@ -27,12 +28,13 @@ tar_load(daily)
 daily <- daily |> 
   select(temp_air_meanC) |> 
   tsibble::tsibble(key = meta_station_id) |> 
-  select(-meta_station_name) |> 
-  filter(meta_station_id %in% c("az01", "az02", "az07"))
+  filter(meta_station_id %in% c("az01", "az02", "az07")) |> 
+  select(-meta_station_name)
 
 
 # split the data
 train <- daily |>  filter(datetime < ymd("2020-01-01"))
+new_data <- daily |> filter(datetime >= ymd("2020-01-01"))
 ```
 
 ## Fit ARIMA
@@ -43,18 +45,41 @@ It is relatively fast if we don't specify the seasonal period, but it usually es
 Specifying the seasonal period as 365 makes it suuuuper slow.
 
 ```{r}
+set.seed(123)
+tic()
 fit <- train |> 
-  model(ARIMA(temp_air_meanC ~ 1 + PDQ(period = 365)))
-fit |> filter(meta_station_id == "az01") |> report()
+  model(ARIMA(temp_air_meanC ~ PDQ(period = 365)))
+toc()
+fit
+walk(1:nrow(fit), ~ {fit |> slice(.x) |> report()})
 ```
 
 Because it fits a different ARIMA model for each station, it may find a different "best" model for each station.
-In this case, however, they're all `ARIMA(1,0,1)(0,1,0)[365] w/ drift` which means...
+In this case the seasonal component is the same for all three stations (0,1,0), but the non-seasonal component of the model is different for all three stations.
+Maybe that's ok, maybe not?
+
+## Re-fit
+
+We can use the `refit()` function to fit the same model with the same coefficients to new data and that is much faster because the auto ARIMA model selection process gets skipped:
 
 ```{r}
-refit1 <- fit |> refit(daily)
-refit1 |>  filter(meta_station_id == "az01") |> report()
-
-refit2 <- fit |> refit(daily, reestimate = TRUE)
-refit2 |>  filter(meta_station_id == "az01") |> report()
+tic()
+updated_fit <- refit(fit, daily)
+toc()
+updated_fit
+walk(1:nrow(updated_fit), ~ {updated_fit |> slice(.x) |> report()})
 ```
+
+`stream()` does something similar, but adds data instead of replacing it.
+Seems buggy though.
+ARIMA might not be supported yet.
+
+```{r}
+# tic()
+# updated_fit2 <- stream(fit, new_data)
+# toc()
+# updated_fit2
+# walk(1:nrow(updated_fit2), ~ {updated_fit2 |> slice(.x) |> report()})
+```
+
+
