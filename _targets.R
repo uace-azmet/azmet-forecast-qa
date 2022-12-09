@@ -19,7 +19,8 @@ tar_option_set(
     "fabletools",
     "feasts",
     "readxl",
-    "arrow"
+    "arrow",
+    "patchwork"
   ), 
   format = "rds" # default storage format
 )
@@ -88,8 +89,8 @@ tar_plan(
   
   tar_target(
     resid_daily,
-    gg_tsresiduals(ts_daily |> filter(meta_station_id == "az01")) +
-      labs(title = needs_qa_daily),
+    plot_tsresids(ts_daily |> filter(meta_station_id == "az01")) +
+      patchwork::plot_annotation(title = needs_qa_daily),
     pattern = map(ts_daily, needs_qa_daily), 
     iteration = "list"
   ),
