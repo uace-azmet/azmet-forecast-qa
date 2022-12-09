@@ -1,14 +1,13 @@
-# Created by use_targets().
-# Follow the comments below to fill in this target script.
-# Then follow the manual to check and run the pipeline:
-#   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline # nolint
+# Follow the manual to check and run the pipeline:
+#   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline 
 
 # Load packages required to define the pipeline:
 library(targets)
-library(tarchetypes) # Load other packages as needed. # nolint
+library(tarchetypes)
 
 # Set target options:
 tar_option_set(
+  # define packages needed for the workflow:
   packages = c(
     "tibble",
     "tidyverse",
@@ -18,10 +17,11 @@ tar_option_set(
     "lubridate",
     "fable",
     "fabletools",
-    "feasts"
+    "feasts",
+    "readxl",
+    "arrow"
   ), 
   format = "rds" # default storage format
-  # Set other options as needed.
 )
 
 # tar_make_clustermq() configuration (okay to leave alone):
@@ -30,34 +30,65 @@ options(clustermq.scheduler = "multicore")
 # tar_make_future() configuration (okay to leave alone):
 future::plan(future.callr::callr)
 
-# Run the R scripts in the R/ folder with your custom functions:
+# Source the R scripts in the R/ folder with your custom functions:
 tar_source()
-# source("other_functions.R") # Source other scripts as needed. # nolint
 
-# Replace the target list below with your own:
+
+# Define targets:
 tar_plan(
 
-# Read and wrangle data ---------------------------------------------------
-  tar_file(hist_file, "data/daily_hist.csv"),
-  daily_hist = read_wrangle_hist(hist_file),
-  daily_recent = get_daily_recent(daily_hist),
-  daily = update_daily(daily_hist, daily_recent), 
-  daily_train = daily |> filter(datetime < max(datetime)), 
+  # Read and wrangle data ---------------------------------------------------
+  tar_file(legacy_daily_file, "data/daily_hist.csv"),
+  legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
+  db_daily_init = update_daily_hist(legacy_daily), #up to october 2022
+  tar_target(
+    db_daily, 
+    update_daily(db_daily_init), #also writes to data/daily
+    #This target becomes invalid if it hasn't been run for a day
+    cue = tarchetypes::tar_cue_age(
+      name = db_daily,
+      age = as.difftime(1, units = "days") 
+    ),
+    format = "file" #because it returns a filepath?
+  ), 
+  daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
+  daily_train = daily |> filter(datetime < max(datetime)),
   daily_test = daily |> filter(datetime == max(datetime)),
+  
+  #hourly
+  hourly_start = "2020-12-30 00",
+  tar_target(
+    db_hourly_init,
+    init_hourly(hourly_start)
+  ),
+  tar_target(
+    db_hourly,
+    update_hourly(db_hourly_init),
+    #This target becomes invalid if it hasn't been run for a day
+    cue = tarchetypes::tar_cue_age(
+      name = db_hourly,
+      age = as.difftime(1, units = "days")
+    ),
+    format = "file"
+  ),
+  
+  tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
+  needs_qa_daily = needs_qa(metadata_file, "daily"),
+  needs_qa_hourly = needs_qa(metadata_file, "hourly"),
 
-# Modeling ----------------------------------------------------------------
+  # Modeling ----------------------------------------------------------------
 
   ts_sol_rad = fit_ts_sol_rad(daily_train),
   # ts_temp = ,
   # ts_precip = ,
 
-# Forecasting -------------------------------------------------------------
+  # Forecasting -------------------------------------------------------------
 
   fc_sol_rad = forecast_sol_rad(ts_sol_rad, daily_test),
   # fc_remp = ,
   # fc_precip = ,
 
-# Reports -----------------------------------------------------------------
+  # Reports -----------------------------------------------------------------
   tar_quarto(report, "docs/report.qmd"),
   tar_quarto(readme, "README.qmd")
   
