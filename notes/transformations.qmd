@@ -1,0 +1,47 @@
+---
+title: "Transformations"
+format: html
+editor: visual
+---
+
+# Transformations
+
+Some variables are problematic because the model residuals won't meet assumptions of normality:
+
+-   precipitation (x is super zero-inflated, x ≥ 0)
+
+-   `sol_rad_total` (0 ≤ x ≤ ???, x is left-skewed)
+
+-   soil temp has some really obvious outliers
+
+-   humidity (0 ≤ x ≤ 100)
+
+-   `wind_vector_dir` (polar!)
+
+```{r}
+tar_load(resid_daily)
+walk(resid_daily, print)
+```
+
+Try doing models with Box-Cox transformations
+
+```{r}
+tar_load(daily)
+hist(daily$precip_total_mm)
+hist(log1p(daily$precip_total_mm))
+
+box_cox2 <- function(y, lambda1, lambda2) {
+  if(lambda1 == 0) {
+    log(y + lambda2)
+  } else {
+    (((y + lambda2)^lambda1) - 1) / lambda1
+  }
+}
+
+
+daily |> select(precip_total_mm) |> 
+  model(SNAIVE(box_cox2(precip_total_mm, lambda1 = 0.5, lambda2 = 0.5))) |> 
+  filter(meta_station_id == "az01") |> 
+  plot_tsresids()
+```
+
