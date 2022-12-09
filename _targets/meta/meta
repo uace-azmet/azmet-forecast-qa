@@ -1,32 +1,32 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|bd2ab7087bbb4d4e|||||||||||||||
-daily|stem|d882a71fe5fba25b|bd516b6a911698d4|95b8f4b204cebf06|-758949561||t19332.7083891711s|70678f3fc60127e2|5351363|rds|local|vector|||0.488||
-daily_test|stem|49e76f2612e39b0d|6ffe0f4d1524c760|8b5d25edd35e37d4|-1600148948||t19332.7089865002s|628f31e81a50fa78|4822|rds|local|vector|||0.015||
-daily_train|stem|8caa0094bd0b5fde|98fab79423e6d910|0efcf313d718886a|-504909608||t19332.7089862014s|116191cd7a3fb89c|5348463|rds|local|vector|||0.023||
-db_daily|stem|8f781d99ae761bbe|43e524209fbc3f7c|7700e30749aa5f0f|-1523575140|data/daily|t19332.7083728364s|df29d0311c20575b|10857175|file|local|vector|||0.136|No data retrieved from API|
+.Random.seed|object|b4b58802ed86c3ec|||||||||||||||
+daily|stem|78fa11468c5eb045|bd516b6a911698d4|fbcba1c323b91f9f|-758949561||t19335.7032268587s|c39076fd6b77bb07|5355204|rds|local|vector|||0.537||
+daily_test|stem|7330b1fbe684d3d1|6ffe0f4d1524c760|935c32f454ed1391|-1600148948||t19335.7038106872s|660104f3730fc92c|4809|rds|local|vector|||0.017||
+daily_train|stem|0099b20a05b397a3|98fab79423e6d910|1808a596d5c8e239|-504909608||t19335.7038103721s|8fa63c854675e9fa|5353114|rds|local|vector|||0.034||
+db_daily|stem|d7334648d98d95fd|43e524209fbc3f7c|7700e30749aa5f0f|-1523575140|data/daily|t19335.7032093567s|94e3196b44d66904|10770130|file|local|vector|||1.021||
 db_daily_init|stem|07405a5e081960ce|68c34e3789e89120|a53874ccc7f1cd83|-785006229||t19332.708327208s|e0224cf10db1a05d|62|rds|local|vector|||28.862||
-db_hourly|stem|2f7bbc62e3a56ffb|fa6724170b5d508a|a611fd3b90b5eab5|801284518|data/hourly|t19332.7144682695s|aedcea3c8fa354fb|45948651|file|local|vector|||3.913||
+db_hourly|stem|872a67994303da10|fa6724170b5d508a|a611fd3b90b5eab5|801284518|data/hourly|t19335.7031971499s|934eeef9c83eaf4c|46044227|file|local|vector|||5.342||
 db_hourly_init|stem|2276d5f346da910e|f771e3791492fc45|0ef4fdafe12a8e4c|-694431874||t19332.7079918995s|b2c2d69496a0fbf4|63|rds|local|vector|||1.881||
-fc_daily|pattern|fac00cd480ddf174|833aae5d2036601a||-316323687||||27758|rds|local|vector||fc_daily_ff8a304f*fc_daily_a6b4971f*fc_daily_67f84e3e*fc_daily_5c05cb40*fc_daily_c7e8e912*fc_daily_be450d45*fc_daily_542bead1*fc_daily_ef795209*fc_daily_273e27b0*fc_daily_b06b35c8*fc_daily_0395ed4d*fc_daily_9b31dd4a*fc_daily_7ad04a02*fc_daily_c197e050*fc_daily_f52fd406*fc_daily_d18c55f6*fc_daily_9f39b0b6*fc_daily_76f60d59*fc_daily_8ad929ff|24.768||
-fc_daily_0395ed4d|branch|809997e789d41e21|833aae5d2036601a|f35632eccbeced2e|-1783835845||t19332.7091503979s|c8ecc6b389811a11|1439|rds|local|vector|fc_daily||1.146||
-fc_daily_273e27b0|branch|337c8718ad053916|833aae5d2036601a|a81a71fb0b9e7801|937573028||t19332.7091231527s|489f14a9dbed69c6|1449|rds|local|vector|fc_daily||1.182||
-fc_daily_542bead1|branch|ca5a8a9fa2509ebd|833aae5d2036601a|669cdd2113e74a12|1072088990||t19332.7090952732s|b20b1bbbf4a1d6a3|1487|rds|local|vector|fc_daily||1.398||
-fc_daily_5c05cb40|branch|7b5da33252161156|833aae5d2036601a|38d5c34718914af5|1526769550||t19332.7090519509s|3701d7f491dfd0d7|1493|rds|local|vector|fc_daily||1.383||
-fc_daily_67f84e3e|branch|acf3218648db72ee|833aae5d2036601a|4e8eeb941fcf7148|1988635549||t19332.7090358802s|a8fa5b2eb64d2369|1495|rds|local|vector|fc_daily||1.317||
-fc_daily_76f60d59|branch|b0a23154be593eb1|833aae5d2036601a|bbe2f5e077214646|-206620457||t19332.7092563655s|7206094e05de0d2c|1511|rds|local|vector|fc_daily||1.502||
-fc_daily_7ad04a02|branch|056d0c2d7652ffd8|833aae5d2036601a|30f131581061f917|480951372||t19332.7091789753s|6f2ae92ab16d5074|1434|rds|local|vector|fc_daily||1.175||
-fc_daily_8ad929ff|branch|52b24d9ca7dcfa51|833aae5d2036601a|32e89eae2feb245a|1597471177||t19332.7092746852s|889332e94008a476|1545|rds|local|vector|fc_daily||1.576||
-fc_daily_9b31dd4a|branch|241ab7538283d528|833aae5d2036601a|0973c06c90079e87|1527256536||t19332.7091653069s|cf3e2c55d5d98aed|1443|rds|local|vector|fc_daily||1.282||
-fc_daily_9f39b0b6|branch|e987c1387a728694|833aae5d2036601a|b82198ad8134a51a|-483598084||t19332.7092388841s|d047b3e941ef0982|1486|rds|local|vector|fc_daily||1.436||
-fc_daily_a6b4971f|branch|96df661d7be7320c|833aae5d2036601a|333361d71a91847d|-1192186917||t19332.7090205336s|b4bd4450987d844c|1441|rds|local|vector|fc_daily||1.505||
-fc_daily_b06b35c8|branch|3dc4fe21881b27a4|833aae5d2036601a|2d2a682e6c6be577|-932690295||t19332.7091370653s|4e6a5b1b535297b6|1424|rds|local|vector|fc_daily||1.196||
-fc_daily_be450d45|branch|7308d0fd156caf58|833aae5d2036601a|ea3fcd659990dc37|-1478159112||t19332.7090789982s|6519bd7d59f8c08e|1472|rds|local|vector|fc_daily||1.159||
-fc_daily_c197e050|branch|4b4014fc8a27b116|833aae5d2036601a|13f316de25cd6669|1625984598||t19332.7091930559s|489f14a9dbed69c6|1449|rds|local|vector|fc_daily||1.212||
-fc_daily_c7e8e912|branch|68e6f8aa93ab5c89|833aae5d2036601a|dccfeeb70765edc1|-1220757394||t19332.7090655106s|cac21cfbb006626d|1623|rds|local|vector|fc_daily||1.166||
-fc_daily_d18c55f6|branch|a1406a63df9b84ce|833aae5d2036601a|9d1cac0710f42654|-1219617366||t19332.7092221711s|bbc65c4cbc83a933|1549|rds|local|vector|fc_daily||1.314||
-fc_daily_ef795209|branch|d18f295029fd70ef|833aae5d2036601a|5d31c178b5cd9e22|123707749||t19332.7091094056s|bad4729a6c5a6a49|1552|rds|local|vector|fc_daily||1.214||
-fc_daily_f52fd406|branch|7d4d709aeffcc5e7|833aae5d2036601a|9467aac469693bf5|-88869252||t19332.7092068735s|d2214d06b76702f9|1438|rds|local|vector|fc_daily||1.187||
-fc_daily_ff8a304f|branch|44447193bc1a089f|833aae5d2036601a|fd70c7acb993de45|2123715539||t19332.7090030331s|f0b0e221c50278b5|1028|rds|local|vector|fc_daily||1.418||
+fc_daily|pattern|ba534afbad69f1a7|833aae5d2036601a||-316323687||||27708|rds|local|vector||fc_daily_ff8a304f*fc_daily_a6b4971f*fc_daily_67f84e3e*fc_daily_5c05cb40*fc_daily_c7e8e912*fc_daily_be450d45*fc_daily_542bead1*fc_daily_ef795209*fc_daily_273e27b0*fc_daily_b06b35c8*fc_daily_0395ed4d*fc_daily_9b31dd4a*fc_daily_7ad04a02*fc_daily_c197e050*fc_daily_f52fd406*fc_daily_d18c55f6*fc_daily_9f39b0b6*fc_daily_76f60d59*fc_daily_8ad929ff|25.054||
+fc_daily_0395ed4d|branch|5a3769b38eb2f41a|833aae5d2036601a|ad7048d49a83f780|-1783835845||t19335.703974375s|146097aa938bf2be|1442|rds|local|vector|fc_daily||1.267||
+fc_daily_273e27b0|branch|d5ea50d6517322d8|833aae5d2036601a|75a38dcb18c51d43|937573028||t19335.7039451288s|dc7a753e3e0eb12d|1430|rds|local|vector|fc_daily||1.285||
+fc_daily_542bead1|branch|3152dcf01357af99|833aae5d2036601a|54585dfe4aad2ba4|1072088990||t19335.7039153535s|7b2710506856f90a|1478|rds|local|vector|fc_daily||1.243||
+fc_daily_5c05cb40|branch|2cfb61907da4e524|833aae5d2036601a|4fd21e3fd0154301|1526769550||t19335.703871169s|1c9eaeb5e7ad96a8|1503|rds|local|vector|fc_daily||1.311||
+fc_daily_67f84e3e|branch|13442feb346365d5|833aae5d2036601a|545e974ec7e47639|1988635549||t19335.7038559093s|290d96ce30a0f184|1498|rds|local|vector|fc_daily||1.271||
+fc_daily_76f60d59|branch|b0e01b71387f8fdf|833aae5d2036601a|cadec57af9073880|-206620457||t19335.7040865067s|ff5c133327f980f0|1504|rds|local|vector|fc_daily||1.299||
+fc_daily_7ad04a02|branch|0abda3effaee700d|833aae5d2036601a|90e0fabcc3e32328|480951372||t19335.7040065258s|e1a731960eb47640|1433|rds|local|vector|fc_daily||1.399||
+fc_daily_8ad929ff|branch|6b0940d2eca4ccbf|833aae5d2036601a|2d8cd8ff224c2b2c|1597471177||t19335.7041024129s|48b59e47f3bd6120|1555|rds|local|vector|fc_daily||1.367||
+fc_daily_9b31dd4a|branch|9c82e193ffd351d5|833aae5d2036601a|40abbc12a3844525|1527256536||t19335.7039902347s|d2214d06b76702f9|1438|rds|local|vector|fc_daily||1.362||
+fc_daily_9f39b0b6|branch|702aa5d640f3db33|833aae5d2036601a|be75d80817563f07|-483598084||t19335.7040713675s|36722defea59e375|1476|rds|local|vector|fc_daily||1.317||
+fc_daily_a6b4971f|branch|eab650e9fce4ad5e|833aae5d2036601a|9b73a057e2eb1934|-1192186917||t19335.7038411258s|55c6f0d524268d55|1465|rds|local|vector|fc_daily||1.278||
+fc_daily_b06b35c8|branch|2573dd8c5b06cc44|833aae5d2036601a|a93ff4ca99fc9bd4|-932690295||t19335.7039596223s|6555785af6084c81|1432|rds|local|vector|fc_daily||1.245||
+fc_daily_be450d45|branch|bdebfd7bd0680e6b|833aae5d2036601a|bf425df4c4057b1b|-1478159112||t19335.7039008877s|7ef437898c6e04bd|1473|rds|local|vector|fc_daily||1.272||
+fc_daily_c197e050|branch|88e1d9ba2e633423|833aae5d2036601a|1eccd4db627f1d45|1625984598||t19335.7040245595s|9ef5b03992486a66|1444|rds|local|vector|fc_daily||1.55||
+fc_daily_c7e8e912|branch|4136aaab383e0868|833aae5d2036601a|6b57c658cdf11fcc|-1220757394||t19335.703886081s|3b3b488a19f67e1b|1619|rds|local|vector|fc_daily||1.282||
+fc_daily_d18c55f6|branch|d39ffd3620ba6e89|833aae5d2036601a|1354937684de5f4f|-1219617366||t19335.7040560354s|0f70c2208605a37d|1533|rds|local|vector|fc_daily||1.347||
+fc_daily_ef795209|branch|163b4ec1f28e4231|833aae5d2036601a|c5842e5f602dbfcb|123707749||t19335.7039301597s|5eccb956753eba15|1560|rds|local|vector|fc_daily||1.271||
+fc_daily_f52fd406|branch|2ffb439aa2b747ef|833aae5d2036601a|aac870d07885d039|-88869252||t19335.704040363s|7a587817a4db716d|1453|rds|local|vector|fc_daily||1.357||
+fc_daily_ff8a304f|branch|c500c602df889696|833aae5d2036601a|dd7eb504234c2ef0|2123715539||t19335.703826234s|5d142abbeffdc119|972|rds|local|vector|fc_daily||1.331||
 fit_ts_daily|function|6e0950092782818f|||||||||||||||
 fit_ts_sol_rad|function|64219347c603a2be|||||||||||||||
 forecast_daily|function|e437acc67bfccae8|||||||||||||||
@@ -42,47 +42,47 @@ needs_qa_daily|stem|39c647fdee6a1aab|03927e641642f316|aecf20622feb7718|-10061389
 needs_qa_hourly|stem|08dbde39c31f0383|39476934d05583a6|aecf20622feb7718|239003581||t19332.7079930821s|fef240c3b35f4169|180|rds|local|vector|||0.044||
 read_wrangle_hist|function|dbb4d18b844226b6|||||||||||||||
 readme|stem|710b8e06dec4e37d|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19332.7079226069s|abda3f786358bb5c|9169|file|local|vector|||7.831||
-report|stem|5c63c62612c1a1d9|86d12644a99a593f|93f33ce8f3ef1e79|-237041703|docs/report.html*docs/report.qmd|t19332.7153752389s|009a4d0f9230ca5b|4038060|file|local|vector|||77.781||
-resid_daily|pattern|5b26518f8d0beef6|5d3aac20988f43f1||1309544749||||6869062|rds|local|list||resid_daily_ff8a304f*resid_daily_a6b4971f*resid_daily_67f84e3e*resid_daily_5c05cb40*resid_daily_c7e8e912*resid_daily_be450d45*resid_daily_542bead1*resid_daily_ef795209*resid_daily_273e27b0*resid_daily_b06b35c8*resid_daily_0395ed4d*resid_daily_9b31dd4a*resid_daily_7ad04a02*resid_daily_c197e050*resid_daily_f52fd406*resid_daily_d18c55f6*resid_daily_9f39b0b6*resid_daily_76f60d59*resid_daily_8ad929ff|1.954||
-resid_daily_0395ed4d|branch|2738b4d228efa8d7|5d3aac20988f43f1|58d8832ecf1c8f30|1734287456||t19332.7093104471s|f6939680165e7925|363174|rds|local|list|resid_daily||0.102||
-resid_daily_273e27b0|branch|5b7f26d9405ad1b6|5d3aac20988f43f1|a66a66a2b40e019a|697740248||t19332.7093048943s|44a8ce51ea62ce3f|361890|rds|local|list|resid_daily||0.093||
-resid_daily_542bead1|branch|7afa8d1b94782379|5d3aac20988f43f1|828b53a68a978f60|1317190566||t19332.7092990936s|8c52f9e910344fb6|364338|rds|local|list|resid_daily||0.128||
-resid_daily_5c05cb40|branch|3748319eda8df3af|5d3aac20988f43f1|def777eee6123e13|-469080729||t19332.7092885413s|ccbd6999ece4ed92|377419|rds|local|list|resid_daily||0.122||
-resid_daily_67f84e3e|branch|62aba990e0ebc19d|5d3aac20988f43f1|14408150c96610a9|-1543832803||t19332.7092847961s|23628957990f1b0c|377410|rds|local|list|resid_daily||0.108||
-resid_daily_76f60d59|branch|a6a6798c5a4feaa4|5d3aac20988f43f1|e6ee62cc5ac7f9c1|-1702551630||t19332.7093291143s|7acbd4f284902a1c|350703|rds|local|list|resid_daily||0.089||
-resid_daily_7ad04a02|branch|32952dc36b2d097b|5d3aac20988f43f1|ddd958348a90c7f4|944621483||t19332.7093162972s|701d2e6655eb8747|350301|rds|local|list|resid_daily||0.091||
-resid_daily_8ad929ff|branch|30718d62ecb7cc58|5d3aac20988f43f1|acbd49e950ed5b5b|2104950275||t19332.709331597s|e8c8da4e1ae00813|356710|rds|local|list|resid_daily||0.085||
-resid_daily_9b31dd4a|branch|17ffd06c9ac16577|5d3aac20988f43f1|faf6a4443236d13f|128758672||t19332.7093131135s|2807b4baac8dd931|350076|rds|local|list|resid_daily||0.088||
-resid_daily_9f39b0b6|branch|a576fbc19e391eec|5d3aac20988f43f1|53d796b5ef5aac15|-1369319209||t19332.7093265245s|976772d306f56a8f|363368|rds|local|list|resid_daily||0.075||
-resid_daily_a6b4971f|branch|84d2b6e9f02fb9af|5d3aac20988f43f1|f9a6de5e1fbc9501|-487263972||t19332.7092815372s|9d9fe0893bdf5d25|377236|rds|local|list|resid_daily||0.112||
-resid_daily_b06b35c8|branch|e2ec5477ec5d5b8c|5d3aac20988f43f1|03acd246a9e63e99|1807779209||t19332.7093076381s|08393336d6a039b8|359942|rds|local|list|resid_daily||0.087||
-resid_daily_be450d45|branch|f3f5d48caf13c0e3|5d3aac20988f43f1|650f3ff69f1f81d1|1179294469||t19332.7092957603s|91994d010515caec|366172|rds|local|list|resid_daily||0.128||
-resid_daily_c197e050|branch|fa12e196d545c595|5d3aac20988f43f1|22b617000dca1479|421508976||t19332.7093190786s|342dbb31528d31e9|352299|rds|local|list|resid_daily||0.093||
-resid_daily_c7e8e912|branch|4f11a384b6e3118b|5d3aac20988f43f1|5b21aeb646c7911b|-324670392||t19332.709292299s|050d68777d23b42e|400170|rds|local|list|resid_daily||0.133||
-resid_daily_d18c55f6|branch|c1d513c2afc188fb|5d3aac20988f43f1|54d063e89bc3eae7|961449720||t19332.7093240478s|55eb8fbd8cc47248|356777|rds|local|list|resid_daily||0.085||
-resid_daily_ef795209|branch|03a125e12817176f|5d3aac20988f43f1|d84546a76fcf8a0e|-148290147||t19332.7093020969s|807940abe2c10483|370116|rds|local|list|resid_daily||0.1||
-resid_daily_f52fd406|branch|2c0e63038f72dc39|5d3aac20988f43f1|58b83a2ffcaef730|1673128440||t19332.7093215624s|c3fa39814b5512a0|360922|rds|local|list|resid_daily||0.079||
-resid_daily_ff8a304f|branch|fcb91c7b70f536c4|5d3aac20988f43f1|5ed10a65c9dd06c2|1366309801||t19332.709278158s|690bf2c4c09f3caf|310039|rds|local|list|resid_daily||0.156||
-ts_daily|pattern|f418f6676dde111b|974edaa6950ca731||-908825674||||107552153|rds|local|list||ts_daily_4828eb38*ts_daily_c4d3187c*ts_daily_2616b906*ts_daily_740ac7e4*ts_daily_a4c0191e*ts_daily_6daf13ff*ts_daily_894d14d0*ts_daily_c07aad1e*ts_daily_1177e9a3*ts_daily_72f49635*ts_daily_2e3d08c9*ts_daily_db2f96a1*ts_daily_b9f36516*ts_daily_7121c4b4*ts_daily_9dbce86a*ts_daily_de1bc782*ts_daily_772f6063*ts_daily_c1aaf311*ts_daily_03f5c79d|18.159||
-ts_daily_03f5c79d|branch|f1f17daf5c5599de|974edaa6950ca731|46bbc13c648d71fb|225183704||t19332.7089753536s|40072ee335d9a092|4800979|rds|local|list|ts_daily||0.847||
-ts_daily_1177e9a3|branch|82739cfe68f7dbde|974edaa6950ca731|ed8ba683a2506118|473076023||t19332.7086639703s|56c512bc45ccf010|7181038|rds|local|list|ts_daily||0.917|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
-ts_daily_2616b906|branch|60acf2204b25ffb1|974edaa6950ca731|59650e8c7fad80d6|449870485||t19332.7084744801s|ca273c3d87756b17|5556577|rds|local|list|ts_daily||1.154||
-ts_daily_2e3d08c9|branch|aa2fe4d71bf3d55e|974edaa6950ca731|86a87c74720b22c5|238479881||t19332.7087378435s|3d2bcb2b5182e73b|7167926|rds|local|list|ts_daily||0.908|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
-ts_daily_4828eb38|branch|ceee8a595fdf8fca|974edaa6950ca731|44c983fd148d363a|1600364228||t19332.708412371s|27f9a83d0235d5d4|2966787|rds|local|list|ts_daily||1.045|Using an external vector in selections was deprecated in tidyselect 1.1.0.ℹ Please use all_of or any_of instead.   Was  data  selectneeds_qa_daily   Now  data  selectall_ofneeds_qa_dailySee httpstidyselect.rlib.orgreferencefaqexternalvector.html.|
-ts_daily_6daf13ff|branch|9aaa949342de81c3|974edaa6950ca731|efd9be13fae1ba40|-1589691003||t19332.708565543s|ba8489f519a24ceb|5256132|rds|local|list|ts_daily||1.036||
-ts_daily_7121c4b4|branch|478b63383828ed07|974edaa6950ca731|228fd558c50670e5|581599506||t19332.708841319s|d88404bc8264eb7d|6585555|rds|local|list|ts_daily||1.001|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
-ts_daily_72f49635|branch|29396fc5423a25da|974edaa6950ca731|ce357acca54d3e4c|1717210986||t19332.7087013172s|2c6264d37decff02|7076816|rds|local|list|ts_daily||1.107|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
-ts_daily_740ac7e4|branch|20a10261319fb7b0|974edaa6950ca731|61ff71e535904739|578986033||t19332.7085045546s|38957c1b57931b9c|5479155|rds|local|list|ts_daily||0.987||
-ts_daily_772f6063|branch|bcfce920ccd50795|974edaa6950ca731|dbe3121b48e776fb|-642707742||t19332.7089210058s|eee936bff75384dd|5273075|rds|local|list|ts_daily||0.822||
-ts_daily_894d14d0|branch|ef7933d9354d6d45|974edaa6950ca731|063e934b65666f1a|1406384699||t19332.7085967208s|257bf029399d64fc|5208907|rds|local|list|ts_daily||0.942||
-ts_daily_9dbce86a|branch|f57620b27fe7cf0c|974edaa6950ca731|111c13d23ed414b9|-74100581||t19332.708868803s|24ebeac522128369|4883608|rds|local|list|ts_daily||0.91||
-ts_daily_a4c0191e|branch|439512e081f9c14c|974edaa6950ca731|3a3cd89569a954d6|1626162330||t19332.7085333595s|02c9f00d8247fb1f|6540569|rds|local|list|ts_daily||0.926||
-ts_daily_b9f36516|branch|b79089fe44355f68|974edaa6950ca731|b267eaab9e6f5b7a|-1840906935||t19332.7088079211s|04b6f9eb0a0e2ac9|6576056|rds|local|list|ts_daily||1.034|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
-ts_daily_c07aad1e|branch|b664a181319bc326|974edaa6950ca731|ec17d4c162094ffd|193338792||t19332.7086284099s|808201535348ecaa|5371267|rds|local|list|ts_daily||1.033||
-ts_daily_c1aaf311|branch|128f1f2f90e9bf30|974edaa6950ca731|aeb7e7d6546ad0f2|469512766||t19332.7089489734s|7b0485f88a099040|4795336|rds|local|list|ts_daily||0.809||
-ts_daily_c4d3187c|branch|34c0b3c45399d350|974edaa6950ca731|b4fb081d619c5aba|-344029863||t19332.7084409766s|f10edf660dd73808|5491734|rds|local|list|ts_daily||0.879||
-ts_daily_db2f96a1|branch|ef6411f8fcd7db8b|974edaa6950ca731|4cb1896e40de3c58|-1468949486||t19332.708774284s|7158e6e39c38fd11|6574930|rds|local|list|ts_daily||1.059|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
-ts_daily_de1bc782|branch|9f8879ade00dd0df|974edaa6950ca731|e49a5263b961d1fd|772706474||t19332.7088924494s|b81515ca14ff03a8|4765706|rds|local|list|ts_daily||0.743||
+report|stem|9bc4636d3572678b|86d12644a99a593f|8d6140760f356c54|-237041703|docs/report.html*docs/report.qmd|t19335.705241503s|cb80dd59f3750b93|4013439|file|local|vector|||93.459||
+resid_daily|pattern|a9964fb35a09498b|5d3aac20988f43f1||1309544749||||6871311|rds|local|list||resid_daily_ff8a304f*resid_daily_a6b4971f*resid_daily_67f84e3e*resid_daily_5c05cb40*resid_daily_c7e8e912*resid_daily_be450d45*resid_daily_542bead1*resid_daily_ef795209*resid_daily_273e27b0*resid_daily_b06b35c8*resid_daily_0395ed4d*resid_daily_9b31dd4a*resid_daily_7ad04a02*resid_daily_c197e050*resid_daily_f52fd406*resid_daily_d18c55f6*resid_daily_9f39b0b6*resid_daily_76f60d59*resid_daily_8ad929ff|2.062||
+resid_daily_0395ed4d|branch|898ab5a1592f491c|5d3aac20988f43f1|542e745b987b7669|1734287456||t19335.7041350738s|0468e359ab0427ab|363260|rds|local|list|resid_daily||0.115||
+resid_daily_273e27b0|branch|f566bc44a2708e40|5d3aac20988f43f1|a7ae2f6ac6340611|697740248||t19335.7041291062s|9256f710603ffd67|361946|rds|local|list|resid_daily||0.094||
+resid_daily_542bead1|branch|a9d27337a50af6b6|5d3aac20988f43f1|9c4a05cfcdd94489|1317190566||t19335.7041235514s|be58114b49b2f327|364465|rds|local|list|resid_daily||0.093||
+resid_daily_5c05cb40|branch|4d9c6c9320c57d84|5d3aac20988f43f1|1766810050cf4da5|-469080729||t19335.7041148763s|33460a8e1f7d3d15|377516|rds|local|list|resid_daily||0.096||
+resid_daily_67f84e3e|branch|ff67c339c21fb18e|5d3aac20988f43f1|42ce3627e612326c|-1543832803||t19335.7041120871s|8182ffba19b27166|377511|rds|local|list|resid_daily||0.099||
+resid_daily_76f60d59|branch|f15a4e3d1da94d3c|5d3aac20988f43f1|94e8e5987d33915c|-1702551630||t19335.7041571449s|85ff397010f537ed|350837|rds|local|list|resid_daily||0.1||
+resid_daily_7ad04a02|branch|b9714defdb1661cf|5d3aac20988f43f1|8695ca7f765378c8|944621483||t19335.7041416086s|b525fd21ce8fea44|350425|rds|local|list|resid_daily||0.129||
+resid_daily_8ad929ff|branch|53d2e4edde756d5e|5d3aac20988f43f1|abf43bb6e04c74d8|2104950275||t19335.7041600589s|f40740ecbeaa4083|356829|rds|local|list|resid_daily||0.11||
+resid_daily_9b31dd4a|branch|a8e27f6ef77dc35e|5d3aac20988f43f1|560cf5e0cbec5369|128758672||t19335.7041383151s|d49ccf09213befb9|350166|rds|local|list|resid_daily||0.102||
+resid_daily_9f39b0b6|branch|0492153febcc6337|5d3aac20988f43f1|9897e6ca58d50e44|-1369319209||t19335.704154013s|3113ac25bad278e1|363524|rds|local|list|resid_daily||0.096||
+resid_daily_a6b4971f|branch|b00bcb98cb090281|5d3aac20988f43f1|5b0f32c308b8fb09|-487263972||t19335.7041092009s|a1d0600be680b724|377328|rds|local|list|resid_daily||0.11||
+resid_daily_b06b35c8|branch|79dc5f40a26eb693|5d3aac20988f43f1|ce65e87c4607a367|1807779209||t19335.7041320573s|79de8af8ffcf627a|360011|rds|local|list|resid_daily||0.101||
+resid_daily_be450d45|branch|0152e2cf657f3154|5d3aac20988f43f1|1c8a5087446b353f|1179294469||t19335.7041207643s|f8505ef8605dfc19|366268|rds|local|list|resid_daily||0.11||
+resid_daily_c197e050|branch|1267e59fa4448437|5d3aac20988f43f1|17d9bd01fe4b0f2c|421508976||t19335.7041446749s|2f4151fda3a9b1d9|352381|rds|local|list|resid_daily||0.099||
+resid_daily_c7e8e912|branch|320d49db0dba0f65|5d3aac20988f43f1|fd6facaa10c319cf|-324670392||t19335.7041177351s|cc00624042be77e2|400467|rds|local|list|resid_daily||0.097||
+resid_daily_d18c55f6|branch|d91d9bf30784f7f8|5d3aac20988f43f1|80cb28c3bf90f1ff|961449720||t19335.7041511288s|9ae00558920713fe|356888|rds|local|list|resid_daily||0.099||
+resid_daily_ef795209|branch|80430aca9a8381f1|5d3aac20988f43f1|39db2e26a90ae10f|-148290147||t19335.7041263693s|cf1f2414fedd6f85|370300|rds|local|list|resid_daily||0.095||
+resid_daily_f52fd406|branch|dd36413b476b5927|5d3aac20988f43f1|9e7121ec441b5362|1673128440||t19335.7041482653s|ae3322d74038f592|361049|rds|local|list|resid_daily||0.145||
+resid_daily_ff8a304f|branch|3c0e99145fd6377a|5d3aac20988f43f1|ae8ae83843f07a42|1366309801||t19335.7041061936s|a613b6d7bbc6b06b|310140|rds|local|list|resid_daily||0.172||
+ts_daily|pattern|8c206173f96ee87c|974edaa6950ca731||-908825674||||107607931|rds|local|list||ts_daily_4828eb38*ts_daily_c4d3187c*ts_daily_2616b906*ts_daily_740ac7e4*ts_daily_a4c0191e*ts_daily_6daf13ff*ts_daily_894d14d0*ts_daily_c07aad1e*ts_daily_1177e9a3*ts_daily_72f49635*ts_daily_2e3d08c9*ts_daily_db2f96a1*ts_daily_b9f36516*ts_daily_7121c4b4*ts_daily_9dbce86a*ts_daily_de1bc782*ts_daily_772f6063*ts_daily_c1aaf311*ts_daily_03f5c79d|17.571||
+ts_daily_03f5c79d|branch|d3a615a974b2ed6d|974edaa6950ca731|224a94fa94219ac7|225183704||t19335.7037985093s|d1d0f2f52aa68e80|4803201|rds|local|list|ts_daily||1.042||
+ts_daily_1177e9a3|branch|201aca9cd645105a|974edaa6950ca731|0f1335d027e57b3f|473076023||t19335.7034842012s|3a16419cde99c48a|7184353|rds|local|list|ts_daily||0.927|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+ts_daily_2616b906|branch|5689a98361aaf47e|974edaa6950ca731|3eed39d63a1177cb|449870485||t19335.7033065554s|c9680304bfaa1d91|5559965|rds|local|list|ts_daily||0.869||
+ts_daily_2e3d08c9|branch|d09ccb4930630b8a|974edaa6950ca731|5d5c6917953e25ab|238479881||t19335.7035540415s|d00ad494969de689|7171554|rds|local|list|ts_daily||0.927|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+ts_daily_4828eb38|branch|de9a37f05abe1ca2|974edaa6950ca731|1f1b8eebaaf2fe37|1600364228||t19335.7032503113s|9f51b4c0d4e1af33|2968456|rds|local|list|ts_daily||1.034|1m22mUsing an external vector in selections was deprecated in tidyselect 1.1.0.36mℹ39m Please use all_of or any_of instead.   Was  data  selectneeds_qa_daily   Now  data  selectall_ofneeds_qa_dailySee httpstidyselect.rlib.orgreferencefaqexternalvector.html.|
+ts_daily_6daf13ff|branch|86f4b8462ec93f8a|974edaa6950ca731|ca910908ddc0762c|-1589691003||t19335.7033907785s|d317f16f16de28f1|5259233|rds|local|list|ts_daily||0.892||
+ts_daily_7121c4b4|branch|9844d36c12e4233e|974edaa6950ca731|7050d9838d603068|581599506||t19335.7036548008s|036cbb5d1174acb9|6589004|rds|local|list|ts_daily||0.959|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+ts_daily_72f49635|branch|ba1182abac96d4e5|974edaa6950ca731|ac9d2331192002f7|1717210986||t19335.7035192623s|aa45d02a5f6772d0|7079849|rds|local|list|ts_daily||0.936|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+ts_daily_740ac7e4|branch|92c318a4dd36f723|974edaa6950ca731|6396d40a4bf40955|578986033||t19335.7033343369s|91c45b93b599be14|5482749|rds|local|list|ts_daily||0.883||
+ts_daily_772f6063|branch|b62f159eb489c743|974edaa6950ca731|6bfbf870cc037999|-642707742||t19335.7037419811s|4ce2058b9aade5be|5275514|rds|local|list|ts_daily||1.052||
+ts_daily_894d14d0|branch|044204041b4a0034|974edaa6950ca731|6e567323b5d940cb|1406384699||t19335.7034209829s|465df12bcac876bf|5212528|rds|local|list|ts_daily||1.044||
+ts_daily_9dbce86a|branch|0e8236a5c2a5f9bf|974edaa6950ca731|92cec3d9fbd9af34|-74100581||t19335.7036822647s|4e79711976aaca4d|4884568|rds|local|list|ts_daily||0.904||
+ts_daily_a4c0191e|branch|744ff3bbec36bcdd|974edaa6950ca731|7b98e04285f7435a|1626162330||t19335.7033622138s|dc5199b731faa997|6546793|rds|local|list|ts_daily||0.842||
+ts_daily_b9f36516|branch|3037524278d89e5d|974edaa6950ca731|3b138b42e1da2552|-1840906935||t19335.7036208576s|ea48390c705a02f3|6578606|rds|local|list|ts_daily||0.909|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+ts_daily_c07aad1e|branch|fd76665b81caada2|974edaa6950ca731|7ac44b3e205ec834|193338792||t19335.7034486208s|46af3336f7f1c570|5373584|rds|local|list|ts_daily||0.859||
+ts_daily_c1aaf311|branch|c35cad426f5997f8|974edaa6950ca731|44762c74da6f2fe7|469512766||t19335.7037704896s|49ebd006edff0c09|4796946|rds|local|list|ts_daily||0.852||
+ts_daily_c4d3187c|branch|e3299c077ffa998a|974edaa6950ca731|74340b5332d3e7eb|-344029863||t19335.7032783899s|64db1edce854aef7|5495440|rds|local|list|ts_daily||0.847||
+ts_daily_db2f96a1|branch|78f0bc6f0d43ff26|974edaa6950ca731|256e09e1d7ea4884|-1468949486||t19335.703587572s|caa866dbb0be98aa|6577198|rds|local|list|ts_daily||0.905|1 error encountered for SNAIVElag3651 All observations are missing, a model cannot be estimated without data.|
+ts_daily_de1bc782|branch|47e0fcd69248692e|974edaa6950ca731|3917a6c0d1360e6d|772706474||t19335.7037091773s|ab7ec9d1796b1aa1|4768390|rds|local|list|ts_daily||0.888||
 ts_sol_rad|stem|4c2271716ef3fc7f|efbe62b57d96bb46|63db43cf97720875|-801868184||t19332.7093450838s|4c59c3ed007f001e|6092498|rds|local|vector|||0.195||
 update_daily|function|440655ea5aba5e56|||||||||||||||
 update_daily_hist|function|4b0fcf0e49ebbd7d|||||||||||||||
