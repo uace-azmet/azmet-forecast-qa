@@ -11,7 +11,6 @@ editor: source
 
 ### gefs4cast::noaa_gefs
 
-
 ```{r}
 library(dplyr)
 ## set path for gdal binary 
@@ -25,18 +24,18 @@ readr::write_csv(station_info %>%
   "new_station_info.csv")
 
 
-gefs4cast::noaa_gefs(date = Sys.Date(),
-  cycle = "00",
-  threads = 70,
-  gdal_ops = "",
-  s3 = arrow::s3_bucket("drivers", endpoint_override = "data.ecoforecast.org"),
-  max_horizon = 48,
-  purge = TRUE,
-  quiet = FALSE,
-  dest = tempdir(),#".",
-  locations = "new_station_info.csv",#paste0("https://github.com/eco4cast/neon4cast-noaa-download/",
-   # "raw/master/noaa_download_site_list.csv"),
-  name_pattern = "noaa/gefs-v12/stage1/{cycle_int}/{nice_date}/part-0.parquet")
+# gefs4cast::noaa_gefs(date = Sys.Date(),
+#   cycle = "00",
+#   threads = 70,
+#   gdal_ops = "",
+#   s3 = arrow::s3_bucket("drivers", endpoint_override = "data.ecoforecast.org"),
+#   max_horizon = 48,
+#   purge = TRUE,
+#   quiet = FALSE,
+#   dest = tempdir(),#".",
+#   locations = "new_station_info.csv",#paste0("https://github.com/eco4cast/neon4cast-noaa-download/",
+#    # "raw/master/noaa_download_site_list.csv"),
+#   name_pattern = "noaa/gefs-v12/stage1/{cycle_int}/{nice_date}/part-0.parquet")
 ```
 
 
@@ -58,25 +57,22 @@ gdalcubes_options(parallel = TRUE)#24)
 ```
 
 ```{r}
-date <- Sys.Date() - lubridate::days(1)#as.Date("2022-12-05")
+date <- Sys.Date() - lubridate::days(1)
+# may need to adjust for time zones?
+#as.Date("2022-12-05")
 
-gefsdir <- fs::dir_create("gefs")
-
-#gefs_cog(tmpdir, ens_avg=TRUE, max_horizon=240, date = date)
+gefsdir <- fs::dir_create(file.path("gefs", date))
 
 gefs_cog(gefsdir, 
          ens_avg = FALSE,
-         max_horizon = 48, 
+         max_horizon = 48, # get next 48 h          
          date = date) |>
   system.time()
 ```
 
 ```{r}
-# 000 file has different bands and so cannot be stacked into the collection
-
-
 gefs_cubes <- list()
-for (i in 1:30) {
+for (i in 1:30) { # ens 00 different?
   ens <- stringr::str_pad(i, 2, pad = '0')
   ens_id <- paste0('gep', ens)
   .f <- fs::dir_ls(gefsdir, 
@@ -120,7 +116,7 @@ v <- cube_view(srs = "EPSG:4326",
               dy = 0.1,
               dt = "PT1H",
               #dt = "PT3H",   # original resolution
-               aggregation = "mean", 
+               aggregation = "mean", # will only aggregate if multiple ensemble members are viewed
                resampling = "cubicspline"
 )
 ```
@@ -148,20 +144,44 @@ ggplot(data = ens_forecast) +
   facet_wrap(~meta_station_name, ncol = 6) +
   theme_bw()
 
-ggplot(data = ens_forecast) +
-  geom_line(aes(x = time, y = TMP, color = meta_station_name)) +
-  facet_wrap(~ens, ncol = 6) 
+ens_long <- ens_forecast |>
+  tidyr::pivot_longer(cols = -c(ens, FID, meta_station_name, meta_station_id, time, geometry),
+               names_to = "var",
+               values_to = "value") |>
+  mutate(time = lubridate::ymd_hms(time),
+         id = paste0(meta_station_name, var))
+a <- ggplot(data = ens_long) +
+  geom_smooth(aes(x = time, y = value, color = meta_station_name)) +
+  #geom_line(aes(x = time, y = value, color = meta_station_name, group = id), alpha = 0.25) +
+  facet_wrap(~var, ncol = 4, scales = 'free_y') 
 
-  #geom_sf(aes(fill = TMP)) +
-  facet_wrap(~meta_station_name, ncol = 6) +
-  scale_fill_viridis_c(option = "plasma", na.value = "white") +
-  theme_void() +
-  theme(legend.position = "none")
+ggsave(a, width = 20, height = 10, filename = 'fig.pdf')
 ```
 
-```{r}
-x <- raster_cube(gefs_cube, v)  |> extract_geom(azmet_pts)
+Next step: long w/ summaries
+ens, FID, station, time, geom, var, median, min, max, ucl_95, lcl_95, ucl_99, lcl_99
 
+```{r}
+## create statistical summaries by station, variable, and time
+
+ens_stats <- ens_long %>% 
+  group_by(meta_station_name, var, time) %>% 
+  summarise(median = median(value),
+            min = min(value),
+            max = max(value),
+            ucl_95 = quantile(value, 0.975),
+            lcl_95 = quantile(value, 0.025),
+            ucl_99 = quantile(value, 0.995),
+            lcl_99 = quantile(value, 0.005)) %>% 
+  ungroup() %>% 
+  mutate(id = paste0(meta_station_name, var))
+
+```
+
+
+Look at the data as a movie:
+- should add station points and maybe some county boundaries to this
+```{r}
 raster_cube(gefs_cube, v) |>
   gdalcubes::select_bands("TMP") |>
   animate( col = viridisLite::viridis, nbreaks=100,
