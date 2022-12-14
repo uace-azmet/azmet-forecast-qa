@@ -159,7 +159,6 @@ ggsave(a, width = 20, height = 10, filename = 'fig.pdf')
 ```
 
 Next step: long w/ summaries
-ens, FID, station, time, geom, var, median, min, max, ucl_95, lcl_95, ucl_99, lcl_99
 
 ```{r}
 ## create statistical summaries by station, variable, and time
@@ -175,7 +174,39 @@ ens_stats <- ens_long %>%
             lcl_99 = quantile(value, 0.005)) %>% 
   ungroup() %>% 
   mutate(id = paste0(meta_station_name, var))
+# save above as csv
+readr::write_csv(ens_stats, 'ens_stats.csv')
+```
 
+```{r}
+## create a plot of ens_stats time vs. value, with color by station, and facet by variable
+
+a <- ggplot(data = ens_stats) +
+  geom_line(aes(x = time, y = median, color = meta_station_name)) +
+  geom_ribbon(aes(x = time, ymin = lcl_95, ymax = ucl_95, fill = meta_station_name), alpha = 0.25) +
+  geom_ribbon(aes(x = time, ymin = min, ymax = max, fill = meta_station_name), alpha = 0.05) +
+  facet_wrap(~var, ncol = 4, scales = 'free_y')
+a
+# make plot above wider aspect
+ggsave(a, width = 20, height = 10, filename = 'fig.pdf')
+
+# above plot but saved as one file per station, using a for loop
+for(stn in unique(ens_stats$meta_station_name)){
+  a <- ggplot(data = ens_stats %>% filter(meta_station_name == stn)) +
+    geom_line(aes(x = time, y = median)) +
+    geom_ribbon(aes(x = time, ymin = lcl_95, ymax = ucl_95), alpha = 0.25) +
+    geom_ribbon(aes(x = time, ymin = min, ymax = max), alpha = 0.05) +
+    facet_wrap(~var, ncol = 4, scales = 'free_y')
+  ggsave(a, width = 20, height = 10, filename = paste0(stn, '.pdf'))
+}
+```
+
+```{r}
+
+
+```
+
+```{r}
 ```
 
 
