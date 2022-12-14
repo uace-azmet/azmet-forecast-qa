@@ -7,42 +7,17 @@ editor: source
 ---
 
 
-## gefs4cast
+## Download ensemble forecasts for AZMET stations
 
-### gefs4cast::noaa_gefs
+The goal here is to get a forecast for today that we can use to evaluate data streaming in from the AZMET stations.
 
 ```{r}
 library(dplyr)
 ## set path for gdal binary 
 Sys.setenv("GDAL_BIN"="/usr/bin/")
 #remotes::install_github("cct-datascience/azmetr")
-#library(azmetr)
 data(station_info, package = 'azmetr')
-readr::write_csv(station_info %>% 
-  dplyr::mutate(site_name = meta_station_name, 
-         site_id = meta_station_id),
-  "new_station_info.csv")
 
-
-# gefs4cast::noaa_gefs(date = Sys.Date(),
-#   cycle = "00",
-#   threads = 70,
-#   gdal_ops = "",
-#   s3 = arrow::s3_bucket("drivers", endpoint_override = "data.ecoforecast.org"),
-#   max_horizon = 48,
-#   purge = TRUE,
-#   quiet = FALSE,
-#   dest = tempdir(),#".",
-#   locations = "new_station_info.csv",#paste0("https://github.com/eco4cast/neon4cast-noaa-download/",
-#    # "raw/master/noaa_download_site_list.csv"),
-#   name_pattern = "noaa/gefs-v12/stage1/{cycle_int}/{nice_date}/part-0.parquet")
-```
-
-
-### Vignette 
-
-From https://projects.ecoforecast.org/gefs4cast/articles/gefs-cog.html
-```{r}
 library(gdalcubes) 
 # remotes::install_github("neon4cast/gefs4cast")
 #remotes::install_github('eco4cast/gefs4cast')
@@ -56,16 +31,20 @@ library(tmap)
 gdalcubes_options(parallel = TRUE)#24)
 ```
 
+
+Based on [gefs4cast vignette](https://projects.ecoforecast.org/gefs4cast/articles/gefs-cog.html)
+
+Download ensemble forecasts
 ```{r}
 date <- Sys.Date() - lubridate::days(1)
 # may need to adjust for time zones?
-#as.Date("2022-12-05")
+# yesterday's forecast starts today?
 
 gefsdir <- fs::dir_create(file.path("gefs", date))
 
 gefs_cog(gefsdir, 
          ens_avg = FALSE,
-         max_horizon = 48, # get next 48 h          
+         max_horizon = 48, # get next 48 h. might only need 24h?          
          date = date) |>
   system.time()
 ```
@@ -93,9 +72,7 @@ for (i in 1:30) { # ens 00 different?
 }
 ```
 
-
-#### Cube View
-
+Create a view that downscales the data to 0.1 degree resolution, hourly.
 ```{r}
 
 azmet_pts <- station_info %>% 
@@ -121,6 +98,7 @@ v <- cube_view(srs = "EPSG:4326",
 )
 ```
 
+Now generate a dataframe of all the predictions.
 ```{r}
 
 preds <- list()
@@ -136,27 +114,6 @@ for(ens in names(gefs_cubes)){
 ens_forecast <- dplyr::bind_rows(preds, .id = 'ens')
 ```
 
-```{r}
-library(ggplot2)
-
-ggplot(data = ens_forecast) +
-  geom_line(aes(x = time, y = TMP, group = ens)) +
-  facet_wrap(~meta_station_name, ncol = 6) +
-  theme_bw()
-
-ens_long <- ens_forecast |>
-  tidyr::pivot_longer(cols = -c(ens, FID, meta_station_name, meta_station_id, time, geometry),
-               names_to = "var",
-               values_to = "value") |>
-  mutate(time = lubridate::ymd_hms(time),
-         id = paste0(meta_station_name, var))
-a <- ggplot(data = ens_long) +
-  geom_smooth(aes(x = time, y = value, color = meta_station_name)) +
-  #geom_line(aes(x = time, y = value, color = meta_station_name, group = id), alpha = 0.25) +
-  facet_wrap(~var, ncol = 4, scales = 'free_y') 
-
-ggsave(a, width = 20, height = 10, filename = 'fig.pdf')
-```
 
 Next step: long w/ summaries
 
@@ -180,33 +137,39 @@ readr::write_csv(ens_stats, 'ens_stats.csv')
 
 ```{r}
 ## create a plot of ens_stats time vs. value, with color by station, and facet by variable
+library(ggplot2)
 
 a <- ggplot(data = ens_stats) +
   geom_line(aes(x = time, y = median, color = meta_station_name)) +
   geom_ribbon(aes(x = time, ymin = lcl_95, ymax = ucl_95, fill = meta_station_name), alpha = 0.25) +
   geom_ribbon(aes(x = time, ymin = min, ymax = max, fill = meta_station_name), alpha = 0.05) +
   facet_wrap(~var, ncol = 4, scales = 'free_y')
-a
-# make plot above wider aspect
+# make plot above with wide aspect
 ggsave(a, width = 20, height = 10, filename = 'fig.pdf')
 
 # above plot but saved as one file per station, using a for loop
-for(stn in unique(ens_stats$meta_station_name)){
-  a <- ggplot(data = ens_stats %>% filter(meta_station_name == stn)) +
+plots <- list()
+for(stn in unique(ens_stats$meta_station_id)){
+  plots[[stn]] <- ggplot(data = ens_stats %>% filter(meta_station_name == stn)) +
     geom_line(aes(x = time, y = median)) +
     geom_ribbon(aes(x = time, ymin = lcl_95, ymax = ucl_95), alpha = 0.25) +
     geom_ribbon(aes(x = time, ymin = min, ymax = max), alpha = 0.05) +
     facet_wrap(~var, ncol = 4, scales = 'free_y')
-  ggsave(a, width = 20, height = 10, filename = paste0(stn, '.pdf'))
+  ggsave(plots[[stn]], width = 20, height = 10, filename = paste0(stn, '.pdf'))
 }
+
+```{r fig.width=40, fig.height=20}
+# with list above use cowplot to combine into one pdf
+library(cowplot)
+p <- plot_grid(plotlist = plots, ncol = 6, labels = names(plots))
+ggsave(p, width = 40, height = 20, filename = 'all.pdf')
+```
+
+```{r}
 ```
 
 ```{r}
 
-
-```
-
-```{r}
 ```
 
 
