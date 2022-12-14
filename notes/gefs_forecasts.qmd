@@ -158,7 +158,6 @@ for(stn in unique(ens_stats$meta_station_id)){
   ggsave(plots[[stn]], width = 20, height = 10, filename = paste0(stn, '.pdf'))
 }
 
-```{r fig.width=40, fig.height=20}
 # with list above use cowplot to combine into one pdf
 library(cowplot)
 p <- plot_grid(plotlist = plots, ncol = 6, labels = names(plots))
