@@ -71,12 +71,12 @@ tucson <-
 # colnames(tucson)
 
 tucson_test <- tucson |>
-  slice_tail(n = 3)
+  slice_tail(n = 20)
 
 
 tucson <- 
   tucson |> 
-  slice_head(n = -3)
+  slice_head(n = -20)
 ```
 
 ## Fit a GAM
@@ -85,8 +85,7 @@ We'll start with something easy like temperature
 
 ```{r}
 m_temp <- gamm(
-  temp_air_meanC ~ s(date_doy, bs = "cc") + 
-    s(day, k = 12),
+  temp_air_meanC ~ s(date_doy, bs = "cc"),
   data = tucson,
   method = "REML"
 )
@@ -114,13 +113,12 @@ m_temp$lme |> residuals(type = "response") |> auto.arima() -> error_mod
 error_mod
 ```
 
-Auto ARIMA suggests p = 2, q = 2
+Auto ARIMA suggests p = 1, q = 1
 
 ```{r}
 m11 <- gamm(
-  temp_air_meanC ~ s(date_doy, bs = "cc") +
-    s(day, k = 12),
-  correlation = corARMA(form = ~ 1|year, p = 2, q = 2),
+  temp_air_meanC ~ s(date_doy, bs = "cc"),
+  correlation = corARMA(form = ~ 1|year, p = 1, q = 1),
   data = tucson,
   method = "REML"
 )
@@ -157,7 +155,7 @@ p + facet_zoom(x = between(datetime, ymd("2022-08-01"), today()))
 ## Try forecasting
 
 ```{r}
-predict(m11$gam)
+# predict(m11$gam)
 preds <-
   predict(m11$gam, newdata = tucson_test, se.fit = TRUE) |> 
   as_tibble()
@@ -171,12 +169,61 @@ p +
   geom_line(data = preds, aes(y = fit), color = "blue")+
   geom_ribbon(data = preds, aes(ymin = lower, ymax = upper), fill = "blue", alpha = 0.4) +
   geom_point(data = preds, aes(y = temp_air_meanC), color = "blue") +
-  facet_zoom(x = between(datetime, ymd("2022-12-01"), today()))
+  facet_zoom(x = between(datetime, ymd("2022-08-01"), today()))
 ```
 
 Hmm, predictive intervals are too narrow.  Could mess around with different splines, but doesn't seem like it's going to work well.
 
+
+huh, something isn't working about this
+
 ## Try gamlss zero-adjusted gamma family with precip (without ARMA)
+
+```{r}
+library(gamlss)
+
+m <- gamlss(
+  precip_total_mm ~ cs(date_doy),
+  data = tucson |> select(precip_total_mm, date_doy) |> drop_na(),
+  family = ZAGA
+)
+plot(m)
+
+```
+
+MUCH better fit.  Very impressive!!
+
+```{r}
+newdata <- tucson_test |> select(precip_total_mm, date_doy, datetime) |> 
+  filter(!is.na(precip_total_mm))
+
+preds <- newdata |> mutate(.fitted = predict(m, newdata = newdata |> select(-datetime), type = "response"))
+
+```
+
+but predict is poorly supported...
+```{r}
+# preds <- bind_cols(newdata, preds)
+# crit <- qnorm((1-0.95)/2, lower.tail = FALSE)
+# preds <- preds |> 
+#   mutate(upper = fit + (crit * se.fit), lower = fit - (crit * se.fit))
+
+p <-
+  broom::augment(m) |> 
+  add_column(datetime = tucson$datetime) |> 
+  ggplot(aes(x = datetime)) +
+  # geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", color = NA) +
+  geom_line(aes(y = .fitted), linewidth = 0.3) +
+  geom_point(data = tucson, aes(y = precip_total_mm), alpha = 0.5, size = 0.3) +
+  theme_bw()
+p
+
+p +
+  geom_line(data = preds, aes(y = .fitted), color = "blue") +
+  # geom_ribbon(data = preds, aes(ymin = lower, ymax = upper), fill = "blue", alpha = 0.4) +
+  geom_point(data = preds, aes(y = precip_total_mm), color = "blue") +
+  facet_zoom(x = between(datetime, ymd("2022-08-01"), today()))
+```
 
 ## Try adding ARMA
 
