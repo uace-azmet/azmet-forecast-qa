@@ -1,0 +1,92 @@
+---
+title: "Transformations"
+format: html
+editor: visual
+---
+
+# Transformations
+
+Some variables are problematic because the model residuals won't meet assumptions of normality:
+
+-   precipitation (x is super zero-inflated, x ≥ 0)
+
+-   `sol_rad_total` (0 ≤ x ≤ ???, x is left-skewed)
+
+-   soil temp has some really obvious outliers
+
+-   humidity (0 ≤ x ≤ 100)
+
+-   `wind_vector_dir` (polar!)
+
+```{r}
+library(targets)
+tar_load(resid_daily)
+tar_load_globals()
+walk(resid_daily, print)
+```
+Precip is especially bad because it is so zero-inflated
+
+```{r}
+tar_load(daily)
+hist(daily$precip_total_mm)
+```
+
+## Box Cox
+Try doing models with Box-Cox transformations
+
+I guess the simple version of a box-cox is `log1p()`?
+
+To do transformations in `fable` you need to create a transformation function with `new_transformation` that has a forward and inverse.
+
+```{r}
+fwd_log1p <- function(y) {
+  log(y + 1)
+}
+inv_log1p <- function(y) {
+  exp(y) - 1
+}
+inv_log1p(fwd_log1p(1:10))
+my_log1p <- new_transformation(fwd_log1p, inv_log1p)
+
+ts_mods <- daily |>
+  filter(meta_station_id == "az01") |> 
+  dplyr::select(sol_rad_total) |> 
+  model(
+    orig = ARIMA(sol_rad_total ~ PDQ(period = 365)),
+    trans = ARIMA(my_log1p(sol_rad_total)~ PDQ(period = 365))
+  )
+accuracy(ts_mods)
+
+ts_mods |> 
+  plot_tsresids()
+
+#How do I get AIC or likelihood???
+ts_mods  |> glance()
+#don't compare AIC because different data
+```
+
+But obviously that's not a good transformation
+
+
+Can I just do a GAM or something?
+
+```{r}
+library(mgcv)
+library(gratia)
+daily2 <- daily |> 
+  mutate(precip_total_um = as.integer(precip_total_mm * 1000))
+m <- gam(precip_total_um ~ s(date_doy, bs = "cc"), family = ziP, data = daily2)
+plot(m)
+```
+
+
+```{r}
+box_cox2 <- function(y, lambda1, lambda2) {
+  if(lambda1 == 0) {
+    log(y + lambda2)
+  } else {
+    (((y + lambda2)^lambda1) - 1) / lambda1
+  }
+}
+```
+

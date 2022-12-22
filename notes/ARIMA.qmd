@@ -1,0 +1,85 @@
+---
+title: "ARIMA models"
+format: html
+editor: visual
+---
+
+# Auto ARIMA
+
+ARIMA models can have varying numbers of parameters.
+`ARIMA`, by default, identifies the best ARIMA model by AICc.
+We can just let it do its thing for all the variables maybe and then to re-fit the same kind of ARIMA model for future data, we can use `refit()`.
+
+```{r}
+library(targets)
+library(fable)
+library(tidyverse)
+library(lubridate)
+library(tictoc)
+```
+
+## Load data
+
+As an example I'll use data up to 2022 to fit the initial ARIMA model and then re-fit to the whole dataset.
+
+```{r}
+tar_load(daily)
+
+daily <- daily |> 
+  select(temp_air_meanC) |> 
+  tsibble::tsibble(key = meta_station_id) |> 
+  filter(meta_station_id %in% c("az01", "az02", "az07")) |> 
+  select(-meta_station_name)
+
+
+# split the data
+train <- daily |>  filter(datetime < ymd("2020-01-01"))
+new_data <- daily |> filter(datetime >= ymd("2020-01-01"))
+```
+
+## Fit ARIMA
+
+This fits an ARIMA model for `temp_air_meanC` for each station with no external predictors.
+The only thing we don't want it to estimate is the seasonality, which should be a year.
+It is relatively fast if we don't specify the seasonal period, but it usually estimates it as not being seasonal, or having a seasonal period of 7 days for some reason.
+Specifying the seasonal period as 365 makes it suuuuper slow.
+
+```{r}
+set.seed(123)
+tic()
+fit <- train |> 
+  model(ARIMA(temp_air_meanC ~ PDQ(period = 365)))
+toc()
+fit
+walk(1:nrow(fit), ~ {fit |> slice(.x) |> report()})
+```
+
+Because it fits a different ARIMA model for each station, it may find a different "best" model for each station.
+In this case the seasonal component is the same for all three stations (0,1,0), but the non-seasonal component of the model is different for all three stations.
+Maybe that's ok, maybe not?
+
+## Re-fit
+
+We can use the `refit()` function to fit the same model with the same coefficients to new data and that is much faster because the auto ARIMA model selection process gets skipped:
+
+```{r}
+tic()
+updated_fit <- refit(fit, daily)
+toc()
+updated_fit
+walk(1:nrow(updated_fit), ~ {updated_fit |> slice(.x) |> report()})
+```
+
+`stream()` does something similar, but adds data instead of replacing it.
+Seems buggy though.
+ARIMA might not be supported yet.
+
+```{r}
+# tic()
+# updated_fit2 <- stream(fit, new_data)
+# toc()
+# updated_fit2
+# walk(1:nrow(updated_fit2), ~ {updated_fit2 |> slice(.x) |> report()})
+```
+
+
