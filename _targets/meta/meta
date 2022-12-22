@@ -1,11 +1,11 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|ef197ad9af0ba5fe|||||||||||||||
+.Random.seed|object|71856d34c37a5cfe|||||||||||||||
 daily|stem|da98f4e9d7aeec14|bd516b6a911698d4|9bed447be4cdf90d|-758949561||t19348.8205382326s|c4b6f32b4861185b|5381361|rds|local|vector|||0.927||
 daily_test|stem|6f5e24de49386a0c|6ffe0f4d1524c760|4394bd96c444ab87|-1600148948||t19348.8223417646s|553450e605db4fd7|4874|rds|local|vector|||0.016||
 daily_train|stem|c155b4095d14ef58|98fab79423e6d910|a7650542aae62afc|-504909608||t19348.8209042515s|011766270b985d5b|5378412|rds|local|vector|||0.034||
-db_daily|stem|794497d693217063|43e524209fbc3f7c|662b56e7b5d47fef|-1523575140|data/daily|t19348.8205121842s|d0c3ead2a650a0ba|14117871|file|local|vector|||2.035||
+db_daily|stem|794497d693217063|43e524209fbc3f7c|662b56e7b5d47fef|-1523575140|data/daily|t19348.8047274901s|b19d791baa880f5c|704|file|local|vector|||2.035||
 db_daily_init|stem|07405a5e081960ce|68c34e3789e89120|a53874ccc7f1cd83|-785006229||t19348.8204885333s|e0224cf10db1a05d|62|rds|local|vector|||22.508||
-db_hourly|stem|8eadb7c9aa1f855f|fa6724170b5d508a|4e809df93dbae186|801284518|data/hourly|t19348.8210429983s|e31f84934efd3e28|46260733|file|local|vector|||0.678|No data retrieved from API|
+db_hourly|stem|8eadb7c9aa1f855f|fa6724170b5d508a|4e809df93dbae186|801284518|data/hourly|t19324.8343373665s|8c237f5c678b0a48|160|file|local|vector|||0.678|No data retrieved from API|
 db_hourly_init|stem|2276d5f346da910e|f771e3791492fc45|0ef4fdafe12a8e4c|-694431874||t19348.8210430108s|b2c2d69496a0fbf4|63|rds|local|vector|||0.873||
 fc_daily|pattern|6ecbd6e22c5ed672|833aae5d2036601a||-316323687||||27798|rds|local|vector||fc_daily_ff8a304f*fc_daily_a6b4971f*fc_daily_67f84e3e*fc_daily_5c05cb40*fc_daily_c7e8e912*fc_daily_be450d45*fc_daily_542bead1*fc_daily_ef795209*fc_daily_273e27b0*fc_daily_b06b35c8*fc_daily_0395ed4d*fc_daily_9b31dd4a*fc_daily_7ad04a02*fc_daily_c197e050*fc_daily_f52fd406*fc_daily_d18c55f6*fc_daily_9f39b0b6*fc_daily_76f60d59*fc_daily_8ad929ff|25.566||
 fc_daily_0395ed4d|branch|269f5fa2a4db7c3b|833aae5d2036601a|c0b0a1841c8a8ce7|-1783835845||t19348.8209920727s|6519bd7d59f8c08e|1472|rds|local|vector|fc_daily||1.293||
@@ -42,8 +42,8 @@ needs_qa_daily|stem|39c647fdee6a1aab|03927e641642f316|aecf20622feb7718|-10061389
 needs_qa_hourly|stem|08dbde39c31f0383|39476934d05583a6|aecf20622feb7718|239003581||t19348.8205129827s|fef240c3b35f4169|180|rds|local|vector|||0.034||
 plot_tsresids|function|f2b56351117f97d4|||||||||||||||
 read_wrangle_hist|function|dbb4d18b844226b6|||||||||||||||
-readme|stem|b80b1fc0dfb6c641|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19348.8201912838s|254553845dd140cc|9204|file|local|vector|||8.467||
-report|stem|5f1e823017cb8546|d7757bc21131445c|19d5d23bcb2b7de2|-237041703|docs/QA-report.html*docs/QA-report.qmd|t19348.8223073344s|6a98097404db5a6c|3953507|file|local|vector|||79.835||
+readme|stem|b02830b7ec9e79e0|b2c368e3ec5df936|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19348.8880053137s|929a2ab0ac1660ea|9016|file|local|vector|||10.868||
+report|stem|5f1e823017cb8546|d7757bc21131445c|19d5d23bcb2b7de2|-237041703|docs/QA-report.html*docs/QA-report.qmd|t19348.8289892309s|6a98097404db5a6c|3953507|file|local|vector|||79.835||
 resid_daily|pattern|9dd45ad5b3c505a0|fbd5acbcecbe57ab||1309544749||||89773896|rds|local|list||resid_daily_ff8a304f*resid_daily_a6b4971f*resid_daily_67f84e3e*resid_daily_5c05cb40*resid_daily_c7e8e912*resid_daily_be450d45*resid_daily_542bead1*resid_daily_ef795209*resid_daily_273e27b0*resid_daily_b06b35c8*resid_daily_0395ed4d*resid_daily_9b31dd4a*resid_daily_7ad04a02*resid_daily_c197e050*resid_daily_f52fd406*resid_daily_d18c55f6*resid_daily_9f39b0b6*resid_daily_76f60d59*resid_daily_8ad929ff|2.938||
 resid_daily_0395ed4d|branch|40bd947a66954d5c|fbd5acbcecbe57ab|46fc59ede9b51b24|1734287456||t19348.8212465433s|5e35e9313c46da01|6258936|rds|local|list|resid_daily||0.123||
 resid_daily_273e27b0|branch|a7e728afb56dbcf6|fbd5acbcecbe57ab|c1aac27b619fdd23|697740248||t19348.8212024362s|143b0fc95b249a44|6272641|rds|local|list|resid_daily||0.138||
