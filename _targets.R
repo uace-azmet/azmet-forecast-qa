@@ -109,7 +109,7 @@ tar_plan(
 
   # Reports -----------------------------------------------------------------
   #TODO: move some of the long-running code in the report to targets?
-  tar_quarto(report, "docs/report.qmd"),
+  tar_quarto(report, "docs/QA-report.qmd"),
   tar_quarto(readme, "README.qmd")
   
 )
