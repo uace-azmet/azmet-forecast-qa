@@ -15,5 +15,5 @@ data/hourly/
 *.pdf
 
 # rendered docs
-docs/*.html
-docs/*_files/
+# docs/*.html
+# docs/*_files/
