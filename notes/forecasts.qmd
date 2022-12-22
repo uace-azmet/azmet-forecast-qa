@@ -1,0 +1,216 @@
+---
+title: "Ensemble forecasts"
+author: "David LeBauer"
+format: html
+editor: source
+---
+
+
+## gefs4cast
+
+```{r}
+library(gdalcubes) 
+library(gefs4cast) # remotes::install_github("neon4cast/gefs4cast")
+library(stringr)
+library(lubridate)
+library(stars)
+library(viridisLite)
+library(tmap)
+
+gdalcubes_options(parallel = 24)
+```
+
+```{r}
+date <- Sys.Date()
+gefsdir <- tempfile()
+## 3-hr period up to 10 days, (then every 6 hrs up to 35 day horizon)
+gefs_cog(gefsdir, 
+         ens_avg = FALSE,
+         max_horizon = 48, 
+         date = date) |>
+  system.time()
+```
+
+
+---
+
+```{r}
+
+remotes::install_github("FLARE-forecast/Rnoaa4cast")
+library(Rnoaa4cast)
+
+
+lats <- c(25.1)
+lons <- c(-120.2)
+sites <- c('testsite')
+forecast_date <- Sys.Date()
+model <- 'foo'
+model_ds <- 'foo_ds'
+outdir <- tempdir()
+
+noaa_gefs_point_download_downscale(
+  read_from_path = FALSE,
+  lat_list = lats,
+  lon_list = lons,
+  site_list = sites,
+  forecast_time = 00,
+  forecast_date = Sys.Date(),
+  downscale = TRUE,
+  overwrite = TRUE,
+  model_name = model,
+  model_name_ds = model_ds,
+  output_directory = outdir
+)
+https://www.r-pkg.org/badges/version/ecmwfr
+
+d <- file.path(outdir, model, sites, Sys.Date(), "00")
+dir(d, full.names = TRUE)
+files <- list.files(d)
+
+
+##### gefs4cast
+
+library(arrow)
+library(dplyr)
+Sys.unsetenv("AWS_DEFAULT_REGION")
+s3 <- s3_bucket("neon4cast-drivers/noaa/gefs-v12/stage1",
+                endpoint_override = "data.ecoforecast.org", 
+                anonymous = TRUE)
+df <- open_dataset(s3, partitioning=c("start_date", "cycle"))
+df |> filter(start_date == "2022-04-02", cycle == "00", ensemble==1)
+
+
+stack_noaa_forecasts(forecast_dates = seq(forecast_date, 
+                                          forecast_date + lubridate::days(6),
+                                          by = '1 day'),
+                     site = sites[1],
+                     noaa_directory = file.path(tempdir(), 'noaa_dir'),
+                     noaa_model <- "noaa/NOAAGEFS_6hr",
+                     model_name = model,
+                     output_directory = outdir,
+                     dates_w_errors = list(c(lubridate::as_date(c('2022-01-01'))))
+                      )
+
+```
+
+## weatherData package
+
+
+```{r}
+install.packages('meteoForecast')
+library(meteoForecast)
+library(azmetr)
+
+data(station_info, package = 'azmetr')
+```
+
+What variables are available?
+
+```{r}
+z <- grepVar(x = '', service = 'gfs', complete = TRUE)
+rownames(z) <- NULL
+z[,c(2,3,1)]
+sort(z$name)#grepVar(x = '', service = 'nam', complete = TRUE)
+#grepVar(x = '', service = 'rap', complete = TRUE)
+```
+
+```{r}
+site <- station_info[1,]
+tempK <- getPoint(c(site$longitude, site$latitude), vars = "temp" , service = "nam")
+
+tempK <- getPointRuns(c(site$longitude, site$latitude), vars = "temp" , service = "nam")
+library(azmetr)
+radRuns <- getPointRuns(c(-111.0, 32.3), start = '2022-12-01',
+                        end = '2022-12-09', service = 'nam')
+```
+
+## Example for Sahuarita site
+
+
+```{r}
+# based on https://github.com/eco4cast/neon4cast
+
+#remotes::install_github("eco4cast/gefs4cast")
+#remotes::install_github("eco4cast/neon4cast")
+library(gefs4cast)
+library(purrr)
+library(dplyr)
+library(neon4cast)
+
+
+```
+
+
+## For any site
+
+
+
+```{r}
+remotes::install_github("FLARE-forecast/Rnoaa4cast")
+library(Rnoaa4cast)
+
+
+lats <- c(25.1)
+lons <- c(-120.2)
+sites <- c('testsite')
+forecast_date <- Sys.Date()
+model <- 'foo'
+model_ds <- 'foo_ds'
+outdir <- tempdir()
+
+noaa_gefs_point_download_downscale(
+  read_from_path = FALSE,
+  lat_list = lats,
+  lon_list = lons,
+  site_list = sites,
+  forecast_time = 00,
+  forecast_date = Sys.Date(),
+  downscale = TRUE,
+  overwrite = TRUE,
+  model_name = model,
+  model_name_ds = model_ds,
+  output_directory = outdir
+)
+https://www.r-pkg.org/badges/version/ecmwfr
+
+d <- file.path(outdir, model, sites, Sys.Date(), "00")
+dir(d, full.names = TRUE)
+files <- list.files(d)
+
+
+##### gefs4cast
+
+library(arrow)
+library(dplyr)
+Sys.unsetenv("AWS_DEFAULT_REGION")
+s3 <- s3_bucket("neon4cast-drivers/noaa/gefs-v12/stage1",
+                endpoint_override = "data.ecoforecast.org", 
+                anonymous = TRUE)
+df <- open_dataset(s3, partitioning=c("start_date", "cycle"))
+df |> filter(start_date == "2022-04-02", cycle == "00", ensemble==1)
+
+
+stack_noaa_forecasts(forecast_dates = seq(forecast_date, 
+                                          forecast_date + lubridate::days(6),
+                                          by = '1 day'),
+                     site = sites[1],
+                     noaa_directory = file.path(tempdir(), 'noaa_dir'),
+                     noaa_model <- "noaa/NOAAGEFS_6hr",
+                     model_name = model,
+                     output_directory = outdir,
+                     dates_w_errors = list(c(lubridate::as_date(c('2022-01-01'))))
+                      )
+
+
+
+
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
