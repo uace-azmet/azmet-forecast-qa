@@ -542,8 +542,8 @@
       "RemoteUsername": "mitchelloharawild",
       "RemoteRepo": "distributional",
       "RemoteRef": "master",
-      "RemoteSha": "50e29554456d99e9b7671ba6110bebe5961683d2",
-      "Hash": "8d56aff9f58436f78724bcee86e2991c",
+      "RemoteSha": "1a228040f3849f2b28e332a8fb616addef59f214",
+      "Hash": "3ab4a4c722cf0131bec89bdbeca41729",
       "Requirements": [
         "digest",
         "farver",
