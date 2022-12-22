@@ -49,7 +49,8 @@ tar_plan(
       name = db_daily,
       age = as.difftime(1, units = "days") 
     ),
-    format = "file" #because it returns a filepath?
+    format = "file",
+    deployment = "main" #don't run on parallel worker
   ), 
   daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
   daily_train = daily |> filter(datetime < max(datetime)),
@@ -69,7 +70,8 @@ tar_plan(
       name = db_hourly,
       age = as.difftime(1, units = "days")
     ),
-    format = "file"
+    format = "file",
+    deployment = "main" #don't run on parallel workers
   ),
   
   tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
