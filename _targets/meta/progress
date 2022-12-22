@@ -1,6 +1,7 @@
 name|type|parent|branches|progress
 legacy_daily_file|stem|legacy_daily_file|0|skipped
-readme|stem|readme|0|skipped
+readme|stem|readme|0|started
+readme|stem|readme|0|built
 hourly_start|stem|hourly_start|0|skipped
 metadata_file|stem|metadata_file|0|skipped
 legacy_daily|stem|legacy_daily|0|skipped
