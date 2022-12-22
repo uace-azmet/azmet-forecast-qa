@@ -1,12 +1,13 @@
-#' Add API data to historical data
+#' Add API data to historical data and create a data store
 #' 
 #' Binds historical data (2003-01-01 through 2020-12-31) to more recent data
 #' (through 2022-10-31) retrieved from the AZMet API.  Does some data cleaning
-#' to match the historical data to the API data.
+#' to match the historical data to the API data, then writes data out as a
+#' partitioned parquet data store.
 #'
 #' @param daily_hist the historical dataset tibble
 #'
-#' @return a tibble
+#' @return invisibly, the path "data/daily"
 update_daily_hist <- function(daily_hist) {
   daily_recent <- 
     az_daily(start_date = max(daily_hist$datetime) + 1,
@@ -28,5 +29,11 @@ update_daily_hist <- function(daily_hist) {
       TRUE ~ meta_station_name
     )) |> 
     filter(meta_station_id != "az99") #remove test station
-  daily
+  write_dataset(
+    daily,
+    path = "data/daily",
+    format = "parquet",
+    partitioning = "date_year"
+  )
+  return(invisible("data/daily"))
 }
