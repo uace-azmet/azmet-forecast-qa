@@ -10,3 +10,10 @@
 # database
 data/daily/
 data/hourly/
+
+# large non-diffable files
+*.pdf
+
+# rendered docs
+# docs/*.html
+# docs/*_files/
