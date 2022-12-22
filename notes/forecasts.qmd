@@ -2,7 +2,6 @@
 title: "Ensemble forecasts"
 author: "David LeBauer"
 format: html
-     df-print: paged
 editor: source
 ---
 
