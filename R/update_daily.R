@@ -26,10 +26,22 @@ update_daily <- function(db_daily, ...) {
     return(invisible(db_daily))
     
   } else {
+  
+    #arrow doesn't currently have bindings to bind_rows(), so need to collect()
+    #first.  Only rows with years in common with the new data need to be
+    #collect()ed and written out though.
     
-  daily <- 
-    #arrow doesn't currently have bindings to bind_rows(), so need to collect() first.
-    bind_rows(collect(daily_prev), daily_new) 
+    new_data_years <-
+      daily_new |>
+      pull(date_year) |>
+      unique()
+    
+    daily <- 
+      bind_rows(
+        daily_prev |> 
+          filter(date_year %in% new_data_years) |> collect(),
+        daily_new
+      ) 
   
   #overwrite current year
   write_dataset(

@@ -27,10 +27,21 @@ update_hourly <- function(db_hourly, ...) {
     
   } else {
     
-    hourly <- 
-      #arrow doesn't currently have bindings to bind_rows(), so need to collect() first.
-      bind_rows(collect(hourly_prev), hourly_new) 
+    #arrow doesn't currently have bindings to bind_rows(), so need to collect()
+    #first.  Only rows with years in common with the new data need to be
+    #collect()ed and written out though.
+    new_data_years <-
+      hourly_new |>
+      pull(date_year) |>
+      unique()
     
+    hourly <- 
+      bind_rows(
+        hourly_prev |> 
+          filter(date_year %in% new_data_years) |> collect(),
+        hourly_new
+      ) 
+
     #overwrite current year
     write_dataset(
       hourly,

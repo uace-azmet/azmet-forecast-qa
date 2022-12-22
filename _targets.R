@@ -39,28 +39,31 @@ tar_plan(
 
   # Read and wrangle data ---------------------------------------------------
   tar_file(legacy_daily_file, "data/daily_hist.csv"),
-  legacy_daily = read_wrangle_hist(legacy_daily_file), #up to 2003
-  db_daily_init = update_daily_hist(legacy_daily), #up to october 2022
-  tar_target(
-    db_daily, 
-    update_daily(db_daily_init), #also writes to data/daily
-    #This target becomes invalid if it hasn't been run for a day
-    cue = tarchetypes::tar_cue_age(
-      name = db_daily,
-      age = as.difftime(1, units = "days") 
-    ),
-    format = "file" #because it returns a filepath?
-  ), 
+  tar_target(legacy_daily, #up to 2003
+             read_wrangle_hist(legacy_daily_file),
+             deployment = "main"), 
+  tar_target(db_daily_init, #up to october 2022
+             update_daily_hist(legacy_daily),
+             deployment = "main"), 
+  tar_target(db_daily, 
+             update_daily(db_daily_init), #also writes to data/daily
+             #This target becomes invalid if it hasn't been run for a day
+             cue = tarchetypes::tar_cue_age(
+               name = db_daily,
+               age = as.difftime(1, units = "days") 
+             ),
+             format = "file",
+             deployment = "main"), #don't run on parallel worker
+  
   daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
   daily_train = daily |> filter(datetime < max(datetime)),
   daily_test = daily |> filter(datetime == max(datetime)),
   
   #hourly
   hourly_start = "2020-12-30 00",
-  tar_target(
-    db_hourly_init,
-    init_hourly(hourly_start)
-  ),
+  tar_target(db_hourly_init,
+    init_hourly(hourly_start),
+    deployment = "main"),
   tar_target(
     db_hourly,
     update_hourly(db_hourly_init),
@@ -69,7 +72,8 @@ tar_plan(
       name = db_hourly,
       age = as.difftime(1, units = "days")
     ),
-    format = "file"
+    format = "file",
+    deployment = "main" #don't run on parallel workers
   ),
   
   tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
