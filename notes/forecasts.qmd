@@ -61,7 +61,7 @@ noaa_gefs_point_download_downscale(
   model_name_ds = model_ds,
   output_directory = outdir
 )
-https://www.r-pkg.org/badges/version/ecmwfr
+# https://www.r-pkg.org/badges/version/ecmwfr
 
 d <- file.path(outdir, model, sites, Sys.Date(), "00")
 dir(d, full.names = TRUE)
@@ -171,7 +171,7 @@ noaa_gefs_point_download_downscale(
   model_name_ds = model_ds,
   output_directory = outdir
 )
-https://www.r-pkg.org/badges/version/ecmwfr
+# https://www.r-pkg.org/badges/version/ecmwfr
 
 d <- file.path(outdir, model, sites, Sys.Date(), "00")
 dir(d, full.names = TRUE)
