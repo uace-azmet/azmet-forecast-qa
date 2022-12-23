@@ -23,8 +23,7 @@ tar_load(c(
   fc_daily,
   db_daily,
   db_hourly,
-  needs_qa_daily,
-  needs_qa_hourly
+  forecast_qa_vars
 ))
 
 #TODO: An alternative to collect() is to convert to duckdb and have pointblank work directly on database.  Might be faster?
@@ -234,6 +233,10 @@ See model diagnostic plots with `tar_read(resid_daily)`.
 Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table.
 A failed validation means the observed value fell outside of the 99% prediction interval of the forecast.
 
+::: callout-note
+A few variables are excluded from this validation because these timeseries models are inappropriate for them: `wind_vector_dir` is in polar coordinates, `sol_rad_total` and `precip_total_mm` because they are highly zero-inflated.
+:::
+
 ```{r}
 #| column: body-outset
 forecast_validation <- 
@@ -257,7 +260,7 @@ A forecast observation with 95% and 99% predictive intervals is shown in red.
 
 ```{r}
 library(ggdist)
-varnames <- tar_read(needs_qa_daily)
+varnames <- tar_read(forecast_qa_vars)
 daily_long <- daily |> 
   select(datetime, meta_station_name, meta_station_id, all_of(varnames)) |>
   pivot_longer(all_of(varnames), names_to = "varname")

@@ -82,28 +82,37 @@ tar_plan(
   needs_qa_hourly = needs_qa(metadata_file, "hourly"),
 
   # Modeling ----------------------------------------------------------------
-
-  #TODO: need to transform variables
+  # Limit forecast-based validation to just variables that are appropriate for
+  # this kind of modeling.
+  tar_target(
+    forecast_qa_vars,
+    needs_qa_daily[!needs_qa_daily %in% c(
+      "wind_vector_dir", #polar coords
+      "sol_rad_total", #zero-inflated, ≥0
+      "precip_total_mm" #zero-inflated, ≥0
+    )]
+  ),
   tar_target(
     ts_daily,
-    fit_ts_daily(db_daily, needs_qa_daily),
-    pattern = map(needs_qa_daily),
+    fit_ts_daily(db_daily, forecast_qa_vars),
+    pattern = map(forecast_qa_vars),
     iteration = "list"
   ),
   
   tar_target(
     resid_daily,
     plot_tsresids(ts_daily |> filter(meta_station_id == "az01")) +
-      patchwork::plot_annotation(title = needs_qa_daily),
-    pattern = map(ts_daily, needs_qa_daily), 
+      patchwork::plot_annotation(title = forecast_qa_vars),
+    pattern = map(ts_daily, forecast_qa_vars), 
     iteration = "list"
   ),
   
   # Forecasting -------------------------------------------------------------
+
   tar_target(
     fc_daily,
-    forecast_daily(ts_daily, db_daily, needs_qa_daily),
-    pattern = map(ts_daily, needs_qa_daily),
+    forecast_daily(ts_daily, db_daily, forecast_qa_vars),
+    pattern = map(ts_daily, forecast_qa_vars),
     iteration = "vector"
   ),
 
