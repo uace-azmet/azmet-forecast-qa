@@ -89,7 +89,8 @@ tar_plan(
     needs_qa_daily[!needs_qa_daily %in% c(
       "wind_vector_dir", #polar coords
       "sol_rad_total", #zero-inflated, ≥0
-      "precip_total_mm" #zero-inflated, ≥0
+      "precip_total_mm", #zero-inflated, ≥0
+      "wind_vector_dir_stand_dev" #≥0
     )]
   ),
   
