@@ -1,4 +1,3 @@
-#TODO: could be combined with forecast_daily() to simplify.  Doing it separate is useful for model diagnostics though.
 fit_ts_daily <- function(db_daily, var) {
   df <- db_daily |> 
     arrow::open_dataset() |> 
@@ -14,26 +13,34 @@ fit_ts_daily <- function(db_daily, var) {
   test_df <- df |> 
     filter(datetime == max(datetime))
   
-  #TODO: get this to work with either a string for var or tidyeval.
-  # maybe as.formula() ??
-  ts <- train_df |> 
-    model(SNAIVE( ~ lag(365)))
-  ts
-  
-  # fc <- forecast(ts, newdata = test_df, h = 1)
-  #
-  # fc_tidy <- fc |> 
-  #   hilo(c(95, 99)) |>
-  #   select(-{{var}})
-  # 
-  # left_join(test_df, fc_tidy, by = c("datetime", "meta_station_id")) |> 
-  #   select(-.model) |>
-  #   rename("fc_mean" = ".mean", "fc_95" = "95%", "fc_99" = "99%") |> 
-  #   mutate(lower_95 = fc_95$lower,
-  #          upper_95 = fc_95$upper,
-  #          lower_99 = fc_99$lower,
-  #          upper_99 = fc_99$upper) |> 
-  #   select(-fc_95, -fc_99)
+  # Adapted from https://robjhyndman.com/hyndsight/forecasting-weekly-data/
+  #TODO there might be a better way to find the best value for K using optim()
+  #TODO construct the formula for ARIMA better so the output shows the variable
+  #name and the value of K instead of "i".  This is also necessary for getting
+  #refit() to work because it reads that formula and parses it.
+  best_aicc <- Inf
+  bestfit <- list()
+  for(i in 1:25) {
+    cat("Trying K =", i, "\n")
+    fit <-
+      train_df |> 
+      model(
+        ARIMA( ~ pdq() + PDQ(0, 0, 0) + xreg(fourier(period = "1 year", K = i))),
+      )
+    
+    # This is silly, but let's just optimize the mean AICc for all the sites. It
+    # doesn't seem like the choice of K is very consequential, so this is
+    # probably fine.  Otherwise, this would need to be applied to every site
+    # separately.
+    fit_aicc <- glance(fit)$AICc |> mean() 
+    if(fit_aicc < best_aicc) {
+      bestfit <- fit
+      best_aicc <- fit_aicc
+    } else {
+      break
+    }
+  }
+  bestfit
 }
 
 # forecast_daily(db_daily, var = temp_air_meanC)
