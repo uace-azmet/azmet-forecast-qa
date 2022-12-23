@@ -24,9 +24,7 @@ library(slider)
 tar_load(c(
   fc_daily,
   db_daily,
-  db_hourly,
-  needs_qa_daily,
-  needs_qa_hourly
+  db_hourly
 ))
 
 #TODO: An alternative to collect() is to convert to duckdb and have pointblank work directly on database.  Might be faster?
@@ -237,7 +235,7 @@ create_agent(
 
 ```{r}
 library(ggdist)
-varnames <- tar_read(needs_qa_daily)
+varnames <- tar_read(forecast_qa_vars)
 daily_long <- daily |> 
   select(datetime, meta_station_name, meta_station_id, all_of(varnames)) |>
   pivot_longer(all_of(varnames), names_to = "varname")
