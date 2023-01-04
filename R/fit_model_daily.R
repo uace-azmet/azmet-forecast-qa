@@ -1,4 +1,4 @@
-fit_ts_daily <- function(db_daily, var) {
+fit_model_daily <- function(db_daily, var) {
   df <- db_daily |> 
     arrow::open_dataset() |> 
     select(datetime, meta_station_id, {{var}}) |> 

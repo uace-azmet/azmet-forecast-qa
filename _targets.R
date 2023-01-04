@@ -95,25 +95,25 @@ tar_plan(
   ),
   
   tar_target(
-    ts_daily,
-    fit_ts_daily(db_daily, forecast_qa_vars),
+    model_daily,
+    fit_model_daily(db_daily, forecast_qa_vars),
     pattern = map(forecast_qa_vars),
     iteration = "list"
   ),
   
   tar_target(
     resid_daily,
-    plot_tsresids(ts_daily |> filter(meta_station_id == "az01")) +
+    plot_tsresids(model_daily |> filter(meta_station_id == "az01")) +
       patchwork::plot_annotation(title = forecast_qa_vars),
-    pattern = map(ts_daily, forecast_qa_vars),
+    pattern = map(model_daily, forecast_qa_vars),
     iteration = "list"
   ),
   
   # Forecasting -------------------------------------------------------------
   tar_target(
     fc_daily,
-    forecast_daily(ts_daily, db_daily, forecast_qa_vars),
-    pattern = map(ts_daily, forecast_qa_vars),
+    forecast_daily(model_daily, db_daily, forecast_qa_vars),
+    pattern = map(model_daily, forecast_qa_vars),
     iteration = "vector"
   ),
 
