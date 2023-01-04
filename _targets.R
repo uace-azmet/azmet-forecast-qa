@@ -56,9 +56,6 @@ tar_plan(
              format = "file",
              deployment = "main"), #don't run on parallel worker
   
-  # daily = make_model_data(db_daily), #just use the past 5 years for modeling for now
-  # daily_train = daily |> filter(datetime < max(datetime)),
-  # daily_test = daily |> filter(datetime == max(datetime)),
 
   #hourly
   hourly_start = "2020-12-30 00",
@@ -84,36 +81,50 @@ tar_plan(
   # Modeling ----------------------------------------------------------------
   # Limit forecast-based validation to just variables that are appropriate for
   # this kind of modeling.
+  # tar_target(
+  #   forecast_qa_vars,
+  #   needs_qa_daily[!needs_qa_daily %in% c(
+  #     "wind_vector_dir", #polar coords
+  #     "sol_rad_total", #zero-inflated, ≥0
+  #     "precip_total_mm", #zero-inflated, ≥0
+  #     "wind_vector_dir_stand_dev" #≥0
+  #   )]
+  # ),
+  
+  #subset for testing
   tar_target(
     forecast_qa_vars,
-    needs_qa_daily[!needs_qa_daily %in% c(
-      "wind_vector_dir", #polar coords
-      "sol_rad_total", #zero-inflated, ≥0
-      "precip_total_mm", #zero-inflated, ≥0
-      "wind_vector_dir_stand_dev" #≥0
-    )]
+    c("relative_humidity_max", "temp_air_meanC")
   ),
   
+  #target for training data for models that only gets invalidated once per year
+  #so that model is not re-fit every day.
   tar_target(
-    model_daily,
-    fit_model_daily(db_daily, forecast_qa_vars),
+    training_daily,
+    make_training_daily(db_daily)
+  ),
+  
+  
+  tar_target(
+    models_daily,
+    fit_model_daily(training_daily, forecast_qa_vars),
     pattern = map(forecast_qa_vars),
     iteration = "list"
   ),
   
   tar_target(
     resid_daily,
-    plot_tsresids(model_daily |> filter(meta_station_id == "az01")) +
+    plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
       patchwork::plot_annotation(title = forecast_qa_vars),
-    pattern = map(model_daily, forecast_qa_vars),
+    pattern = map(models_daily, forecast_qa_vars),
     iteration = "list"
   ),
   
   # Forecasting -------------------------------------------------------------
   tar_target(
     fc_daily,
-    forecast_daily(model_daily, db_daily, forecast_qa_vars),
-    pattern = map(model_daily, forecast_qa_vars),
+    forecast_daily(models_daily, db_daily, forecast_qa_vars),
+    pattern = map(models_daily, forecast_qa_vars),
     iteration = "vector"
   ),
 

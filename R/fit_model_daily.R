@@ -1,6 +1,6 @@
 fit_model_daily <- function(db_daily, var) {
   df <- db_daily |> 
-    arrow::open_dataset() |> 
+    # arrow::open_dataset() |> 
     select(datetime, meta_station_id, {{var}}) |> 
     #TODO: filter to use previous x days of data??
     collect() |>
@@ -20,8 +20,9 @@ fit_model_daily <- function(db_daily, var) {
   #refit() to work because it reads that formula and parses it.
   best_aicc <- Inf
   bestfit <- list()
-  for(i in 1:25) {
-    cat("Trying K =", i, "\n")
+  # for(i in 1:25) {
+  #   cat("Trying K =", i, "\n")
+  i = 1 #Debug
     fit <-
       train_df |> 
       model(
@@ -32,15 +33,15 @@ fit_model_daily <- function(db_daily, var) {
     # doesn't seem like the choice of K is very consequential, so this is
     # probably fine.  Otherwise, this would need to be applied to every site
     # separately.
-    fit_aicc <- glance(fit)$AICc |> mean() 
-    if(fit_aicc < best_aicc) {
+    # fit_aicc <- glance(fit)$AICc |> mean() 
+    # if(fit_aicc < best_aicc) {
       bestfit <- fit
-      best_aicc <- fit_aicc
-    } else {
-      break
-    }
-  }
+  #     best_aicc <- fit_aicc
+  #   } else {
+  #     break
+  #   }
+  # }
   bestfit
 }
 
-# forecast_daily(db_daily, var = temp_air_meanC)
+# fit_model_daily(db_daily, var = temp_air_meanC)
