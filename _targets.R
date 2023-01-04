@@ -81,30 +81,30 @@ tar_plan(
   # Modeling ----------------------------------------------------------------
   # Limit forecast-based validation to just variables that are appropriate for
   # this kind of modeling.
-  # tar_target(
-  #   forecast_qa_vars,
-  #   needs_qa_daily[!needs_qa_daily %in% c(
-  #     "wind_vector_dir", #polar coords
-  #     "sol_rad_total", #zero-inflated, ≥0
-  #     "precip_total_mm", #zero-inflated, ≥0
-  #     "wind_vector_dir_stand_dev" #≥0
-  #   )]
-  # ),
-  
-  #subset for testing
   tar_target(
     forecast_qa_vars,
-    c("relative_humidity_max", "temp_air_meanC")
+    needs_qa_daily[!needs_qa_daily %in% c(
+      "wind_vector_dir", #polar coords
+      "sol_rad_total", #zero-inflated, ≥0
+      "precip_total_mm", #zero-inflated, ≥0
+      "wind_vector_dir_stand_dev" #≥0
+    )]
   ),
+  
+  # # #subset for testing
+  # tar_target(
+  #   forecast_qa_vars,
+  #   c("relative_humidity_max", "temp_air_meanC")
+  # ),
   
   #target for training data for models that only gets invalidated once per year
   #so that model is not re-fit every day.
   tar_target(
     training_daily,
-    make_training_daily(db_daily)
+    make_training_daily(db_daily, forecast_qa_vars)
   ),
   
-  
+  # Fit timeseries model (once a year)
   tar_target(
     models_daily,
     fit_model_daily(training_daily, forecast_qa_vars),
@@ -112,6 +112,9 @@ tar_plan(
     iteration = "list"
   ),
   
+  #do some model diagnostics.  This just does them for Tucson, but would be good
+  #to eventually inspect some other stations since different ARIMA models are
+  #best fits for different stations apparently
   tar_target(
     resid_daily,
     plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
@@ -121,6 +124,7 @@ tar_plan(
   ),
   
   # Forecasting -------------------------------------------------------------
+  # re-fit model with data up to yesterday, forecast today.
   tar_target(
     fc_daily,
     forecast_daily(models_daily, db_daily, forecast_qa_vars),

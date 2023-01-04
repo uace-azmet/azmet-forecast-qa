@@ -1,21 +1,30 @@
-forecast_daily <- function(ts_daily, db_daily, var) {
-  test_df <- 
+forecast_daily <- function(model, db_daily, var) {
+  #wrangle data
+  df <- 
     db_daily |> 
     arrow::open_dataset() |> 
-    select(datetime, meta_station_id, {{var}}) |>
-    #TODO: filter to use previous x days of data??
+    dplyr::select(datetime, meta_station_id, all_of({{var}})) |>
     collect() |>
     as_tsibble(key = meta_station_id, index = datetime) |> 
-    tsibble::fill_gaps() |> 
-    filter(datetime == max(datetime))
+    tsibble::fill_gaps()
+  #data to re-fit (not re-estimate) model:
+  refit_df <- df |> filter(datetime < max(datetime))
   
-  fc <- forecast(ts_daily, newdata = test_df, h = 1)
-
+  #data to forecast:
+  fc_df <- df |> filter(datetime == max(datetime))
+  
+  #refit model
+  mod_refit <- fabletools::refit(model, new_data = refit_df)
+  
+  #create forecast
+  fc <- forecast(mod_refit, newdata = fc_df)
+  
+  #tidy forecast
   fc_tidy <- fc |>
     hilo(c(95, 99)) |>
-    select(-{{var}})
+    select(-all_of({{var}}))
 
-  left_join(test_df, fc_tidy, by = c("datetime", "meta_station_id")) |>
+  left_join(fc_df, fc_tidy, by = c("datetime", "meta_station_id")) |>
     select(-.model) |>
     rename("fc_mean" = ".mean", "fc_95" = "95%", "fc_99" = "99%") |>
     mutate(lower_95 = fc_95$lower,
