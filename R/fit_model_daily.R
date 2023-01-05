@@ -1,23 +1,18 @@
 #' Fit timeseries models to daily data
 #' 
 #' Fits a non-seasonal ARIMA model with a fourier term to capture seasonality. 
-#' 
-#' @note This can't be run on parallel workers because `db_daily` hasn't been
-#'   `collect()`ed yet and is just a pointer to files rather than an actual data
-#'   frame.
 #'
-#' @param db_daily the db_daily target which is a filtered (but not
-#'   `collect()`ed) arrow dataset
-#' @param var unquoted name of weather variable column
+#' @param training_daily the training_daily target (a tibble)
+#' @param var character vector of column names in db_daily
 #'
 #' @return a model object
 fit_model_daily <- function(training_daily, var) {
   df <- 
     training_daily |> 
-    select(datetime, meta_station_id, all_of({{var}})) |> 
+    select(datetime, meta_station_id, matches(var)) |> 
     group_by(meta_station_id) |> 
     #remove stations that don't have any data
-    filter(!all(is.na({{var}}))) |> 
+    filter(if_all(matches(var), ~!is.na(.))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
     tsibble::fill_gaps()
   
@@ -34,8 +29,8 @@ fit_model_daily <- function(training_daily, var) {
     
     # Construct the formula for ARIMA() as a call so the output shows the actual
     # variable name and value for K (not just K = i).  This looks nicer in the
-    # output, suppresses some warnings from fable, and is necessary for refit() to
-    # work correctly since it parses the formula.
+    # output, suppresses some warnings from fable, and I think it is necessary
+    # for refit() to work correctly since it seems to parse the formula.
     arima_call <- 
       call(
         "ARIMA",
@@ -47,9 +42,11 @@ fit_model_daily <- function(training_daily, var) {
         eval(arima_call), #evaluate the constructed call
       )
     
-    # This is silly, but let's just optimize the mean AICc across all the sites.
-    # It doesn't seem like the choice of K is very consequential, so this is
-    # probably fine.  Otherwise, this would need to be applied to every site
+    # This is silly, but let's just optimize the *mean* AICc across all the
+    # sites. It doesn't seem like the choice of K is very consequential, so this
+    # is probably fine. All sites will be fit with the same value for K (max
+    # order of fourier series), but still allowed to have different ARIMA
+    # models. Otherwise, this for loop would need to be applied to every site
     # separately and each site would likely have different values for K.
     
     fit_aicc <- glance(fit)$AICc |> mean()
