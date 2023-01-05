@@ -9,10 +9,10 @@
 fit_model_daily <- function(training_daily, var) {
   df <- 
     training_daily |> 
-    select(datetime, meta_station_id, matches(var)) |> 
+    select(datetime, meta_station_id, all_of(var)) |> 
     group_by(meta_station_id) |> 
     #remove stations that don't have any data
-    filter(if_all(matches(var), ~!is.na(.))) |> 
+    filter(if_all(var, ~!is.na(.))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
     tsibble::fill_gaps()
   
