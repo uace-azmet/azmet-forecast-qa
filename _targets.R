@@ -43,28 +43,39 @@ tar_plan(
   tar_target(legacy_daily, #up to 2003
              read_wrangle_hist(legacy_daily_file),
              deployment = "main"), 
+  
+  # Writes to data store, but returns a tibble. I think this is necessary for
+  # this workflow to run, but if you remove the data files manually, it won't
+  # invalidate this target!
   tar_target(db_daily_init, #up to october 2022
              update_daily_hist(legacy_daily),
              deployment = "main"), 
+  
   tar_target(db_daily, 
-             update_daily(db_daily_init), #also writes to data/daily
+             update_daily("data/daily", db_daily_init), #also writes to data/daily
              #This target becomes invalid if it hasn't been run for a day
              cue = tarchetypes::tar_cue_age(
                name = db_daily,
                age = as.difftime(1, units = "days") 
              ),
-             format = "file",
+             format = "file", #function just returns a path, so track the actual files
              deployment = "main"), #don't run on parallel worker
   
 
   #hourly
   hourly_start = "2020-12-30 00",
+  
+  # Writes to data store, but returns a tibble. I think this is necessary for
+  # this workflow to run, but if you remove the data files manually, it won't
+  # invalidate this target!
   tar_target(db_hourly_init,
     init_hourly(hourly_start),
     deployment = "main"),
+  
+  
   tar_target(
     db_hourly,
-    update_hourly(db_hourly_init),
+    update_hourly("data/hourly", db_hourly_init),
     #This target becomes invalid if it hasn't been run for a day
     cue = tarchetypes::tar_cue_age(
       name = db_hourly,
@@ -91,7 +102,7 @@ tar_plan(
     )]
   ),
   
-  # # #subset for testing
+  # #subset for testing
   # tar_target(
   #   forecast_qa_vars,
   #   c("temp_soil_10cm_maxC", "temp_air_meanC")
