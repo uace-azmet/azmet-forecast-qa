@@ -6,7 +6,8 @@
 #'   `collect()`ed yet and is just a pointer to files rather than an actual data
 #'   frame.
 #'
-#' @param db_daily the db_daily target which is a filtered (but not `collect()`ed) arrow dataset
+#' @param db_daily the db_daily target which is a filtered (but not
+#'   `collect()`ed) arrow dataset
 #' @param var unquoted name of weather variable column
 #'
 #' @return a model object
@@ -14,14 +15,11 @@ fit_model_daily <- function(training_daily, var) {
   df <- 
     training_daily |> 
     select(datetime, meta_station_id, all_of({{var}})) |> 
+    group_by(meta_station_id) |> 
+    #remove stations that don't have any data
+    filter(!all(is.na({{var}}))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
     tsibble::fill_gaps()
-  
-  train_df <- df |> 
-    filter(datetime != max(datetime))
-  
-  test_df <- df |> 
-    filter(datetime == max(datetime))
   
   # Adapted from https://robjhyndman.com/hyndsight/forecasting-weekly-data/
   #TODO there might be a better way to find the best value for K, or maybe it's
@@ -44,7 +42,7 @@ fit_model_daily <- function(training_daily, var) {
         str2lang(glue::glue("{var} ~ pdq() + PDQ(0,0,0) + xreg(fourier(period = '1 year', K = {i}))"))
       )
     fit <-
-      train_df |> 
+      df |> 
       model(
         eval(arima_call), #evaluate the constructed call
       )
