@@ -94,7 +94,7 @@ tar_plan(
   # # #subset for testing
   # tar_target(
   #   forecast_qa_vars,
-  #   c("relative_humidity_max", "temp_air_meanC")
+  #   c("temp_soil_10cm_maxC", "temp_air_meanC")
   # ),
   
   #target for training data for models that only gets invalidated once per year
