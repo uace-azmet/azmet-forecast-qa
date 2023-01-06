@@ -20,7 +20,8 @@ tar_option_set(
     "feasts",
     "readxl",
     "arrow",
-    "patchwork"
+    "patchwork",
+    "glue"
   ), 
   seed = 659,
   format = "rds" # default storage format
