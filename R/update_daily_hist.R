@@ -8,11 +8,11 @@
 #' @param daily_hist the historical dataset tibble
 #'
 #' @return invisibly, the path "data/daily"
-update_daily_hist <- function(daily_hist) {
+update_daily_hist <- function(legacy_daily) {
   daily_recent <- 
-    az_daily(start_date = max(daily_hist$datetime) + 1,
+    az_daily(start_date = max(legacy_daily$datetime) + 1,
              end_date = "2022-10-31")
-  daily <- bind_rows(daily_hist, daily_recent)
+  daily <- bind_rows(legacy_daily, daily_recent)
   daily <- daily |> 
     #remove duplicates
     filter(!are_duplicated(
@@ -35,5 +35,5 @@ update_daily_hist <- function(daily_hist) {
     format = "parquet",
     partitioning = "date_year"
   )
-  return(invisible("data/daily"))
+  daily
 }

@@ -4,7 +4,7 @@
 #'
 #' @param init_datetime the start datetime for the data store
 #'
-#' @return invisibly returns the path "data/hourly"
+#' @return a tibble
 init_hourly <- function(init_datetime) {
   
   init_datetime <- ymd_h(init_datetime)
@@ -20,6 +20,6 @@ init_hourly <- function(init_datetime) {
     format = "parquet",
     partitioning = "date_year"
   )
-  invisible("data/hourly")
+  hourly
 }
 

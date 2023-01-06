@@ -14,6 +14,9 @@ data/hourly/
 # large non-diffable files
 *.pdf
 
+# targets store
+_targets/
+
 # rendered docs
 # docs/*.html
 # docs/*_files/

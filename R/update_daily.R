@@ -4,11 +4,11 @@
 #' Update daily data from API
 #'
 #' @param db_daily path to the parquet dataset partitioned by year
-#' @param ... used only to add additional dependencies to trigger updates with
+#' @param db_daily_init used only to add additional dependencies to trigger updates with
 #'   `targets`
 #'
 #' @return invisibly returns the `db_daily` path 
-update_daily <- function(db_daily, ...) {
+update_daily <- function(db_daily, db_daily_init) {
   daily_prev <- open_dataset(db_daily)
   
   #figure out where previous data left off
