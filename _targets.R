@@ -22,6 +22,7 @@ tar_option_set(
     "arrow",
     "patchwork"
   ), 
+  seed = 659,
   format = "rds" # default storage format
 )
 
