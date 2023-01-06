@@ -6,4 +6,4 @@
 # to learn about your options.
 
 # targets::tar_make()
-targets::tar_make_clustermq(workers = 3) 
+targets::tar_make_clustermq(workers = 4) 
