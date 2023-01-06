@@ -1,12 +1,12 @@
 #' Update hourly data from API
 #'
 #' @param db_hourly path to hourly data store ("data/hourly")
-#' @param ... used only to add additional dependencies to trigger updates with
+#' @param db_hourly_init used only to add additional dependencies to trigger updates with
 #'   `targets`
 #'
 #' @return invisibly returns the `db_hourly` path 
 #' 
-update_hourly <- function(db_hourly, ...) {
+update_hourly <- function(db_hourly, db_hourly_init) {
   hourly_prev <- open_dataset(db_hourly)
   
   #figure out where previous data left off
@@ -45,7 +45,7 @@ update_hourly <- function(db_hourly, ...) {
     #overwrite current year
     write_dataset(
       hourly,
-      path = "data/hourly",
+      path = db_hourly,
       format = "parquet",
       partitioning = "date_year"
     )

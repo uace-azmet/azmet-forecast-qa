@@ -24,9 +24,7 @@ library(slider)
 tar_load(c(
   fc_daily,
   db_daily,
-  db_hourly,
-  needs_qa_daily,
-  needs_qa_hourly
+  db_hourly
 ))
 
 #TODO: An alternative to collect() is to convert to duckdb and have pointblank work directly on database.  Might be faster?
@@ -237,8 +235,9 @@ create_agent(
 
 ```{r}
 library(ggdist)
-varnames <- tar_read(needs_qa_daily)
-daily_long <- daily |> 
+varnames <- tar_read(forecast_qa_vars)
+daily_long <- 
+  daily |> 
   select(datetime, meta_station_name, meta_station_id, all_of(varnames)) |>
   pivot_longer(all_of(varnames), names_to = "varname")
 
@@ -252,6 +251,8 @@ make_plot <- function(ts, fc) {
   ylab <- ts$varname |> unique()
   ts |> 
     filter(datetime > today() - weeks(4)) |> 
+    #remove stations that don't have any data
+    filter(meta_station_id %in% fc$meta_station_id) |> 
     ggplot(aes(x = datetime, y = value)) +
     geom_line() +
     geom_point(data = fc, aes(y = fc_mean), color = "red", shape = 1) +
@@ -263,7 +264,7 @@ make_plot <- function(ts, fc) {
     labs(title = ylab, 
          y = ylab,
          x = "Date") +
-    facet_wrap(~meta_station_id, ncol = 4) +
+    facet_wrap(~meta_station_id, ncol = 4, scales = "free_y") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
