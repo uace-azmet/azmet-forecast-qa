@@ -1,12 +1,12 @@
 #' Update hourly data from API
 #'
 #' @param db_hourly path to hourly data store ("data/hourly")
-#' @param ... used only to add additional dependencies to trigger updates with
+#' @param db_hourly_init used only to add additional dependencies to trigger updates with
 #'   `targets`
 #'
 #' @return invisibly returns the `db_hourly` path 
 #' 
-update_hourly <- function(db_hourly, ...) {
+update_hourly <- function(db_hourly, db_hourly_init) {
   hourly_prev <- open_dataset(db_hourly)
   
   #figure out where previous data left off
@@ -27,14 +27,25 @@ update_hourly <- function(db_hourly, ...) {
     
   } else {
     
-    hourly <- 
-      #arrow doesn't currently have bindings to bind_rows(), so need to collect() first.
-      bind_rows(collect(hourly_prev), hourly_new) 
+    #arrow doesn't currently have bindings to bind_rows(), so need to collect()
+    #first.  Only rows with years in common with the new data need to be
+    #collect()ed and written out though.
+    new_data_years <-
+      hourly_new |>
+      pull(date_year) |>
+      unique()
     
+    hourly <- 
+      bind_rows(
+        hourly_prev |> 
+          filter(date_year %in% new_data_years) |> collect(),
+        hourly_new
+      ) 
+
     #overwrite current year
     write_dataset(
       hourly,
-      path = "data/hourly",
+      path = db_hourly,
       format = "parquet",
       partitioning = "date_year"
     )

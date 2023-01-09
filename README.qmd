@@ -17,7 +17,7 @@ This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) fo
 
 This project uses the [`targets` package](https://docs.ropensci.org/targets/) for workflow management. Run `targets::tar_make()` from the console to run the workflow and reproduce all results.
 
-- [QA report (WIP)](https://cct-datascience.github.io/azmet-qaqc/docs/report.html)
+- [QA report (WIP)](https://cct-datascience.github.io/azmet-qaqc/docs/QA-report.html)
 
 **Targets workflow:**
 

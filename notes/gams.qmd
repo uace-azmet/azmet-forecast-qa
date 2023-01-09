@@ -1,0 +1,232 @@
+---
+title: "blog"
+format: html
+editor: visual
+---
+
+Working on an incubator project with Jeremy Weiss to do some quality assurance on weather data from AZMET.
+Our idea was to fit timeseries models to existing data, use those models to forecast the most recent day, and then compare the forecast to observed values.
+If observed values are very different from the forecast (say, outside of 99% predictive interval), then the observed value might be a sensor error.
+I think this is a fairly novel and clever thing to do.
+
+I was excited to teach myself timeseries forecasting for this project and went with the `fable` package and friends for doing this.
+An ARIMA model works well enough for the majority of weather variables, but ARIMA does a particularly terrible job for a few, notably precipitation.
+ARIMA assumes normality of residuals, and there's no transformation in existence that's going to bring the residuals of precip data anywhere close to normally distributed, and there isn't a glm version of ARIMA, as far as I know.
+
+```{r}
+library(targets)
+tar_load(daily)
+daily$precip_total_mm |> hist()
+daily$precip_total_mm |> log1p() |>  hist()
+
+```
+
+Precipitation in southern Arizona is super zero-inflated because it's really two processes.
+First, whether it's going to rain or not is a binomial process, with the probability probably highly dependent on day of year and maybe whether it rained recently.
+Then, given that it's going to rain, the amount of rain is probably something like a gamma distribution which is bounded \[0, inf\] and highly right skewed.
+So my first though was "oh no, do I need to learn Bayesian statistics for this?" since my understanding of Bayesian stats is that you can basically fit any model to data that you can write the math for.
+But then I remembered my old friend, generalized additive models.
+I recalled seeing some examples of timeseries modeling with GAMs (probably from Gavin Simpson) and decided to figure out if I could use them for this problem and if it would do a better job than ARIMA.
+
+GAMs are generalized linear models, but the relationships with individual predictors can be defined by more than just slopes and intercepts, but smooth splines.
+These splines are penalized, so they are only as "wiggly" as is supported by data.
+As a first pass, let's try something easier like temperature
+
+## Load packages
+
+`mgcv` for fitting gams `gamlss` for additional familes `gratia` for plotting and other stuff
+
+```{r}
+library(mgcv)
+library(gamlss)
+library(gratia)
+library(tidyverse)
+library(lubridate)
+```
+
+## Example data
+
+Let's just use on station for now.
+
+```{r}
+# colnames(daily)
+tucson <- 
+  daily |> 
+  as_tibble() |> 
+  filter(meta_station_id == "az01") |> 
+  mutate(year = year(datetime)) |> 
+  mutate(day = as.numeric(datetime)) |> 
+  arrange(datetime) |> 
+  mutate(across(
+    c(
+      temp_air_meanC,
+      precip_total_mm,
+      relative_humidity_mean,
+      sol_rad_total
+    ),
+    list("lag" = lag)
+  )) |> 
+  slice(-1) #remove first row because lag is NA
+# glimpse(tucson)
+# colnames(tucson)
+
+tucson_test <- tucson |>
+  slice_tail(n = 20)
+
+
+tucson <- 
+  tucson |> 
+  slice_head(n = -20)
+```
+
+## Fit a GAM
+
+We'll start with something easy like temperature
+
+```{r}
+m_temp <- gamm(
+  temp_air_meanC ~ s(date_doy, bs = "cc"),
+  data = tucson,
+  method = "REML"
+)
+```
+
+```{r}
+draw(m_temp)
+```
+
+This is a model where mean air temp is explained by a smooth function of day of year and a trend through time.
+For `date_doy` I used a cyclical cubic spline (`bs = "cc"`) which forces the beginning and end of the line to "meet up" (i.e. Dec 31 and Jan 1 should be similar fitted values)
+
+But this model is wrong because it assumes observations are independent.
+
+```{r}
+acf(resid(m_temp$lme), lag.max = 36)
+pacf(resid(m_temp$lme), lag.max = 36)
+```
+
+add autocorrelation
+
+```{r}
+library(forecast)
+m_temp$lme |> residuals(type = "response") |> auto.arima() -> error_mod
+error_mod
+```
+
+Auto ARIMA suggests p = 1, q = 1
+
+```{r}
+m11 <- gamm(
+  temp_air_meanC ~ s(date_doy, bs = "cc"),
+  correlation = corARMA(form = ~ 1|year, p = 1, q = 1),
+  data = tucson,
+  method = "REML"
+)
+
+anova(m_temp$lme, m11$lme)
+
+ acf(residuals(m11$lme, type = "normalized"), lag.max = 36)
+pacf(residuals(m11$lme, type = "normalized"), lag.max = 36)
+```
+
+Yay, better!
+
+```{r}
+draw(m11$gam)
+```
+
+```{r}
+p <-
+  fitted_values(m11$gam, ci_level = .99) |> 
+  add_column(datetime = tucson$datetime) |> 
+  ggplot(aes(x = datetime)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", color = NA) +
+  geom_line(aes(y = fitted), linewidth = 0.3) +
+  geom_point(data = tucson, aes(y = temp_air_meanC), alpha = 0.5, size = 0.3) +
+  theme_bw()
+p
+```
+
+```{r}
+library(ggforce)
+p + facet_zoom(x = between(datetime, ymd("2022-08-01"), today()))
+```
+
+## Try forecasting
+
+```{r}
+# predict(m11$gam)
+preds <-
+  predict(m11$gam, newdata = tucson_test, se.fit = TRUE) |> 
+  as_tibble()
+
+preds <- bind_cols(tucson_test, preds)
+crit <- qnorm((1-0.95)/2, lower.tail = FALSE)
+preds <- preds |> 
+  mutate(upper = fit + (crit * se.fit), lower = fit - (crit * se.fit))
+
+p +
+  geom_line(data = preds, aes(y = fit), color = "blue")+
+  geom_ribbon(data = preds, aes(ymin = lower, ymax = upper), fill = "blue", alpha = 0.4) +
+  geom_point(data = preds, aes(y = temp_air_meanC), color = "blue") +
+  facet_zoom(x = between(datetime, ymd("2022-08-01"), today()))
+```
+
+Hmm, predictive intervals are too narrow.  Could mess around with different splines, but doesn't seem like it's going to work well.
+
+
+huh, something isn't working about this
+
+## Try gamlss zero-adjusted gamma family with precip (without ARMA)
+
+```{r}
+library(gamlss)
+
+m <- gamlss(
+  precip_total_mm ~ cs(date_doy),
+  data = tucson |> select(precip_total_mm, date_doy) |> drop_na(),
+  family = ZAGA
+)
+plot(m)
+
+```
+
+MUCH better fit.  Very impressive!!
+
+```{r}
+newdata <- tucson_test |> select(precip_total_mm, date_doy, datetime) |> 
+  filter(!is.na(precip_total_mm))
+
+preds <- newdata |> mutate(.fitted = predict(m, newdata = newdata |> select(-datetime), type = "response"))
+
+```
+
+but predict is poorly supported...
+```{r}
+# preds <- bind_cols(newdata, preds)
+# crit <- qnorm((1-0.95)/2, lower.tail = FALSE)
+# preds <- preds |> 
+#   mutate(upper = fit + (crit * se.fit), lower = fit - (crit * se.fit))
+
+p <-
+  broom::augment(m) |> 
+  add_column(datetime = tucson$datetime) |> 
+  ggplot(aes(x = datetime)) +
+  # geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", color = NA) +
+  geom_line(aes(y = .fitted), linewidth = 0.3) +
+  geom_point(data = tucson, aes(y = precip_total_mm), alpha = 0.5, size = 0.3) +
+  theme_bw()
+p
+
+p +
+  geom_line(data = preds, aes(y = .fitted), color = "blue") +
+  # geom_ribbon(data = preds, aes(ymin = lower, ymax = upper), fill = "blue", alpha = 0.4) +
+  geom_point(data = preds, aes(y = precip_total_mm), color = "blue") +
+  facet_zoom(x = between(datetime, ymd("2022-08-01"), today()))
+```
+
+## Try adding ARMA
+
+## Try adding random effect of station
+
+

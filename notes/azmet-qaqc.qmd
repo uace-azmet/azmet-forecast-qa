@@ -51,7 +51,6 @@ Load data
 daily_ts <- tar_read(daily)
 ```
 
-
 # Preliminary (exploratory) analysis
 
 I'll start by looking at a subset of sites just to make visualization easier.
@@ -318,6 +317,7 @@ fit_dcmp <-
     STL(sol_rad_total ~ season(period = "1 year")),
     NAIVE(season_adjust)
   ))
+fit_dcmp
 ```
 
 ## Forecasting methods
@@ -342,8 +342,6 @@ fit_snaive |>
   filter(meta_station_name == "Tucson") |> 
   autoplot(daily_ts_sub |> filter(year(datetime)>2021), level = c(95, 99))
 ```
-
-OOf, those prediction inteverals are WIDE.
 
 Check residuals
 
@@ -410,11 +408,15 @@ fit_compare <-
       STL(sol_rad_total ~ season(period = "1 year")),
       NAIVE(season_adjust)
     ),
-    arima = ARIMA(sol_rad_total)
+    #auto ARIMA
+    arima = ARIMA(sol_rad_total ~ pdq() + PDQ(period = "365 days"))
   )
+fit_compare |> select(arima) |> report()
+# ARIMA(2,0,3)(0,1,0)[365] is best fit for ARIMA
 
 fc <- fit_compare |> forecast(sol_rad_test)
 fc |> 
+  # filter(.model == "arima") |> 
   autoplot(bind_rows(sol_rad_train, sol_rad_test) |> filter(year(datetime)>=2021), level = NULL)
 accuracy(fc, sol_rad_test)
 
@@ -423,21 +425,18 @@ accuracy(fc, sol_rad_test)
 accuracy(fc, sol_rad_test, list(winkler = winkler_score), level = 80)
 ```
 
-Best method here is seasonal naive.
+ARIMA and seasonal naive are basically equivalent, and seasonal naive is a lot faster to fit.
 I guess this isn't terribly surprising for these type of data?
-I feel like it should be *smoother* though.
+I feel like the forecast values should be a LOT *smoother* though.
 
 ```{r}
 fc |> 
-  filter(.model %in% c("arima", "snaive")) |> 
+  filter(.model %in% c("arima", "snaive")) |>
   autoplot(sol_rad_train |> filter(year(datetime)>=2021), level = c(95, 99)) +
-  geom_line(data = sol_rad_test, aes(y = sol_rad_total), alpha = 0.3, linetype = 2)
+  geom_line(data = sol_rad_test, aes(y = sol_rad_total), alpha = 0.3, linetype = 2) +
+  facet_wrap(~.model)
 
 ```
-
-Surprised that ARIMA did poorly.
-Maybe I'm not understanding it well?
-Maybe I have to specify seasonality since I know it?
 
 ```{r}
 fit_arima <- sol_rad_train |> 
