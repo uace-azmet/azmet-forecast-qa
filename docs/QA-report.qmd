@@ -224,16 +224,41 @@ get_agent_report(hourly_check, title = "Hourly Data Consistency Check")
 
 # Forecast-based validation
 
-::: callout-warning
-WORK IN PROGRESS\
-Currently the same seasonal naïve model is fit to every variable and it is not always appropriate.
-See model diagnostic plots with `tar_read(resid_daily)`.
+For these validations, a timeseries model is fit to past data, a forecast for the current day is made, and that forecast is compared to observed values.
+If observed values are outside the 99% predictive interval of the forecast then the value doesn't pass the validation.
+Interpret these validations with caution---a failing validation does not necessarily mean there is a problem with the data and could just represent an extreme event.
+Check the plots below as well.
+
+::: {.callout-note collapse="true"}
+## Expand to see model details
+
+Timeseries models are fit using a non-seasonal ARIMA model using a fourier terms to capture seasonality.
+The maximum order of the fourier terms (`K`) is estimated for each weather variable to minimize model AIC.
+An auto-ARIMA function is used for the non-seasonal ARIMA part of the model and the order of the coefficients $p$, $d$, and $q$ are estimated separately for each weather variable and each *station*.
+
+This is done using the `fable` package with something like the following (pseudo-code):
+
+``` r
+for (i in 1:25) {
+  fit <- df |> model(
+    ARIMA( ~ pdq() + PDQ(0,0,0) + xreg(fourier(period = '1 year', K = i)))
+  )
+  fit_aicc <- fit$AICc
+  if(fit_aicc < bestfit) {
+    bestfit <- fit_aicc
+  } else {
+    return(fit)
+  }
+}
+```
+
+The maximum order of the Fourier series, the order of the ARIMA coefficients, and the estimates for the coefficients are only estimated once per year.
+Each day, the model is re-fit to new data (but not re-estimated) before being used to forecast.
 :::
 
-Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table.
-A failed validation means the observed value fell outside of the 99% prediction interval of the forecast.
+To read the `pointblank` table, hover over the TBL column to see which variable each row corresponds to
 
-::: callout-note
+::: callout-important
 A few variables are excluded from this validation because these timeseries models are inappropriate for them: `wind_vector_dir` is in polar coordinates, `sol_rad_total` and `precip_total_mm` because they are highly zero-inflated.
 :::
 
