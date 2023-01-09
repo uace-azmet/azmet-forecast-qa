@@ -79,7 +79,7 @@ az_solar_df |>
 
 #PAR is too small of a slice of the solar radiation measured to be helpful.  Ugh. need to calculate for a wider range of wavelenghts.
 
-# this is some solar constant version.  Don't know what the ref is
+# this version uses the solar constant to estimate solar radiation *outside* the atmosphere
 zenith_to_sol_rad <- function(zenith){
   foo <-  function(zenith) {
     
@@ -91,8 +91,8 @@ zenith_to_sol_rad <- function(zenith){
     if(zenith >= 90) {
       radiation <- 0
     } else {
-      #multiply by "solar constant" (don't know where this comes from)
-      radiation <-  cosz * 1366
+      #multiply by "solar constant" 
+      radiation <-  cosz * 1388 #W/m^2
     }
     radiation
   }
@@ -103,12 +103,37 @@ zenith_to_sol_rad <- function(zenith){
 
 az_solar_df <-
   az_solar_df |> 
-  mutate(r_pot = zenith_to_sol_rad(zenith) * set_units(1, "hr"))
+  mutate(r_pot = (zenith_to_sol_rad(zenith) * set_units(1, "hr")) |> set_units("MJ/m^2") )
 
 az_solar_df |> 
-  
   filter(date_doy == 300, year(date_datetime)== 2021) |>
   ggplot(aes(x = date_datetime)) +
   geom_line(aes(y = sol_rad_total)) +
   geom_line(aes(y = r_pot), color = "red") +
   facet_wrap(~meta_station_id)
+
+#check against daily data
+
+az_solar_daily <- 
+  az_solar_df |> 
+  as_tibble() |> 
+  mutate(date = date(date_datetime)) |>
+  group_by(date, meta_station_id, meta_station_name) |> 
+  summarize(r_pot = sum(r_pot))
+
+daily <- 
+  tar_read(db_daily) |> open_dataset() |> 
+  select(meta_station_id, meta_station_name, datetime, date_doy, sol_rad_total) |> 
+ #just use 2021 for simplicity
+  filter(year(datetime)==2021) |> 
+  collect() |> 
+  az_add_units() |> 
+  rename(date = datetime)
+
+full_join(az_solar_daily, daily) |> 
+  ggplot(aes(x= date, color = meta_station_id)) +
+  geom_line(aes(y = sol_rad_total)) +
+  geom_line(aes(y = r_pot), color = "red") +
+  facet_wrap(~meta_station_id)
+
+#not useful because doesn't include atmosphere.
