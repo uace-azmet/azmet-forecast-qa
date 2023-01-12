@@ -7,8 +7,6 @@ format:
 editor: visual
 ---
 
-This could be a parameterized report to change the dates for the QA/QC (e.g. for doing legacy data)
-
 ```{r}
 #| echo: false
 #| message: false
@@ -24,7 +22,8 @@ library(slider)
 tar_load(c(
   fc_daily,
   db_daily,
-  db_hourly
+  db_hourly,
+  forecast_qa_vars
 ))
 
 #TODO: An alternative to collect() is to convert to duckdb and have pointblank work directly on database.  Might be faster?
@@ -41,59 +40,75 @@ hourly <-
   arrange(meta_station_id, desc(date_datetime))
 ```
 
+This report uses the `pointblank` package for displaying data validation results.
+In the tables below the "STEP" column contains the name of the validation function, but you can mouse over it for a more human-readable description.
+The UNITS column is how many rows were tested, PASS and FAIL columns show the number (upper) and fraction (lower) of rows that pass or fail the validation step.
+The W S N column shows whether this step triggered a warning, a stop, or a notification.
+The EXT column contains a blue CSV button to download ("EXTract") the failed rows for the validation for you to inspect.
+Find more on the anatomy of this table in the `pointblank` [documentation](https://rich-iannone.github.io/pointblank/articles/VALID-I.html#a-simple-example-with-the-basics).
+
 # Consistency checks
 
-## Action levels
-
-We can set action levels as a number of observations or a fraction of observations.
-We can also set different action levels for "warn" (yellow in the table below), "stop" (red in the table below), and "notify" (send an email to someone).
-For now I've set the action levels to warn at 1 failing observation and "stop" at 1% observations failing.
-
 ```{r}
-#create action levels for warnings and errors
+# Action levels
+#
+# We can set action levels as a number of observations or a fraction of
+# observations. We can also set different action levels for "warn" (yellow in
+# the table below), "stop" (red in the table below), and "notify" (send an email
+# to someone). For now I've set the action levels to warn at 1 failing
+# observation and "stop" at 1% observations failing.
 #TODO add notify level
 
 al <- action_levels(warn_at = 1, stop_at = 0.1)
 ```
 
-## Daily Data
-
 ```{r}
 #| column: body-outset
-daily |> 
+daily_check <-
+  daily |> 
   create_agent(
-    tbl_name = "Daily measures",
-    label = "Consistency Checks",
+    # tbl_name = "Daily Data Consistency Checks",
+    # label = "Consistency Checks",
     actions = al
   ) |> 
   # Internal consistency checks from 'NWS (1994) TSP 88-21-R2':
-  col_vals_gte(temp_air_meanC, vars(dwpt_mean), na_pass = TRUE) |> 
-  col_vals_lte(temp_air_minC, vars(temp_air_meanC), na_pass = TRUE) |> 
-  col_vals_lte(temp_air_meanC, vars(temp_air_maxC), na_pass = TRUE) |> 
-  col_vals_lte(wind_spd_mean_mps, vars(wind_spd_max_mps), na_pass = TRUE) |> 
-  col_vals_lte(temp_soil_10cm_meanC, vars(temp_soil_10cm_maxC), na_pass = TRUE) |> 
-  col_vals_lte(temp_soil_10cm_minC, vars(temp_soil_10cm_meanC), na_pass = TRUE) |> 
-  col_vals_lte(temp_soil_50cm_meanC, vars(temp_soil_50cm_maxC), na_pass = TRUE) |> 
+  col_vals_gte(temp_air_meanC, vars(dwpt_mean), na_pass = TRUE) |>
+  col_vals_lte(temp_air_minC, vars(temp_air_meanC), na_pass = TRUE) |>
+  col_vals_lte(temp_air_meanC, vars(temp_air_maxC), na_pass = TRUE) |>
+  col_vals_lte(wind_spd_mean_mps, vars(wind_spd_max_mps), na_pass = TRUE) |>
+  col_vals_lte(temp_soil_10cm_meanC, vars(temp_soil_10cm_maxC), na_pass = TRUE) |>
+  col_vals_lte(temp_soil_10cm_minC, vars(temp_soil_10cm_meanC), na_pass = TRUE) |>
+  col_vals_lte(temp_soil_50cm_meanC, vars(temp_soil_50cm_maxC), na_pass = TRUE) |>
   col_vals_lte(temp_soil_50cm_minC, vars(temp_soil_50cm_meanC), na_pass = TRUE) |>
-  col_vals_lte(relative_humidity_mean, vars(relative_humidity_max), na_pass = TRUE) |>
-  col_vals_lte(relative_humidity_min, vars(relative_humidity_mean), na_pass = TRUE) |>
+  col_vals_lte(relative_humidity_mean,
+               vars(relative_humidity_max),
+               na_pass = TRUE) |>
+  col_vals_lte(relative_humidity_min,
+               vars(relative_humidity_mean),
+               na_pass = TRUE) |> 
   
   #TODO calculate max sol radiation based on date and location and check for that
   # col_vals_lt(sol_rad_total, sol_rad_expected, preconditions = ~calc_sol(date))
   interrogate()
+get_agent_report(daily_check, title = "Daily Consistency Checks")
 ```
 
 ## Hourly data
+
+```{=html}
+<!--
 
 Some of the validations here take advantage of lags and sliding window functions.
 Validations on variable changes are done by checking that `abs(variable - lag(variable)` is less than some threshold.
 Sliding window functions are used to check that variables are not under a threshold for a certain number of observations in a row.
 This is done with the `slider` package and the `slide_*()` functions.
-For example:\
+For example:
 
+-->
+```
 ```{r}
 #| code-fold: show
-#| 
+#| include: false
 x <- c(0, 2, 0, 0, 0, 3)
 # For every window of two values, check if x < 1 for the previous two values
 slider::slide(x, ~.x < 1, .before = 2)
@@ -109,7 +124,8 @@ slider::slide_lgl( #return a logical vector instead of a list
 
 ```{r}
 #| column: body-outset
-hourly |> 
+hourly_check <- 
+  hourly |> 
   create_agent(
     tbl_name = "Hourly measures",
     label = "Consistency Checks",
@@ -202,24 +218,54 @@ hourly |>
       ) |> ungroup()
   ) |> 
 interrogate()
+
+get_agent_report(hourly_check, title = "Hourly Data Consistency Check")
 ```
 
 # Forecast-based validation
 
-## Daily
+For these validations, a timeseries model is fit to past data, a forecast for the current day is made, and that forecast is compared to observed values.
+If observed values are outside the 99% predictive interval of the forecast then the value doesn't pass the validation.
+Interpret these validations with caution---a failing validation does not necessarily mean there is a problem with the data and could just represent an extreme event.
+Check the plots below as well.
 
-::: callout-warning
-WORK IN PROGRESS\
-Currently the same seasonal naïve model is fit to every variable and it is not always appropriate.
-See model diagnostic plots with `tar_read(resid_daily)`.
+::: {.callout-note collapse="true"}
+## Expand to see model details
+
+Timeseries models are fit using a non-seasonal ARIMA model using a fourier terms to capture seasonality.
+The maximum order of the fourier terms (`K`) is estimated for each weather variable to minimize model AIC.
+An auto-ARIMA function is used for the non-seasonal ARIMA part of the model and the order of the coefficients $p$, $d$, and $q$ are estimated separately for each weather variable and each *station*.
+
+This is done using the `fable` package with something like the following (pseudo-code):
+
+``` r
+for (i in 1:25) {
+  fit <- df |> model(
+    ARIMA( ~ pdq() + PDQ(0,0,0) + xreg(fourier(period = '1 year', K = i)))
+  )
+  fit_aicc <- fit$AICc
+  if(fit_aicc < bestfit) {
+    bestfit <- fit_aicc
+  } else {
+    return(fit)
+  }
+}
+```
+
+The maximum order of the Fourier series, the order of the ARIMA coefficients, and the estimates for the coefficients are only estimated once per year.
+Each day, the model is re-fit to new data (but not re-estimated) before being used to forecast.
 :::
 
-Mouse over the "TBL" column symbol to see which variable is associated with each row of the validation table.
-A failed validation means the observed value fell outside of the 99% prediction interval of the forecast.
+To read the `pointblank` table, hover over the TBL column to see which variable each row corresponds to
+
+::: callout-important
+A few variables are excluded from this validation because these timeseries models are inappropriate for them: `wind_vector_dir` is in polar coordinates, `sol_rad_total` and `precip_total_mm` because they are highly zero-inflated.
+:::
 
 ```{r}
 #| column: body-outset
-create_agent(
+forecast_validation <- 
+  create_agent(
   fc_daily,
   tbl_name = "Daily Measures",
   label = "Forecast-Based Validations",
@@ -229,9 +275,13 @@ create_agent(
     obs, vars(lower_99), vars(upper_99), segments = vars(varname)
     ) |> 
   interrogate()
+get_agent_report(forecast_validation, title = "Forecast-based Validation (Daily Data)")
 ```
 
 ### Timeseries Plots
+
+These show the last four weeks of data as a line, today's observed value as a blue point.
+A forecast observation with 95% and 99% predictive intervals is shown in red.
 
 ```{r}
 library(ggdist)
