@@ -38,38 +38,38 @@ graph LR
     x70a5fa6bea6f298d[""Pattern""]:::none --- xf0bce276fe2b9d3e>""Function""]:::none
   end
   subgraph Graph
-    x3d7b2a2ab5636113(["metadata_file"]):::outdated --> xac2ac35653724b54(["needs_qa_hourly"]):::outdated
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xac2ac35653724b54(["needs_qa_hourly"]):::outdated
-    x44bd6feeb3fb18b4(["db_daily"]):::outdated --> x2c1f6f5234e92642(["training_daily"]):::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> x2c1f6f5234e92642(["training_daily"]):::outdated
-    xe87583f9b9d152fa>"make_training_daily"]:::uptodate --> x2c1f6f5234e92642(["training_daily"]):::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
-    x4d3c4dcfeadc796d["models_daily"]:::outdated --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
-    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
-    x1920bdb737e11d2e(["legacy_daily_file"]):::started --> xff9b736edef41c8b(["legacy_daily"]):::outdated
-    x842666df821db265>"read_wrangle_hist"]:::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::outdated
-    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::outdated
-    x2c1f6f5234e92642(["training_daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::outdated
-    x3d7b2a2ab5636113(["metadata_file"]):::outdated --> xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated
-    x44bd6feeb3fb18b4(["db_daily"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x4bc7352f98499683>"forecast_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x4d3c4dcfeadc796d["models_daily"]:::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    xba07353683c5dbf8(["db_hourly_init"]):::outdated --> xf4a7af7aeef4f182(["db_hourly"]):::outdated
-    x967af66f8b51e317>"update_hourly"]:::uptodate --> xf4a7af7aeef4f182(["db_hourly"]):::outdated
-    xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated --> x601d3b0e7d261371(["forecast_qa_vars"]):::outdated
+    xff9b736edef41c8b(["legacy_daily"]):::outdated --> x1cab041545db0886(["db_daily_init"]):::outdated
+    x8b3096a190996662>"update_daily_hist"]:::uptodate --> x1cab041545db0886(["db_daily_init"]):::outdated
     x44bd6feeb3fb18b4(["db_daily"]):::outdated --> xe0fba61fbc506510(["report"]):::outdated
     xf4a7af7aeef4f182(["db_hourly"]):::outdated --> xe0fba61fbc506510(["report"]):::outdated
     xdd96ec4b0bb5ab6b["fc_daily"]:::outdated --> xe0fba61fbc506510(["report"]):::outdated
     x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> xe0fba61fbc506510(["report"]):::outdated
-    xff9b736edef41c8b(["legacy_daily"]):::outdated --> x1cab041545db0886(["db_daily_init"]):::outdated
-    x8b3096a190996662>"update_daily_hist"]:::uptodate --> x1cab041545db0886(["db_daily_init"]):::outdated
+    x44bd6feeb3fb18b4(["db_daily"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
+    x4bc7352f98499683>"forecast_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
+    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
+    x4d3c4dcfeadc796d["models_daily"]:::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
+    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::outdated
+    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::outdated
+    x2c1f6f5234e92642(["training_daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::outdated
     xd1a6dd314cda4831(["hourly_start"]):::outdated --> xba07353683c5dbf8(["db_hourly_init"]):::outdated
     x7a5743c959c496f9>"init_hourly"]:::uptodate --> xba07353683c5dbf8(["db_hourly_init"]):::outdated
     x1cab041545db0886(["db_daily_init"]):::outdated --> x44bd6feeb3fb18b4(["db_daily"]):::outdated
     xed180ed90a78526a>"update_daily"]:::uptodate --> x44bd6feeb3fb18b4(["db_daily"]):::outdated
+    xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated --> x601d3b0e7d261371(["forecast_qa_vars"]):::outdated
+    x1920bdb737e11d2e(["legacy_daily_file"]):::started --> xff9b736edef41c8b(["legacy_daily"]):::outdated
+    x842666df821db265>"read_wrangle_hist"]:::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::outdated
+    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
+    x4d3c4dcfeadc796d["models_daily"]:::outdated --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
+    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
+    x3d7b2a2ab5636113(["metadata_file"]):::outdated --> xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated
+    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::outdated
+    xba07353683c5dbf8(["db_hourly_init"]):::outdated --> xf4a7af7aeef4f182(["db_hourly"]):::outdated
+    x967af66f8b51e317>"update_hourly"]:::uptodate --> xf4a7af7aeef4f182(["db_hourly"]):::outdated
+    x44bd6feeb3fb18b4(["db_daily"]):::outdated --> x2c1f6f5234e92642(["training_daily"]):::outdated
+    x601d3b0e7d261371(["forecast_qa_vars"]):::outdated --> x2c1f6f5234e92642(["training_daily"]):::outdated
+    xe87583f9b9d152fa>"make_training_daily"]:::uptodate --> x2c1f6f5234e92642(["training_daily"]):::outdated
+    x3d7b2a2ab5636113(["metadata_file"]):::outdated --> xac2ac35653724b54(["needs_qa_hourly"]):::outdated
+    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xac2ac35653724b54(["needs_qa_hourly"]):::outdated
     x6e52cb0f1668cc22(["readme"]):::started --> x6e52cb0f1668cc22(["readme"]):::started
   end
   classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
