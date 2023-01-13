@@ -179,21 +179,22 @@
     },
     "azmetr": {
       "Package": "azmetr",
-      "Version": "0.0.0.9005",
+      "Version": "0.0.0.9006",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteUsername": "cct-datascience",
       "RemoteRepo": "azmetr",
       "RemoteRef": "HEAD",
-      "RemoteSha": "a70e82ce6cfbdd55705710a3fab8fff5591dbb2d",
+      "RemoteSha": "3db3a0e92a09e0a8740d2b541b37ec28e45977d7",
       "RemoteHost": "api.github.com",
-      "Hash": "27909c2d8e74ae8cf79c0b1323de547c",
+      "Hash": "9b9082f3195e102053658e407ffad027",
       "Requirements": [
         "attempt",
         "curl",
         "dplyr",
         "httr",
         "lubridate",
+        "magrittr",
         "purrr",
         "rlang",
         "tibble",
@@ -394,10 +395,10 @@
     },
     "cli": {
       "Package": "cli",
-      "Version": "3.5.0",
+      "Version": "3.6.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "eb9fc121ad9a1075c471107ef185be46",
+      "Hash": "3177a5a16c243adc199ba33117bd9657",
       "Requirements": []
     },
     "clipr": {
@@ -1643,10 +1644,10 @@
     },
     "purrr": {
       "Package": "purrr",
-      "Version": "1.0.0",
+      "Version": "1.0.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "1ad491d27989ec6c26a2918ad6df116b",
+      "Hash": "d71c815267c640f17ddbf7f16144b4bb",
       "Requirements": [
         "cli",
         "lifecycle",
@@ -1954,6 +1955,18 @@
         "htmltools",
         "htmlwidgets",
         "jsonlite",
+        "shiny"
+      ]
+    },
+    "shinycssloaders": {
+      "Package": "shinycssloaders",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f39bb3c44a9b496723ec7e86f9a771d8",
+      "Requirements": [
+        "digest",
+        "glue",
         "shiny"
       ]
     },
