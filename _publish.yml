@@ -1,0 +1,4 @@
+- source: project
+  connect:
+    - id: eae617b5-0125-4d01-92a0-08f6cb815040
+      url: 'https://viz.datascience.arizona.edu:443/content/eae617b5-0125-4d01-92a0-08f6cb815040/'
