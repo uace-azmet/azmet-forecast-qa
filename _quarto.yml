@@ -1,9 +1,6 @@
 project:
   title: "azmet-qaqc"
   execute-dir: project
-  render:
-    - docs/QA-report.qmd
-  type: website
 
 
 
