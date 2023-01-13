@@ -1,5 +1,6 @@
 ---
 title: "Report"
+date: now
 format: 
   html:
     code-fold: true
