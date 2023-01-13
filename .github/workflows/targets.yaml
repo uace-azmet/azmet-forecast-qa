@@ -132,6 +132,7 @@ jobs:
         with:
           target: connect
           render: "false"
+          path: docs/QA-report.qmd
           CONNECT_SERVER: ${{ secrets.CONNECT_URL }}
           CONNECT_API_KEY: ${{ secrets.CONNECT_APIKEY }}
 
