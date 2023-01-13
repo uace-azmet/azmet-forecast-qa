@@ -72,7 +72,7 @@ jobs:
         run: |
           if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
           renv::restore()
-
+  
       - name: Check if previous runs exists
         id: runs-exist
         run: git ls-remote --exit-code --heads origin targets-runs
@@ -126,15 +126,15 @@ jobs:
           done
           git commit -am "Run pipeline"
           git push origin targets-runs
-          
-      - name: Publish report(s)
-        run: |
-          quarto::quarto_publish_doc(
-            "docs/QA-report.qmd",
-            server = "viz.datascience.arizona.edu",
-            account = "ericrscott"
-          )
-        shell: Rscript {0}
+      
+      - name: Render and Publish 
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: connect
+          render: "false"
+          CONNECT_SERVER: ${{ secrets.CONNECT_URL }}
+          CONNECT_API_KEY: ${{ secrets.CONNECT_APIKEY }}
+
 
       - name: Prepare failure artifact
         if: failure()
