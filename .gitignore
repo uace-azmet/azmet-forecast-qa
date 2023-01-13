@@ -20,3 +20,6 @@ _targets/
 # rendered docs
 # docs/*.html
 # docs/*_files/
+
+# rendered site
+_site/
