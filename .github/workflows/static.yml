@@ -5,7 +5,7 @@ on:
   # Runs on pushes targeting the default branch
   workflow_run:
     workflows: "targets"
-    branches: main
+    branches: targets-runs
     types:
       - completed
 
@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: '.'
+          path: 'docs/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
