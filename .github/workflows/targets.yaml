@@ -131,7 +131,7 @@ jobs:
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: connect
-          render: "false"
+          render: "true"
           path: docs/QA-report.qmd
           CONNECT_SERVER: ${{ secrets.CONNECT_URL }}
           CONNECT_API_KEY: ${{ secrets.CONNECT_APIKEY }}
