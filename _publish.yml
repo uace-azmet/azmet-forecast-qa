@@ -1,4 +1,4 @@
 - source: project
   connect:
-    - id: eae617b5-0125-4d01-92a0-08f6cb815040
-      url: 'https://viz.datascience.arizona.edu:443/content/eae617b5-0125-4d01-92a0-08f6cb815040/'
+    - id: 8fd3565b-f5d9-42c5-bca4-abb8d111dd43
+      url: 'https://viz.datascience.arizona.edu:443/content/8fd3565b-f5d9-42c5-bca4-abb8d111dd43/'
