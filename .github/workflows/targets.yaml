@@ -127,7 +127,12 @@ jobs:
           git commit -am "Run pipeline"
           git push origin targets-runs
       
-      - name: Render and Publish 
+      - name: Checkout targets-runs branch
+        uses: actions/checkout@v3
+        with:
+          ref: targets-runs
+      
+      - name: Render and Publish QA report
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: connect
