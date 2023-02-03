@@ -11,7 +11,7 @@
 update_daily_hist <- function(legacy_daily) {
   daily_recent <- 
     az_daily(start_date = max(legacy_daily$datetime) + 1,
-             end_date = "2022-10-31")
+             end_date = lubridate::today())
   daily <- bind_rows(legacy_daily, daily_recent)
   daily <- daily |> 
     #remove duplicates
@@ -29,11 +29,5 @@ update_daily_hist <- function(legacy_daily) {
       TRUE ~ meta_station_name
     )) |> 
     filter(meta_station_id != "az99") #remove test station
-  write_dataset(
-    daily,
-    path = "data/daily",
-    format = "parquet",
-    partitioning = "date_year"
-  )
   daily
 }
