@@ -179,15 +179,15 @@
     },
     "azmetr": {
       "Package": "azmetr",
-      "Version": "0.0.0.9006",
+      "Version": "0.0.0.9000",
       "Source": "GitHub",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "cct-datascience",
       "RemoteRepo": "azmetr",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "3db3a0e92a09e0a8740d2b541b37ec28e45977d7",
-      "RemoteHost": "api.github.com",
-      "Hash": "9b9082f3195e102053658e407ffad027",
+      "RemoteRef": "main",
+      "RemoteSha": "980e41f6c828c7535dd63fa862695b9ca827ddb8",
+      "Hash": "7b354583179d319411bc7f2101cfe33c",
       "Requirements": [
         "attempt",
         "curl",
@@ -446,6 +446,16 @@
       "Repository": "CRAN",
       "Hash": "b6e3e947d1d7ebf3d2bdcea1bde63fe7",
       "Requirements": []
+    },
+    "config": {
+      "Package": "config",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "31d77b09f63550cee9ecb5a08bf76e8f",
+      "Requirements": [
+        "yaml"
+      ]
     },
     "cpp11": {
       "Package": "cpp11",

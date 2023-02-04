@@ -1,0 +1,8 @@
+rsconnect:
+  targets:
+     # path: '/mnt/data/azmet-targets/'
+     path: './_targets'
+
+default:
+  targets:
+     path: './_targets'

@@ -22,7 +22,8 @@ tar_option_set(
     "readxl",
     "arrow",
     "patchwork",
-    "glue"
+    "glue",
+    "pins"
   ), 
   seed = 659,
   format = "rds" # default storage format
@@ -103,6 +104,7 @@ tar_plan(
     )
   ),
   
+  
   #do some model diagnostics.  This just does them for Tucson, but would be good
   #to eventually inspect some other stations since different ARIMA models are
   #best fits for different stations apparently
@@ -115,13 +117,21 @@ tar_plan(
   # ),
   
   # Forecasting -------------------------------------------------------------
-  # re-fit model with data up to yesterday, forecast today.
-  # tar_target(
-  #   fc_daily,
-  #   forecast_daily(models_daily, db_daily, forecast_qa_vars),
-  #   pattern = map(models_daily, forecast_qa_vars),
-  #   iteration = "vector"
-  # ),
+  # re-fit model with data up to yesterday, forecast today, return a tibble
+  tar_target(
+    fc_daily,
+    forecast_daily(models_daily, daily, forecast_qa_vars),
+    pattern = map(models_daily, forecast_qa_vars),
+    iteration = "vector",
+    format = "parquet"
+  ),
+  tar_target(
+    pin_fc,
+    {
+      board <- board_connect()
+      board |> pin_write(fc_daily)
+    }
+  )
 
   # Reports -----------------------------------------------------------------
   #TODO: move some of the long-running code in the report to targets?
