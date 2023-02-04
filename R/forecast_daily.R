@@ -7,13 +7,10 @@
 #' @param var character vector of column names in db_daily
 #'
 #' @return a tibble
-forecast_daily <- function(model, db_daily, var) {
+forecast_daily <- function(model, daily, var) {
   #wrangle data
   df <- 
-    db_daily |> 
-    arrow::open_dataset() |> 
-    dplyr::select(datetime, meta_station_id, all_of(var)) |>
-    collect() |>
+   daily |>
     #remove stations that don't have any data
     filter(if_all(var, ~!is.na(.))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
