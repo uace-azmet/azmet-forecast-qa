@@ -2,16 +2,13 @@
 title: "RMarkdown Report Driving `targets` pipeline"
 date: "`r Sys.Date()`"
 output: html_document
-rmd_output_metadata:
-  rsc_output_files:
-    - _targets/
 resource_files:
-- data/
-- R/
-- renv.lock
-- _targets.R
-- config.yml
-- _targets/
+- "data/"
+- "R/"
+- "renv.lock"
+- "_targets.R"
+- "config.yml"
+- "_targets/"
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -20,6 +17,7 @@ library(rsconnect)
 library(tarchetypes)
 library(config)
 library(visNetwork)
+library(fs)
 ```
 
 ```{r cache-setup}
@@ -39,5 +37,11 @@ tar_visnetwork()
 
 ```{r make}
 tar_make()
+```
+Save the _targets data store as output
+
+```{r}
+outputs <- list.files("./_targets", recursive = TRUE, full.names = TRUE)
+rmarkdown::output_metadata$set(rsc_output_files = outputs)
 ```
 

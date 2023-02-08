@@ -23,7 +23,8 @@ tar_option_set(
     "arrow",
     "patchwork",
     "glue",
-    "pins"
+    "pins",
+    "urca"
   ), 
   seed = 659,
   format = "rds" # default storage format
@@ -99,8 +100,8 @@ tar_plan(
     pattern = map(forecast_qa_vars),
     iteration = "list",
     cue = tarchetypes::tar_cue_age(
-      name = models_daily, 
-      age = as.difftime(60, units = "days") 
+      name = models_daily,
+      age = as.difftime(60, units = "days")
     )
   ),
   
@@ -130,7 +131,9 @@ tar_plan(
     {
       board <- board_connect()
       board |> pin_write(fc_daily)
-    }
+    },
+    deployment = "main"
+
   )
 
   # Reports -----------------------------------------------------------------
