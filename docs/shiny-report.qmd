@@ -23,7 +23,6 @@ library(pointblank)
 library(lubridate)
 ```
 
-
 ```{r}
 #| context: data
 #| include: false
@@ -42,7 +41,6 @@ tic()
 hourly <- azmetr::az_hourly(start_date_time = "2020-01-01 00")
 toc() # about 333 seconds
 ```
-
 
 This report uses the `pointblank` package for displaying data validation results.
 In the tables below the "STEP" column contains the name of the validation function, but you can mouse over it for a more human-readable description.
@@ -114,7 +112,6 @@ output$check_daily <-
   })
 ```
 
-
 ## Hourly Data
 
 ```{r}
@@ -122,7 +119,6 @@ output$check_daily <-
 
 gt_output(outputId = "check_hourly")
 ```
-
 
 ```{r}
 #| context: server
@@ -238,5 +234,3 @@ output$check_hourly <-
     get_agent_report(hourly_check, title = "Hourly Data Consistency Check")
   })
 ```
-    
-    
