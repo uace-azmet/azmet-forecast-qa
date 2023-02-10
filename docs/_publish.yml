@@ -1,4 +1,0 @@
-- source: QA-report.qmd
-  connect:
-    - id: 8fd3565b-f5d9-42c5-bca4-abb8d111dd43
-      url: 'https://viz.datascience.arizona.edu:443/content/8fd3565b-f5d9-42c5-bca4-abb8d111dd43/'
