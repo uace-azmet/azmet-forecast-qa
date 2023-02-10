@@ -39,7 +39,6 @@ future::plan(future.callr::callr)
 # Source the R scripts in the R/ folder with your custom functions:
 tar_source()
 
-
 # Define targets:
 tar_plan(
 
@@ -55,7 +54,7 @@ tar_plan(
   tar_target(
     daily, 
     update_daily_hist(legacy_daily),
-    cue = tarchetypes::tar_cue_age(
+    cue = tarchetypes::tar_cue_age( #TODO: maybe set to invalidate always
       name = daily,
       age = as.difftime(1, units = "days")
     ),
@@ -63,38 +62,29 @@ tar_plan(
     deployment = "main"
   ), 
   
-
   tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
   needs_qa_daily = needs_qa(metadata_file, "daily"),
 
   # Modeling ----------------------------------------------------------------
   # Limit forecast-based validation to just variables that are appropriate for
   # this kind of modeling.
-  # tar_target(
-  #   forecast_qa_vars,
-  #   needs_qa_daily[!needs_qa_daily %in% c(
-  #     "wind_vector_dir", #polar coords
-  #     "sol_rad_total", #zero-inflated, ≥0
-  #     "precip_total_mm", #zero-inflated, ≥0
-  #     "wind_vector_dir_stand_dev" #≥0
-  #   )]
-  # ),
-
-  # #subset for testing
   tar_target(
     forecast_qa_vars,
-    c("temp_soil_10cm_maxC", "temp_air_meanC")
+    needs_qa_daily[!needs_qa_daily %in% c(
+      "wind_vector_dir", #polar coords
+      "sol_rad_total", #zero-inflated, ≥0
+      "precip_total_mm", #zero-inflated, ≥0
+      "wind_vector_dir_stand_dev" #≥0
+    )]
   ),
-  
-  #target for training data for models that only gets invalidated once per year
-  #so that model is not re-fit every day.
+
+  # #subset for testing
   # tar_target(
-  #   training_daily,
-  #   make_training_daily(db_daily, forecast_qa_vars)
+  #   forecast_qa_vars,
+  #   c("temp_soil_10cm_maxC", "temp_air_meanC")
   # ),
   
   # Fit timeseries model (once every 60 days)
-  #TODO may need to make independent of `daily` target by having this function query the database separately
   tar_target(
     models_daily,
     fit_model_daily(daily, forecast_qa_vars),
@@ -102,21 +92,26 @@ tar_plan(
     iteration = "list",
     cue = tarchetypes::tar_cue_age(
       name = models_daily,
-      age = as.difftime(60, units = "days")
+      age = as.difftime(60, units = "days"),
+      depend = FALSE #don't re-run just because `daily` is invalidated
     )
   ),
   
+  # Model Diagnostics 
   
-  #do some model diagnostics.  This just does them for Tucson, but would be good
-  #to eventually inspect some other stations since different ARIMA models are
-  #best fits for different stations apparently
-  # tar_target(
-  #   resid_daily,
-  #   plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
-  #     patchwork::plot_annotation(title = forecast_qa_vars),
-  #   pattern = map(models_daily, forecast_qa_vars),
-  #   iteration = "list"
-  # ),
+  # TODO: Currently, this target just makes diagnostic plots
+  # for Tucson, but would be good to eventually inspect other stations since
+  # different ARIMA models are fit for each station.  Eventually could have a
+  # separate, static report that is published with plots and other model
+  # diagnostics for each station.
+  
+  tar_target(
+    resid_daily,
+    plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
+      patchwork::plot_annotation(title = forecast_qa_vars),
+    pattern = map(models_daily, forecast_qa_vars),
+    iteration = "list"
+  ),
   
   # Forecasting -------------------------------------------------------------
   # re-fit model with data up to yesterday, forecast today, return a tibble
@@ -143,7 +138,7 @@ tar_plan(
     },
     deployment = "main"
 
-  )
+  ),
 
   # Reports -----------------------------------------------------------------
   tar_quarto(readme, "README.qmd")
