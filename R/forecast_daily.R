@@ -7,13 +7,10 @@
 #' @param var character vector of column names in db_daily
 #'
 #' @return a tibble
-forecast_daily <- function(model, db_daily, var) {
+forecast_daily <- function(model, daily, var) {
   #wrangle data
   df <- 
-    db_daily |> 
-    arrow::open_dataset() |> 
-    dplyr::select(datetime, meta_station_id, all_of(var)) |>
-    collect() |>
+   daily |>
     #remove stations that don't have any data
     filter(if_all(var, ~!is.na(.))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
@@ -35,21 +32,23 @@ forecast_daily <- function(model, db_daily, var) {
   mod_refit <- fabletools::refit(model, new_data = refit_df)
   
   #create forecast
-  fc <- forecast(mod_refit, newdata = fc_df)
+  fc <- fabletools::forecast(mod_refit, newdata = fc_df, h = 1)
   
   #tidy forecast
   fc_tidy <- fc |>
     hilo(c(95, 99)) |>
-    select(-all_of(var))
-
-  left_join(fc_df, fc_tidy, by = c("datetime", "meta_station_id")) |>
-    select(-.model) |>
-    rename("fc_mean" = ".mean", "fc_95" = "95%", "fc_99" = "99%") |>
+    select(-all_of(var)) |> #remove column with distribution (named after the variable)
+    select(-.model) |> 
+    rename("fc_mean" = ".mean", "fc_95" = "95%", "fc_99" = "99%") |> 
     mutate(lower_95 = fc_95$lower,
            upper_95 = fc_95$upper,
            lower_99 = fc_99$lower,
            upper_99 = fc_99$upper) |>
-    select(-fc_95, -fc_99) |> 
+    select(-fc_95, -fc_99)
+  
+  fc_df |> 
+    select(datetime, meta_station_id, meta_station_name, all_of(var)) |> 
+    left_join(fc_tidy, by = c("datetime", "meta_station_id")) |>
     rename("obs" = all_of(var)) |> 
     mutate(varname = var, .before = obs) |> 
     as_tibble()

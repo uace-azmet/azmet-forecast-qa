@@ -4,6 +4,7 @@
 # Load packages required to define the pipeline:
 library(targets)
 library(tarchetypes)
+library(arrow)
 
 # Set target options:
 tar_option_set(
@@ -21,7 +22,9 @@ tar_option_set(
     "readxl",
     "arrow",
     "patchwork",
-    "glue"
+    "glue",
+    "pins",
+    "urca"
   ), 
   seed = 659,
   format = "rds" # default storage format
@@ -36,60 +39,31 @@ future::plan(future.callr::callr)
 # Source the R scripts in the R/ folder with your custom functions:
 tar_source()
 
-
 # Define targets:
 tar_plan(
 
   # Read and wrangle data ---------------------------------------------------
   tar_file(legacy_daily_file, "data/daily_hist.csv"),
-  tar_target(legacy_daily, #up to 2003
-             read_wrangle_hist(legacy_daily_file),
-             deployment = "main"), 
-  
-  # Writes to data store, but returns a tibble. I think this is necessary for
-  # this workflow to run, but if you remove the data files manually, it won't
-  # invalidate this target!
-  tar_target(db_daily_init, #up to october 2022
-             update_daily_hist(legacy_daily),
-             deployment = "main"), 
-  
-  tar_target(db_daily, 
-             update_daily("data/daily", db_daily_init), #also writes to data/daily
-             #This target becomes invalid if it hasn't been run for a day
-             cue = tarchetypes::tar_cue_age(
-               name = db_daily,
-               age = as.difftime(1, units = "days") 
-             ),
-             format = "file", #function just returns a path, so track the actual files
-             deployment = "main"), #don't run on parallel worker
-  
-
-  #hourly
-  hourly_start = "2020-12-30 00",
-  
-  # Writes to data store, but returns a tibble. I think this is necessary for
-  # this workflow to run, but if you remove the data files manually, it won't
-  # invalidate this target!
-  tar_target(db_hourly_init,
-    init_hourly(hourly_start),
-    deployment = "main"),
-  
-  
   tar_target(
-    db_hourly,
-    update_hourly("data/hourly", db_hourly_init),
-    #This target becomes invalid if it hasn't been run for a day
-    cue = tarchetypes::tar_cue_age(
-      name = db_hourly,
+    legacy_daily, #up to 2003
+             read_wrangle_hist(legacy_daily_file),
+    format = "parquet",
+    deployment = "main"
+  ), 
+  #get data from 2003 to 2020
+  tar_target(
+    daily, 
+    update_daily_hist(legacy_daily),
+    cue = tarchetypes::tar_cue_age( #TODO: maybe set to invalidate always
+      name = daily,
       age = as.difftime(1, units = "days")
     ),
-    format = "file",
-    deployment = "main" #don't run on parallel workers
-  ),
+    format = "parquet",
+    deployment = "main"
+  ), 
   
   tar_file(metadata_file, "data/azmet-data-metadata.xlsx"),
   needs_qa_daily = needs_qa(metadata_file, "daily"),
-  needs_qa_hourly = needs_qa(metadata_file, "hourly"),
 
   # Modeling ----------------------------------------------------------------
   # Limit forecast-based validation to just variables that are appropriate for
@@ -103,31 +77,34 @@ tar_plan(
       "wind_vector_dir_stand_dev" #≥0
     )]
   ),
-  
+
   # #subset for testing
   # tar_target(
   #   forecast_qa_vars,
   #   c("temp_soil_10cm_maxC", "temp_air_meanC")
   # ),
   
-  #target for training data for models that only gets invalidated once per year
-  #so that model is not re-fit every day.
-  tar_target(
-    training_daily,
-    make_training_daily(db_daily, forecast_qa_vars)
-  ),
-  
-  # Fit timeseries model (once a year)
+  # Fit timeseries model (once every 60 days)
   tar_target(
     models_daily,
-    fit_model_daily(training_daily, forecast_qa_vars),
+    fit_model_daily(daily, forecast_qa_vars),
     pattern = map(forecast_qa_vars),
-    iteration = "list"
+    iteration = "list",
+    cue = tarchetypes::tar_cue_age(
+      name = models_daily,
+      age = as.difftime(60, units = "days"),
+      depend = FALSE #don't re-run just because `daily` is invalidated
+    )
   ),
   
-  #do some model diagnostics.  This just does them for Tucson, but would be good
-  #to eventually inspect some other stations since different ARIMA models are
-  #best fits for different stations apparently
+  # Model Diagnostics 
+  
+  # TODO: Currently, this target just makes diagnostic plots
+  # for Tucson, but would be good to eventually inspect other stations since
+  # different ARIMA models are fit for each station.  Eventually could have a
+  # separate, static report that is published with plots and other model
+  # diagnostics for each station.
+  
   tar_target(
     resid_daily,
     plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
@@ -137,15 +114,32 @@ tar_plan(
   ),
   
   # Forecasting -------------------------------------------------------------
-  # re-fit model with data up to yesterday, forecast today.
+  # re-fit model with data up to yesterday, forecast today, return a tibble
   tar_target(
     fc_daily,
-    forecast_daily(models_daily, db_daily, forecast_qa_vars),
+    forecast_daily(models_daily, daily, forecast_qa_vars),
     pattern = map(models_daily, forecast_qa_vars),
-    iteration = "vector"
+    iteration = "vector",
+    format = "parquet"
+  ),
+  
+  # add forecast to previous forecasts
+  
+  tar_target(
+    pin_fc,
+    \(fc_daily) {
+      board <- board_connect()
+      #read pin
+      old <- board |> pin_read("ericrscott/fc_daily")
+      #add new forecast data
+      fc_daily <- bind_rows(fc_daily, old) |> distinct()
+      #update pin
+      board |> pin_write(fc_daily, name = "ericrscott/fc_daily")
+    },
+    deployment = "main"
+
   ),
 
   # Reports -----------------------------------------------------------------
   tar_quarto(readme, "README.qmd")
-  
 )

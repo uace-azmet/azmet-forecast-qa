@@ -185,18 +185,16 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "cct-datascience",
       "RemoteRepo": "azmetr",
-      "RemoteRef": "20405998f1c48490763080ff31635f1f48af74af",
-      "RemoteSha": "20405998f1c48490763080ff31635f1f48af74af",
-      "Hash": "210690ca737d02d0272fe2badb2356b9",
+      "RemoteRef": "main",
+      "RemoteSha": "980e41f6c828c7535dd63fa862695b9ca827ddb8",
+      "Hash": "7b354583179d319411bc7f2101cfe33c",
       "Requirements": [
         "attempt",
-        "cachem",
         "curl",
         "dplyr",
         "httr",
         "lubridate",
         "magrittr",
-        "memoise",
         "purrr",
         "rlang",
         "tibble",
@@ -705,6 +703,14 @@
         "tsibble",
         "vctrs"
       ]
+    },
+    "filelock": {
+      "Package": "filelock",
+      "Version": "1.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "38ec653c2613bed60052ba3787bd8a2c",
+      "Requirements": []
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -1503,6 +1509,35 @@
       "Hash": "b762f8f7d305f7eb0bab96eb1a3c782a",
       "Requirements": [
         "processx"
+      ]
+    },
+    "pins": {
+      "Package": "pins",
+      "Version": "1.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c6bfa6bbbc54c1d71828ab9167918016",
+      "Requirements": [
+        "cli",
+        "digest",
+        "ellipsis",
+        "filelock",
+        "fs",
+        "generics",
+        "glue",
+        "httr",
+        "jsonlite",
+        "lifecycle",
+        "magrittr",
+        "mime",
+        "openssl",
+        "rappdirs",
+        "rlang",
+        "tibble",
+        "whisker",
+        "withr",
+        "yaml",
+        "zip"
       ]
     },
     "pkgconfig": {
@@ -2398,6 +2433,14 @@
       "Hash": "2982481615756e24e79fee95bdc95daa",
       "Requirements": []
     },
+    "whisker": {
+      "Package": "whisker",
+      "Version": "0.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c6abfa47a46d281a7d5159d0a8891e88",
+      "Requirements": []
+    },
     "withr": {
       "Package": "withr",
       "Version": "2.5.0",
@@ -2446,6 +2489,14 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9b570515751dcbae610f29885e025b41",
+      "Requirements": []
+    },
+    "zip": {
+      "Package": "zip",
+      "Version": "2.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c42bfcec3fa6a0cce17ce1f8bc684f88",
       "Requirements": []
     },
     "zoo": {
