@@ -5,7 +5,7 @@
 #' to match the historical data to the API data, then writes data out as a
 #' partitioned parquet data store.
 #'
-#' @param daily_hist the historical dataset tibble
+#' @param legacy_daily the historical dataset tibble
 #'
 #' @return invisibly, the path "data/daily"
 update_daily_hist <- function(legacy_daily) {
