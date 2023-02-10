@@ -1,7 +1,0 @@
-rsconnect:
-  targets:
-     # path: '/mnt/posit-connect/targets_test/'
-     path: './_targets'
-default:
-  targets:
-     path: './_targets'
