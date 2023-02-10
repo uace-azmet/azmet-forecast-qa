@@ -194,12 +194,6 @@ data/hourly/date_year=2020/part-0.parquet
 data/hourly/date_year=2021/part-0.parquet
 data/hourly/date_year=2022/part-0.parquet
 data/hourly/date_year=2023/part-0.parquet
-docs/QA-report_files/figure-html/unnamed-chunk-8-16.png
-docs/QA-report_files/figure-html/unnamed-chunk-8-17.png
-docs/QA-report_files/figure-html/unnamed-chunk-8-18.png
-docs/QA-report_files/figure-html/unnamed-chunk-8-19.png
-docs/report.html
-docs/report_files/figure-html/unnamed-chunk-4-1.png
 docs/QA-report.html
 docs/QA-report_files/figure-html/unnamed-chunk-8-1.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-10.png
@@ -208,6 +202,10 @@ docs/QA-report_files/figure-html/unnamed-chunk-8-12.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-13.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-14.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-15.png
+docs/QA-report_files/figure-html/unnamed-chunk-8-16.png
+docs/QA-report_files/figure-html/unnamed-chunk-8-17.png
+docs/QA-report_files/figure-html/unnamed-chunk-8-18.png
+docs/QA-report_files/figure-html/unnamed-chunk-8-19.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-2.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-3.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-4.png
@@ -216,3 +214,5 @@ docs/QA-report_files/figure-html/unnamed-chunk-8-6.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-7.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-8.png
 docs/QA-report_files/figure-html/unnamed-chunk-8-9.png
+docs/report.html
+docs/report_files/figure-html/unnamed-chunk-4-1.png

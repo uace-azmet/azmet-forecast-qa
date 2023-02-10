@@ -179,22 +179,24 @@
     },
     "azmetr": {
       "Package": "azmetr",
-      "Version": "0.0.0.9006",
+      "Version": "0.0.0.9000",
       "Source": "GitHub",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "cct-datascience",
       "RemoteRepo": "azmetr",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "3db3a0e92a09e0a8740d2b541b37ec28e45977d7",
-      "RemoteHost": "api.github.com",
-      "Hash": "9b9082f3195e102053658e407ffad027",
+      "RemoteRef": "20405998f1c48490763080ff31635f1f48af74af",
+      "RemoteSha": "20405998f1c48490763080ff31635f1f48af74af",
+      "Hash": "210690ca737d02d0272fe2badb2356b9",
       "Requirements": [
         "attempt",
+        "cachem",
         "curl",
         "dplyr",
         "httr",
         "lubridate",
         "magrittr",
+        "memoise",
         "purrr",
         "rlang",
         "tibble",
@@ -1955,18 +1957,6 @@
         "htmltools",
         "htmlwidgets",
         "jsonlite",
-        "shiny"
-      ]
-    },
-    "shinycssloaders": {
-      "Package": "shinycssloaders",
-      "Version": "1.0.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f39bb3c44a9b496723ec7e86f9a771d8",
-      "Requirements": [
-        "digest",
-        "glue",
         "shiny"
       ]
     },
