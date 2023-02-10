@@ -132,9 +132,9 @@ tar_plan(
       #read pin
       old <- board |> pin_read("ericrscott/fc_daily")
       #add new forecast data
-      fc_daily <- bind_rows(old, fc_daily) |> distinct()
+      fc_daily <- bind_rows(fc_daily, old) |> distinct()
       #update pin
-      board |> pin_write(fc_daily)
+      board |> pin_write(fc_daily, name = "ericrscott/fc_daily")
     },
     deployment = "main"
 
