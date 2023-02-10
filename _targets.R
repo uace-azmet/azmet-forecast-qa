@@ -94,6 +94,7 @@ tar_plan(
   # ),
   
   # Fit timeseries model (once every 60 days)
+  #TODO may need to make independent of `daily` target by having this function query the database separately
   tar_target(
     models_daily,
     fit_model_daily(daily, forecast_qa_vars),
@@ -126,10 +127,18 @@ tar_plan(
     iteration = "vector",
     format = "parquet"
   ),
+  
+  # add forecast to previous forecasts
+  
   tar_target(
     pin_fc,
-    {
+    \(fc_daily) {
       board <- board_connect()
+      #read pin
+      old <- board |> pin_read("ericrscott/fc_daily")
+      #add new forecast data
+      fc_daily <- bind_rows(old, fc_daily) |> distinct()
+      #update pin
       board |> pin_write(fc_daily)
     },
     deployment = "main"
