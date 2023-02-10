@@ -24,4 +24,5 @@ _targets/
 # rendered site
 _site/
 
+# connect
 rsconnect/
