@@ -1,2 +1,3 @@
 shiny-report*
-!shiny-report.qmd
+!^shiny-report.qmd$
+rsconnect/
