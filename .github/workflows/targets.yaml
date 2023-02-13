@@ -100,7 +100,7 @@ jobs:
         run: targets::tar_make()
         shell: Rscript {0}
         env:       
-          CONNECT_SERVER: ${{ secrets.CONNECT_SERVER }}
+          CONNECT_SERVER: ${{ secrets.CONNECT_URL }}
           CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
 
       - name: Identify files that the targets pipeline produced
