@@ -9,7 +9,7 @@
 #'   Eric Scott under the name "fc_daily"
 #'
 pin_forecast <- function(fc_daily, name = "ericrscott/fc_daily") {
-  board <- board_connect()
+  board <- board_connect(auth = "envvar")
   #read pin
   old <- board |> pin_read(name)
   #add new forecast data
