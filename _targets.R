@@ -54,10 +54,7 @@ tar_plan(
   tar_target(
     daily, 
     update_daily_hist(legacy_daily),
-    cue = tarchetypes::tar_cue_age( #TODO: maybe set to invalidate always
-      name = daily,
-      age = as.difftime(1, units = "days")
-    ),
+    cue = tar_cue("always"),
     format = "parquet",
     deployment = "main"
   ), 
