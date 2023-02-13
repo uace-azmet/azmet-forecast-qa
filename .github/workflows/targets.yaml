@@ -39,6 +39,8 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RENV_PATHS_ROOT: ~/.local/share/renv
+      CONNECT_SERVER: ${{ secrets.CONNECT_SERVER }}
+      CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
     steps:
       - uses: actions/checkout@v3
       - uses: r-lib/actions/setup-r@v2
