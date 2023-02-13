@@ -13,7 +13,7 @@ pin_forecast <- function(fc_daily, name = "ericrscott/fc_daily") {
   #read pin
   old <- board |> pin_read(name)
   #add new forecast data
-  fc_daily <- bind_rows(fc_daily, old) |> distinct()
+  fc_update <- bind_rows(fc_daily, old) |> distinct()
   #update pin
-  board |> pin_write(fc_daily, name)
+  board |> pin_write(fc_update, name)
 }
