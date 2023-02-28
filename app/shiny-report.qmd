@@ -56,14 +56,14 @@ Find more on the anatomy of this table in the `pointblank` [documentation](https
 # Consistency checks
 
 ```{r}
-#slider input might be better?
+#Range slider input might be better?
 dateRangeInput(
   "daterange",
   "Date Range",
   min = ymd("2020-12-30"),
-  max = today(),
-  start = today() - 14,
-  end = today()
+  max = NULL,
+  start = Sys.Date() - 14,
+  end = Sys.Date()
 )
 ```
 
@@ -72,6 +72,20 @@ dateRangeInput(
 ```{r}
 #| column: body-outset
 gt_output(outputId = "check_daily")
+```
+
+```{r}
+#| context: server
+
+# update date range selector so it's relative to today
+observe({
+  updateDateRangeInput(
+    inputId = "daterange",
+    max = Sys.Date(),
+    start = Sys.Date()-14,
+    end = Sys.Date()
+  )
+})
 ```
 
 ```{r}
@@ -284,7 +298,6 @@ A few variables are excluded from this validation because these timeseries model
 
 gt_output(outputId = "check_forecast")
 ```
-
 
 ```{r}
 #| context: server
