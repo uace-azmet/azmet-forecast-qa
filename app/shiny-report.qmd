@@ -10,21 +10,24 @@ editor: visual
 server: shiny
 ---
 
-```{r}
+```{r setup}
 #| include: false
 #| context: setup
 
+# This chunk executes on render AND when the server is created for each new user session.
 library(tidyverse)
 library(azmetr)
-library(tictoc) #for timing
 library(shiny)
 library(gt)
 library(pointblank)
 library(lubridate)
 library(pins)
+
+#What's the date?
+curr_date <- Sys.Date()
 ```
 
-```{r}
+```{r load-data}
 #| context: data
 #| include: false
 #| cache: true
@@ -34,13 +37,11 @@ library(pins)
 # so there will be a long loading time only for the first person to launch the
 # app every day.
 
-tic()
 daily <- azmetr::az_daily(start_date = "2020-01-01")
-toc() # about 25 seconds
+# about 25 seconds
 
-tic()
 hourly <- azmetr::az_hourly(start_date_time = "2020-01-01 00")
-toc() # about 333 seconds
+# about 333 seconds
 
 board <- board_connect()
 fc_daily <- board |> pin_read("ericrscott/fc_daily")
@@ -55,40 +56,27 @@ Find more on the anatomy of this table in the `pointblank` [documentation](https
 
 # Consistency checks
 
-```{r}
+```{r input}
+#This chunk executes when the report is *rendered*
 #Range slider input might be better?
 dateRangeInput(
   "daterange",
   "Date Range",
   min = ymd("2020-12-30"),
-  max = NULL,
-  start = Sys.Date() - 14,
-  end = Sys.Date()
+  max = curr_date,
+  start = curr_date - 14,
+  end = curr_date
 )
 ```
 
 ## Daily Data
 
-```{r}
+```{r output-daily}
 #| column: body-outset
 gt_output(outputId = "check_daily")
 ```
 
-```{r}
-#| context: server
-
-# update date range selector so it's relative to today
-observe({
-  updateDateRangeInput(
-    inputId = "daterange",
-    max = Sys.Date(),
-    start = Sys.Date()-14,
-    end = Sys.Date()
-  )
-})
-```
-
-```{r}
+```{r server-daily}
 #| context: server
 
 al <- action_levels(warn_at = 1, stop_at = 0.1)
@@ -132,13 +120,13 @@ output$check_daily <-
 
 ## Hourly Data
 
-```{r}
+```{r output-hourly}
 #| column: body-outset
 
 gt_output(outputId = "check_hourly")
 ```
 
-```{r}
+```{r server-hourly}
 #| context: server
 
 output$check_hourly <- 
@@ -293,13 +281,13 @@ To read the `pointblank` table, hover over the TBL column to see which variable 
 A few variables are excluded from this validation because these timeseries models are inappropriate for them: `wind_vector_dir` is in polar coordinates, `sol_rad_total` and `precip_total_mm` because they are highly zero-inflated.
 :::
 
-```{r}
+```{r output-forecast}
 #| column: body-outset
 
 gt_output(outputId = "check_forecast")
 ```
 
-```{r}
+```{r server-forecast}
 #| context: server
 
 output$check_forecast <- 
