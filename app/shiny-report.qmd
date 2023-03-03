@@ -23,28 +23,8 @@ library(pointblank)
 library(lubridate)
 library(pins)
 
-#What's the date?
-curr_date <- Sys.Date()
-```
-
-```{r load-data}
-#| context: data
-#| include: false
-#| cache: true
-#| cache.extra: !expr Sys.Date()
-
-# Get full updated data from the API. This *should* be cached at the app level,
-# so there will be a long loading time only for the first person to launch the
-# app every day.
-
-daily <- azmetr::az_daily(start_date = "2020-01-01")
-# about 25 seconds
-
-hourly <- azmetr::az_hourly(start_date_time = "2020-01-01 00")
-# about 333 seconds
-
+#create connection to board with data
 board <- board_connect()
-fc_daily <- board |> pin_read("ericrscott/fc_daily")
 ```
 
 This report uses the `pointblank` package for displaying data validation results.
@@ -63,10 +43,24 @@ dateRangeInput(
   "daterange",
   "Date Range",
   min = ymd("2020-12-30"),
-  max = curr_date,
-  start = curr_date - 14,
-  end = curr_date
+  max = ymd("2023-02-05"),
+  start = ymd("2023-02-01"),
+  end = ymd("2023-02-05")
 )
+```
+
+```{r update-input}
+#| context: server
+
+# Updates date range selector to current date.
+# Unfortunately this happens LAST after the rest of the server code is run
+shiny::updateDateRangeInput(
+  inputId = "daterange",
+  max = Sys.Date(),
+  start = Sys.Date() - 14,
+  end = Sys.Date()
+)
+
 ```
 
 ## Daily Data
@@ -81,12 +75,14 @@ gt_output(outputId = "check_daily")
 
 al <- action_levels(warn_at = 1, stop_at = 0.1)
 
+daily <- board |> pin_read("ericrscott/azmet_daily")
+
 output$check_daily <-
   gt::render_gt({
-    
+
     start <- input$daterange[1]
     end <- input$daterange[2]
-    
+
     daily_check <-
       daily |>
       filter(datetime > start & datetime <= end) |>
@@ -129,20 +125,22 @@ gt_output(outputId = "check_hourly")
 ```{r server-hourly}
 #| context: server
 
-output$check_hourly <- 
+hourly <- board |> pin_read("ericrscott/azmet_hourly")
+
+output$check_hourly <-
   gt::render_gt({
-    
+
     start <- input$daterange[1]
     end <- input$daterange[2]
-    
-    hourly_check <- hourly |> 
+
+    hourly_check <- hourly |>
       filter(date_datetime > start & date_datetime <= end) |>
       create_agent(
         tbl_name = "Hourly measures",
         label = "Consistency Checks",
         actions = al
-      ) |> 
-      
+      ) |>
+
       # Internal consistency checks from 'NWS (1994) TSP 88-21-R2':
       col_vals_gte(
         temp_airC,
@@ -150,52 +148,52 @@ output$check_hourly <-
         na_pass = TRUE,
         #account for rounding error I guess?
         preconditions = function(x) x |> mutate(dwpt = dwpt - 0.2)
-      ) |> 
-      col_vals_lte(wind_spd_mps, vars(wind_spd_max_mps), na_pass = TRUE) |> 
-      
+      ) |>
+      col_vals_lte(wind_spd_mps, vars(wind_spd_max_mps), na_pass = TRUE) |>
+
       # Temporal consistency checks from 'NWS (1994) TSP 88-21-R2':
       col_vals_lt(
         temp_airC_delta,
-        19.4, 
+        19.4,
         na_pass = TRUE,
         brief = "Expect that |∆`temp_airC`| < 19.4",
-        preconditions = function(x) x |> 
-          group_by(meta_station_id) |> 
+        preconditions = function(x) x |>
+          group_by(meta_station_id) |>
           mutate(temp_airC_delta = abs(temp_airC - lag(temp_airC)),
-                 .after = temp_airC) |> 
+                 .after = temp_airC) |>
           ungroup()
-      ) |> 
+      ) |>
       col_vals_lt(
         relative_humidity_delta,
         50,
         na_pass = TRUE,
         brief = "Expect that |∆`relative_humidity`| < 50",
-        preconditions = function(x) x |> 
-          group_by(meta_station_id) |> 
+        preconditions = function(x) x |>
+          group_by(meta_station_id) |>
           mutate(relative_humidity_delta = abs(relative_humidity - lag(relative_humidity)),
-                 .after = relative_humidity) |> 
+                 .after = relative_humidity) |>
           ungroup()
-      ) |> 
+      ) |>
       col_vals_lt(
         wind_spd_mps_delta,
         10.3,
         na_pass = TRUE,
         brief = "Expect that |∆`wind_spd_mps`| < 10.3",
-        preconditions = function(x) x |> 
-          group_by(meta_station_id) |> 
+        preconditions = function(x) x |>
+          group_by(meta_station_id) |>
           mutate(wind_spd_mps_delta = abs(wind_spd_mps - lag(wind_spd_mps)),
-                 .after = wind_spd_mps) |> 
+                 .after = wind_spd_mps) |>
           ungroup()
-      ) |> 
-      
+      ) |>
+
       # Temporal consistency ('persistence') checks:
       col_vals_equal(
         sol_rad_total_14,
         FALSE, #true means < 1 for the past 14 hours
         na_pass = TRUE,
         brief = "Expect that sol_rad_total should not be < 1 for more than 14 hours",
-        preconditions = function(x) x |> 
-          group_by(meta_station_id) |> 
+        preconditions = function(x) x |>
+          group_by(meta_station_id) |>
           mutate(
             sol_rad_total_14 = slider::slide_lgl(
               sol_rad_total, ~all(.x < 0.01),
@@ -203,14 +201,14 @@ output$check_hourly <-
               .complete = TRUE
             )
           ) |> ungroup()
-      ) |> 
+      ) |>
       col_vals_equal(
         wind_spd_mps_14,
         FALSE, #true means < 1 for the past 14 hours
         na_pass = TRUE,
         brief = "Expect that wind_spd_mps should not be < 1 for more than 14 hours",
-        preconditions = function(x) x |> 
-          group_by(meta_station_id) |> 
+        preconditions = function(x) x |>
+          group_by(meta_station_id) |>
           mutate(
             #slide_lgl turns an anonymous function into a sliding window function
             wind_spd_mps_14 = slider::slide_lgl(
@@ -219,14 +217,14 @@ output$check_hourly <-
               .complete = TRUE
             )
           ) |> ungroup()
-      ) |> 
+      ) |>
       col_vals_equal(
         wind_vector_dir_14,
         FALSE, #true means < 1 for the past 14 hours
         na_pass = TRUE,
         brief = "Expect that wind_vector_dir should not be < 1 for more than 14 hours",
-        preconditions = function(x) x |> 
-          group_by(meta_station_id) |> 
+        preconditions = function(x) x |>
+          group_by(meta_station_id) |>
           mutate(
             wind_vector_dir_14 = slider::slide_lgl(
               wind_vector_dir, ~all(.x < 1),
@@ -234,9 +232,9 @@ output$check_hourly <-
               .complete = TRUE
             )
           ) |> ungroup()
-      ) |> 
+      ) |>
       interrogate()
-    
+
     get_agent_report(hourly_check, title = "Hourly Data Consistency Check")
   })
 ```
@@ -289,6 +287,8 @@ gt_output(outputId = "check_forecast")
 
 ```{r server-forecast}
 #| context: server
+
+fc_daily <- board |> pin_read("ericrscott/fc_daily")
 
 output$check_forecast <- 
   gt::render_gt({
