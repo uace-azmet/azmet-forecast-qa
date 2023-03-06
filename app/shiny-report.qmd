@@ -23,7 +23,7 @@ library(pointblank)
 library(lubridate)
 library(pins)
 
-#create connection to board with data
+#create connection to Posit Connect pinboard with data
 board <- board_connect()
 ```
 
@@ -56,7 +56,6 @@ output$date_range <- renderUI({
   )
 })
 
-
 ```
 
 ## Daily Data
@@ -76,7 +75,7 @@ daily <- board |> pin_read("ericrscott/azmet_daily")
 output$check_daily <-
   gt::render_gt({
     
-    req(input$daterange)
+    req(input$daterange, daily)
     start <- input$daterange[1]
     end <- input$daterange[2]
 
@@ -127,7 +126,7 @@ hourly <- board |> pin_read("ericrscott/azmet_hourly")
 output$check_hourly <-
   gt::render_gt({
 
-    req(input$daterange)
+    req(input$daterange, hourly)
     start <- input$daterange[1]
     end <- input$daterange[2]
 
@@ -291,7 +290,7 @@ fc_daily <- board |> pin_read("ericrscott/fc_daily")
 output$check_forecast <- 
   gt::render_gt({
     
-    req(input$daterange)
+    req(input$daterange, fc_daily)
     start <- input$daterange[1]
     end <- input$daterange[2]
     
