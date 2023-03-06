@@ -39,27 +39,23 @@ Find more on the anatomy of this table in the `pointblank` [documentation](https
 ```{r input}
 #This chunk executes when the report is *rendered*
 #Range slider input might be better?
-dateRangeInput(
-  "daterange",
-  "Date Range",
-  min = ymd("2020-12-30"),
-  max = ymd("2023-02-05"),
-  start = ymd("2023-02-01"),
-  end = ymd("2023-02-05")
-)
+uiOutput("date_range")
 ```
 
 ```{r update-input}
 #| context: server
 
-# Updates date range selector to current date.
-# Unfortunately this happens LAST after the rest of the server code is run
-shiny::updateDateRangeInput(
-  inputId = "daterange",
-  max = Sys.Date(),
-  start = Sys.Date() - 14,
-  end = Sys.Date()
-)
+output$date_range <- renderUI({
+  dateRangeInput(
+    "daterange",
+    "Date Range",
+    min = ymd("2020-12-30"),
+    max = Sys.Date(),
+    start = Sys.Date() - 14,
+    end = Sys.Date()
+  )
+})
+
 
 ```
 
@@ -79,7 +75,8 @@ daily <- board |> pin_read("ericrscott/azmet_daily")
 
 output$check_daily <-
   gt::render_gt({
-
+    
+    req(input$daterange)
     start <- input$daterange[1]
     end <- input$daterange[2]
 
@@ -130,6 +127,7 @@ hourly <- board |> pin_read("ericrscott/azmet_hourly")
 output$check_hourly <-
   gt::render_gt({
 
+    req(input$daterange)
     start <- input$daterange[1]
     end <- input$daterange[2]
 
@@ -293,6 +291,7 @@ fc_daily <- board |> pin_read("ericrscott/fc_daily")
 output$check_forecast <- 
   gt::render_gt({
     
+    req(input$daterange)
     start <- input$daterange[1]
     end <- input$daterange[2]
     
