@@ -22,9 +22,6 @@ library(gt)
 library(pointblank)
 library(lubridate)
 library(pins)
-
-#create connection to Posit Connect pinboard with data
-board <- board_connect()
 ```
 
 This report uses the `pointblank` package for displaying data validation results.
@@ -55,7 +52,6 @@ output$date_range <- renderUI({
     end = Sys.Date()
   )
 })
-
 ```
 
 ## Daily Data
@@ -68,9 +64,12 @@ gt_output(outputId = "check_daily")
 ```{r server-daily}
 #| context: server
 
-al <- action_levels(warn_at = 1, stop_at = 0.1)
-
+#create connection to Posit Connect pinboard with data
+board <- board_connect()
 daily <- board |> pin_read("ericrscott/azmet_daily")
+
+#set up default action levels for pointblank
+al <- action_levels(warn_at = 1, stop_at = 0.1)
 
 output$check_daily <-
   gt::render_gt({
