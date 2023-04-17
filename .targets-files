@@ -114,7 +114,9 @@ _targets/objects/models_daily_e1bdaf26
 _targets/objects/needs_qa_daily
 _targets/objects/needs_qa_hourly
 _targets/objects/past_daily
+_targets/objects/pin_daily
 _targets/objects/pin_fc
+_targets/objects/pin_hourly
 _targets/objects/resid_daily_0395ed4d
 _targets/objects/resid_daily_08922144
 _targets/objects/resid_daily_12fee890
