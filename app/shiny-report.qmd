@@ -22,6 +22,7 @@ library(gt)
 library(pointblank)
 library(lubridate)
 library(pins)
+library(arrow)
 ```
 
 This report uses the `pointblank` package for displaying data validation results.
