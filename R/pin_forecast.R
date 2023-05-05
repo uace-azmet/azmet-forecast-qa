@@ -15,5 +15,5 @@ pin_forecast <- function(fc_daily, name = "ericrscott/fc_daily") {
   #add new forecast data
   fc_update <- bind_rows(fc_daily, old) |> distinct()
   #update pin
-  board |> pin_write(fc_update, name)
+  board |> pin_write(fc_update, name, type = "arrow")
 }

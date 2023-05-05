@@ -16,5 +16,5 @@ pin_daily <- function(name = "ericrscott/azmet_daily") {
   new <- azmetr::az_daily(start_date = last_date + 1)
   update <- bind_rows(new, old) |> distinct()
   #update pin
-  board |> pin_write(update, name)
+  board |> pin_write(update, name, type = "arrow")
 }

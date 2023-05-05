@@ -16,5 +16,5 @@ pin_hourly <- function(name = "ericrscott/azmet_hourly") {
   new <- azmetr::az_hourly(start_date_time = last_date)
   update <- bind_rows(new, old) |> distinct()
   #update pin
-  board |> pin_write(update, name)
+  board |> pin_write(update, name, type = "arrow")
 }
