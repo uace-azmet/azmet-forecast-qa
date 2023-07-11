@@ -2,9 +2,9 @@
 #' 
 #' Uses time
 #'
-#' @param model one branch of the models_daily target
-#' @param db_daily db_daily target; path to data store
-#' @param var character vector of column names in db_daily
+#' @param model one branch of the `models_daily` target
+#' @param daily the `daily` target
+#' @param var character; one variable name in `db_daily`
 #'
 #' @return a tibble
 forecast_daily <- function(model, daily, var) {
@@ -12,7 +12,7 @@ forecast_daily <- function(model, daily, var) {
   df <- 
    daily |>
     #remove stations that don't have any data
-    filter(if_all(var, ~!is.na(.))) |> 
+    # filter(if_all(matches(var), ~!is.na(.))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
     tsibble::fill_gaps()
   
@@ -26,7 +26,7 @@ forecast_daily <- function(model, daily, var) {
     df |>
     filter(datetime == max(datetime)) |> 
     #remove stations that don't have any data
-    filter(if_all(var, ~!is.na(.)))
+    filter(if_all(matches(var), ~!is.na(.)))
     
   #refit model
   mod_refit <- fabletools::refit(model, new_data = refit_df)
@@ -37,7 +37,7 @@ forecast_daily <- function(model, daily, var) {
   #tidy forecast
   fc_tidy <- fc |>
     hilo(c(95, 99)) |>
-    select(-all_of(var)) |> #remove column with distribution (named after the variable)
+    select(-matches(var)) |> #remove column with distribution (named after the variable)
     select(-.model) |> 
     rename("fc_mean" = ".mean", "fc_95" = "95%", "fc_99" = "99%") |> 
     mutate(lower_95 = fc_95$lower,
@@ -49,7 +49,7 @@ forecast_daily <- function(model, daily, var) {
   fc_df |> 
     select(datetime, meta_station_id, meta_station_name, all_of(var)) |> 
     left_join(fc_tidy, by = c("datetime", "meta_station_id")) |>
-    rename("obs" = all_of(var)) |> 
+    rename("obs" = matches(var)) |> 
     mutate(varname = var, .before = obs) |> 
     as_tibble()
 }

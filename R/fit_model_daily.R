@@ -2,17 +2,17 @@
 #' 
 #' Fits a non-seasonal ARIMA model with a fourier term to capture seasonality. 
 #'
-#' @param training_daily the training_daily target (a tibble)
-#' @param var character vector of column names in db_daily
+#' @param training_daily the `daily` target (a tibble)
+#' @param var character; variable name in `daily`
 #'
 #' @return a model object
 fit_model_daily <- function(training_daily, var) {
   df <- 
     training_daily |> 
-    select(datetime, meta_station_id, all_of(var)) |> 
+    select(datetime, meta_station_id, matches(var)) |> 
     group_by(meta_station_id) |> 
     #remove stations that don't have any data
-    filter(if_all(var, ~!is.na(.))) |> 
+    filter(if_all(matches(var), ~!is.na(.))) |> 
     as_tsibble(key = meta_station_id, index = datetime) |> 
     tsibble::fill_gaps()
   
