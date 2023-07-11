@@ -1233,9 +1233,9 @@
     },
     "gratia": {
       "Package": "gratia",
-      "Version": "0.7.3.27",
+      "Version": "0.8.1",
       "Source": "Repository",
-      "Repository": "https://gavinsimpson.r-universe.dev",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "cli",
@@ -1259,7 +1259,7 @@
         "tools",
         "vctrs"
       ],
-      "Hash": "142fd119b1ff3c8b7a1d4598c6c8d82a"
+      "Hash": "aac574583d985c85f803e25089b35fe5"
     },
     "gt": {
       "Package": "gt",
@@ -1626,7 +1626,7 @@
     },
     "mgcv": {
       "Package": "mgcv",
-      "Version": "1.8-40",
+      "Version": "1.9-0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1639,7 +1639,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "c6b2fdb18cf68ab613bd564363e1ba0d"
+      "Hash": "086028ca0460d0c368028d3bda58f31b"
     },
     "mime": {
       "Package": "mime",
