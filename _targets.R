@@ -3,6 +3,7 @@
 
 # Load packages required to define the pipeline:
 library(targets)
+library(crew) #for parallel workers
 library(tarchetypes)
 library(arrow)
 
@@ -27,14 +28,9 @@ tar_option_set(
     "urca"
   ), 
   seed = 659,
+  controller = crew_controller_local(workers = 4),
   format = "rds" # default storage format
 )
-
-# tar_make_clustermq() configuration (okay to leave alone):
-options(clustermq.scheduler = "multicore")
-
-# tar_make_future() configuration (okay to leave alone):
-future::plan(future.callr::callr)
 
 # Source the R scripts in the R/ folder with your custom functions:
 tar_source()
@@ -130,14 +126,14 @@ tar_plan(
 
   # update datasets on Connect for report to use
   tar_target(
-    pin_daily,
+    daily_pin,
     pin_daily(),
     deployment = "main",
     cue = tar_cue("always")
   ),
   
   tar_target(
-    pin_hourly,
+    hourly_pin,
     pin_hourly(),
     deployment = "main",
     cue = tar_cue("always")
