@@ -1,5 +1,4 @@
-README
-================
+# README
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
@@ -54,14 +53,10 @@ The following object is masked from ‘package:utils’:
 
     timestamp
 
-Warning message: Targets and globals must have unique names. Ignoring
-global objects that conflict with target names: pin_hourly, pin_daily.
-Warnings like this one are important, but if you must suppress them, you
-can do so with Sys.setenv(TAR_WARN = “false”).
-
 ``` mermaid
 graph LR
   subgraph legend
+    direction LR
     x0a52b03877696646([""Outdated""]):::outdated --- x7420bd9270f8d27d([""Up to date""]):::uptodate
     x7420bd9270f8d27d([""Up to date""]):::uptodate --- x5b3426b4c7fa7dbc([""Started""]):::started
     x5b3426b4c7fa7dbc([""Started""]):::started --- xbf4603d6c2c2ad6b([""Stem""]):::none
@@ -69,6 +64,9 @@ graph LR
     x70a5fa6bea6f298d[""Pattern""]:::none --- xf0bce276fe2b9d3e>""Function""]:::none
   end
   subgraph Graph
+    direction LR
+    x77849b39697a3636>"pin_daily"]:::uptodate --> xfdd8393239dc060b(["daily_pin"]):::outdated
+    x077876839e5cc13d>"pin_hourly"]:::uptodate --> x35480c72297980cb(["hourly_pin"]):::outdated
     x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
     x4d3c4dcfeadc796d["models_daily"]:::outdated --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
     x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
@@ -89,8 +87,6 @@ graph LR
     x8b3096a190996662>"update_daily_hist"]:::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
     xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate --> x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate
     x6e52cb0f1668cc22(["readme"]):::started --> x6e52cb0f1668cc22(["readme"]):::started
-    x77849b39697a3636(["pin_daily"]):::outdated --> x77849b39697a3636(["pin_daily"]):::outdated
-    x077876839e5cc13d(["pin_hourly"]):::outdated --> x077876839e5cc13d(["pin_hourly"]):::outdated
   end
   classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
   classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
@@ -101,8 +97,6 @@ graph LR
   linkStyle 2 stroke-width:0px;
   linkStyle 3 stroke-width:0px;
   linkStyle 4 stroke-width:0px;
-  linkStyle 24 stroke-width:0px;
-  linkStyle 25 stroke-width:0px;
   linkStyle 26 stroke-width:0px;
 ```
 
@@ -157,6 +151,7 @@ fs::dir_tree(recurse = 1)
     │   ├── library
     │   ├── sandbox
     │   ├── settings.dcf
+    │   ├── settings.json
     │   └── staging
     ├── renv.lock
     ├── run.R
