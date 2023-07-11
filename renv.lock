@@ -216,20 +216,21 @@
     },
     "azmetr": {
       "Package": "azmetr",
-      "Version": "0.0.0.9000",
+      "Version": "0.2.0.9000",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "cct-datascience",
       "RemoteRepo": "azmetr",
-      "RemoteRef": "main",
-      "RemoteSha": "980e41f6c828c7535dd63fa862695b9ca827ddb8",
+      "RemoteUsername": "cct-datascience",
+      "RemotePkgRef": "cct-datascience/azmetr",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "72939fa41c8c8c5fc437fab0061de73b889761be",
       "Requirements": [
         "R",
         "attempt",
         "curl",
         "dplyr",
-        "httr",
+        "httr2",
         "lubridate",
         "magrittr",
         "purrr",
@@ -237,7 +238,7 @@
         "tibble",
         "tidyselect"
       ],
-      "Hash": "7b354583179d319411bc7f2101cfe33c"
+      "Hash": "90dfbf40166a8272713dd809d3690c42"
     },
     "backports": {
       "Package": "backports",
@@ -1367,6 +1368,25 @@
         "openssl"
       ],
       "Hash": "7e5e3cbd2a7bc07880c94e22348fb661"
+    },
+    "httr2": {
+      "Package": "httr2",
+      "Version": "0.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R6",
+        "cli",
+        "curl",
+        "glue",
+        "magrittr",
+        "openssl",
+        "rappdirs",
+        "rlang",
+        "withr"
+      ],
+      "Hash": "193bb297368afbbb42dc85784a46b36e"
     },
     "ids": {
       "Package": "ids",
