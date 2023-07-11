@@ -377,24 +377,6 @@
       ],
       "Hash": "c90ff735b7812b60f067a3f7a3b4de63"
     },
-    "bs4Dash": {
-      "Package": "bs4Dash",
-      "Version": "2.1.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "bslib",
-        "fresh",
-        "htmltools",
-        "httpuv",
-        "httr",
-        "jsonlite",
-        "lifecycle",
-        "shiny",
-        "waiter"
-      ],
-      "Hash": "cca14515876425caa963eb95f52e4564"
-    },
     "bslib": {
       "Package": "bslib",
       "Version": "0.4.0",
@@ -469,23 +451,6 @@
         "utils"
       ],
       "Hash": "3f038e5ac7f41d4ac41ce658c85e3042"
-    },
-    "clustermq": {
-      "Package": "clustermq",
-      "Version": "0.8.95.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R6",
-        "Rcpp",
-        "methods",
-        "narray",
-        "progress",
-        "purrr",
-        "utils"
-      ],
-      "Hash": "a9cbe19a941c943dd57b0a602b500437"
     },
     "codetools": {
       "Package": "codetools",
@@ -912,19 +877,6 @@
         "stats"
       ],
       "Hash": "29ad86f09d8f4c8d401d7ff000333651"
-    },
-    "fresh": {
-      "Package": "fresh",
-      "Version": "0.2.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "htmltools",
-        "rstudioapi",
-        "sass",
-        "shiny"
-      ],
-      "Hash": "fa54367040deb4537da49b7ac0ee5770"
     },
     "fs": {
       "Package": "fs",
@@ -1600,19 +1552,6 @@
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
     },
-    "markdown": {
-      "Package": "markdown",
-      "Version": "1.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "mime",
-        "utils",
-        "xfun"
-      ],
-      "Hash": "295690cfe43b7ea23de079b52c134b13"
-    },
     "memoise": {
       "Package": "memoise",
       "Version": "2.0.1",
@@ -1712,21 +1651,6 @@
         "R"
       ],
       "Hash": "6ace059b9be5e80d84a537f9180d441e"
-    },
-    "narray": {
-      "Package": "narray",
-      "Version": "0.5.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "progress",
-        "stats",
-        "stringr",
-        "utils"
-      ],
-      "Hash": "7ec5a2396d3c9ad4374495283dfcdc83"
     },
     "nlme": {
       "Package": "nlme",
@@ -1830,17 +1754,6 @@
         "vctrs"
       ],
       "Hash": "15da5a8412f317beeee6175fbc76f4bb"
-    },
-    "pingr": {
-      "Package": "pingr",
-      "Version": "2.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "processx",
-        "utils"
-      ],
-      "Hash": "b762f8f7d305f7eb0bab96eb1a3c782a"
     },
     "pins": {
       "Package": "pins",
@@ -2352,37 +2265,6 @@
       ],
       "Hash": "4f7970a3edb0a153ac6b376785a1944a"
     },
-    "shinyWidgets": {
-      "Package": "shinyWidgets",
-      "Version": "0.7.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "anytime",
-        "bslib",
-        "grDevices",
-        "htmltools",
-        "jsonlite",
-        "rlang",
-        "sass",
-        "shiny"
-      ],
-      "Hash": "bf4f8beed5bdb53095ccefb4209b5889"
-    },
-    "shinybusy": {
-      "Package": "shinybusy",
-      "Version": "0.3.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "htmltools",
-        "htmlwidgets",
-        "jsonlite",
-        "shiny"
-      ],
-      "Hash": "cf0b9330f677599316a4b36682081e8b"
-    },
     "slider": {
       "Package": "slider",
       "Version": "0.2.2",
@@ -2854,18 +2736,6 @@
         "withr"
       ],
       "Hash": "64f81fdead6e0d250fb041e175d123ab"
-    },
-    "waiter": {
-      "Package": "waiter",
-      "Version": "0.2.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R6",
-        "htmltools",
-        "shiny"
-      ],
-      "Hash": "93e6b6c8ae3f81d4be77a0dc74e5cf5e"
     },
     "waldo": {
       "Package": "waldo",
