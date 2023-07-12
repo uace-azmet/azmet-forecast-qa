@@ -1,5 +1,4 @@
-README
-================
+# README
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
@@ -57,6 +56,7 @@ The following object is masked from ‘package:utils’:
 ``` mermaid
 graph LR
   subgraph legend
+    direction LR
     x0a52b03877696646([""Outdated""]):::outdated --- x7420bd9270f8d27d([""Up to date""]):::uptodate
     x7420bd9270f8d27d([""Up to date""]):::uptodate --- x5b3426b4c7fa7dbc([""Started""]):::started
     x5b3426b4c7fa7dbc([""Started""]):::started --- xbf4603d6c2c2ad6b([""Stem""]):::none
@@ -64,23 +64,26 @@ graph LR
     x70a5fa6bea6f298d[""Pattern""]:::none --- xf0bce276fe2b9d3e>""Function""]:::none
   end
   subgraph Graph
-    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
-    xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate --> x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate
+    direction LR
     x1920bdb737e11d2e(["legacy_daily_file"]):::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
     x842666df821db265>"read_wrangle_hist"]:::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
+    xdd96ec4b0bb5ab6b["fc_daily"]:::outdated --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
+    x82c22abbb211b5ee>"pin_forecast"]:::uptodate --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
+    x6233d5fdb54d5242(["daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
+    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
+    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
+    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
+    x4d3c4dcfeadc796d["models_daily"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
+    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
+    xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate --> x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate
+    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
+    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
     x6233d5fdb54d5242(["daily"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
     x4bc7352f98499683>"forecast_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
     x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
     x4d3c4dcfeadc796d["models_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
-    x4d3c4dcfeadc796d["models_daily"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
-    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
-    x6233d5fdb54d5242(["daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
-    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
-    xdd96ec4b0bb5ab6b["fc_daily"]:::outdated --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
-    x82c22abbb211b5ee>"pin_forecast"]:::uptodate --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
+    x077876839e5cc13d>"pin_hourly"]:::uptodate --> x35480c72297980cb(["hourly_pin"]):::outdated
+    x77849b39697a3636>"pin_daily"]:::uptodate --> xfdd8393239dc060b(["daily_pin"]):::outdated
     xff9b736edef41c8b(["legacy_daily"]):::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
     x8b3096a190996662>"update_daily_hist"]:::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
     x6e52cb0f1668cc22(["readme"]):::started --> x6e52cb0f1668cc22(["readme"]):::started
@@ -94,7 +97,7 @@ graph LR
   linkStyle 2 stroke-width:0px;
   linkStyle 3 stroke-width:0px;
   linkStyle 4 stroke-width:0px;
-  linkStyle 24 stroke-width:0px;
+  linkStyle 26 stroke-width:0px;
 ```
 
 ## Repo Structure
@@ -108,7 +111,9 @@ fs::dir_tree(recurse = 1)
     │   ├── fit_model_daily.R
     │   ├── forecast_daily.R
     │   ├── needs_qa.R
+    │   ├── pin_daily.R
     │   ├── pin_forecast.R
+    │   ├── pin_hourly.R
     │   ├── plot_tsresids.R
     │   ├── read_wrangle_hist.R
     │   └── update_daily_hist.R
@@ -145,8 +150,8 @@ fs::dir_tree(recurse = 1)
     ├── renv
     │   ├── activate.R
     │   ├── library
-    │   ├── sandbox
     │   ├── settings.dcf
+    │   ├── settings.json
     │   └── staging
     ├── renv.lock
     ├── run.R

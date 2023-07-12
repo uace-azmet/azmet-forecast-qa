@@ -1,11 +1,12 @@
 name|type|parent|branches|progress
 legacy_daily_file|stem|legacy_daily_file|0|skipped
-readme|stem|readme|0|skipped
-pin_hourly|stem|pin_hourly|0|started
-pin_hourly|stem|pin_hourly|0|built
+readme|stem|readme|0|started
+readme|stem|readme|0|built
+daily_pin|stem|daily_pin|0|started
+daily_pin|stem|daily_pin|0|built
+hourly_pin|stem|hourly_pin|0|started
+hourly_pin|stem|hourly_pin|0|built
 metadata_file|stem|metadata_file|0|skipped
-pin_daily|stem|pin_daily|0|started
-pin_daily|stem|pin_daily|0|built
 legacy_daily|stem|legacy_daily|0|skipped
 needs_qa_daily|stem|needs_qa_daily|0|skipped
 daily|stem|daily|0|started

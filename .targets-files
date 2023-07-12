@@ -53,6 +53,7 @@ _targets/meta/process
 _targets/meta/progress
 _targets/objects/daily
 _targets/objects/daily_hist
+_targets/objects/daily_pin
 _targets/objects/daily_recent
 _targets/objects/daily_test
 _targets/objects/daily_train
@@ -94,6 +95,7 @@ _targets/objects/fc_daily_feff7f9f
 _targets/objects/fc_daily_ff8a304f
 _targets/objects/fc_sol_rad
 _targets/objects/forecast_qa_vars
+_targets/objects/hourly_pin
 _targets/objects/hourly_start
 _targets/objects/legacy_daily
 _targets/objects/models_daily_070006c3
