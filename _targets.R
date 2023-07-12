@@ -123,21 +123,6 @@ tar_plan(
     pin_forecast(fc_daily),
     deployment = "main"
   ),
-
-  # update datasets on Connect for report to use
-  tar_target(
-    daily_pin,
-    pin_daily(),
-    deployment = "main",
-    cue = tar_cue("always")
-  ),
-  
-  tar_target(
-    hourly_pin,
-    pin_hourly(),
-    deployment = "main",
-    cue = tar_cue("always")
-  ),
   
   # Reports -----------------------------------------------------------------
   tar_quarto(readme, "README.qmd")
