@@ -5,23 +5,19 @@
 # azmet-qaqc
 
 <!-- badges: start -->
+
+[![targets-workflow](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml/badge.svg)](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml)
 <!-- badges: end -->
 
-This repository contains code to perform quality assurance checks on
-[AZMET](https://ag.arizona.edu/azmet/) meterological data. Daily and
-hourly resolution data is accessed via the
-[`azmetr`](https://github.com/cct-datascience/azmetr) R package. The
-resulting QA report is viewable here:
-https://viz.datascience.arizona.edu/azmet-qaqc/
-
-This report has two types of validations: 1) rule-based validations and
-2) forecast-based validations. Rule-based validations check if values
-are within ranges, are correct relative to one another, and are not out
-of range for certain numbers of observations. Forecast-based validations
-start with creating a timeseries model of the data back to 2003. These
-models are updated and used to forecast the current day. The observed
-data is then compared to the forecast data, and if they are very
-different the data is flagged.
+This repository contains code to generate a dataset for doing timeseries
+forecast-based quality assurance checks for
+[AZMET](https://ag.arizona.edu/azmet/) meterological data. Daily
+resolution data is accessed via the
+[`azmetr`](https://github.com/cct-datascience/azmetr) R package. A
+timeseries model is fit to all but the last day of data and a forecast
+is made for the last day. This is then uploaded to a Posit Connect
+server and used downstream by a [validation
+report](https://github.com/cct-datascience/azmet-qa-dashboard).
 
 ## Reproducibility
 
@@ -65,27 +61,25 @@ graph LR
   end
   subgraph Graph
     direction LR
-    x77849b39697a3636>"pin_daily"]:::uptodate --> xfdd8393239dc060b(["daily_pin"]):::outdated
-    x077876839e5cc13d>"pin_hourly"]:::uptodate --> x35480c72297980cb(["hourly_pin"]):::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
-    x4d3c4dcfeadc796d["models_daily"]:::outdated --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
-    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::outdated
+    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
+    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
+    xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate --> x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate
     x1920bdb737e11d2e(["legacy_daily_file"]):::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
     x842666df821db265>"read_wrangle_hist"]:::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
-    x6233d5fdb54d5242(["daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::outdated
-    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::outdated
-    xdd96ec4b0bb5ab6b["fc_daily"]:::outdated --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
-    x82c22abbb211b5ee>"pin_forecast"]:::uptodate --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
     x6233d5fdb54d5242(["daily"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
     x4bc7352f98499683>"forecast_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
     x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x4d3c4dcfeadc796d["models_daily"]:::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
+    x4d3c4dcfeadc796d["models_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
+    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
+    x4d3c4dcfeadc796d["models_daily"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
+    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
+    x6233d5fdb54d5242(["daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
+    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
+    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
+    xdd96ec4b0bb5ab6b["fc_daily"]:::outdated --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
+    x82c22abbb211b5ee>"pin_forecast"]:::uptodate --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
     xff9b736edef41c8b(["legacy_daily"]):::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
     x8b3096a190996662>"update_daily_hist"]:::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
-    xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate --> x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate
     x6e52cb0f1668cc22(["readme"]):::started --> x6e52cb0f1668cc22(["readme"]):::started
   end
   classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
@@ -97,7 +91,7 @@ graph LR
   linkStyle 2 stroke-width:0px;
   linkStyle 3 stroke-width:0px;
   linkStyle 4 stroke-width:0px;
-  linkStyle 26 stroke-width:0px;
+  linkStyle 24 stroke-width:0px;
 ```
 
 ## Repo Structure
@@ -111,9 +105,7 @@ fs::dir_tree(recurse = 1)
     │   ├── fit_model_daily.R
     │   ├── forecast_daily.R
     │   ├── needs_qa.R
-    │   ├── pin_daily.R
     │   ├── pin_forecast.R
-    │   ├── pin_hourly.R
     │   ├── plot_tsresids.R
     │   ├── read_wrangle_hist.R
     │   └── update_daily_hist.R
@@ -126,13 +118,6 @@ fs::dir_tree(recurse = 1)
     │   └── user
     ├── _targets.R
     ├── _targets_packages.R
-    ├── app
-    │   ├── rsconnect
-    │   ├── shiny-report.html
-    │   ├── shiny-report.qmd
-    │   ├── shiny-report_cache
-    │   ├── shiny-report_data
-    │   └── shiny-report_files
     ├── azmet-qaqc.Rproj
     ├── data
     │   ├── azmet-data-metadata.xlsx
@@ -163,9 +148,6 @@ fs::dir_tree(recurse = 1)
   of the targets pipeline is on GitHub.
 - `_targets.R` defines a `targets` workflow
 - `_targets_packages.R` is generated by `targets::tar_renv()`
-- `app/` contains shiny-report.qmd and files generated by rendering it.
-  This is the interactive QA report published to Connect. It is
-  independent of the `targets` pipeline.
 - `data/` contains the .csv file of the historic data (since 2003)
 - `notes/` contains quarto documents of notes / analysis.
   `sliding-windows.qmd` is an exploration of a sliding-window quantile
