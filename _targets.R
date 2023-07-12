@@ -3,7 +3,7 @@
 
 # Load packages required to define the pipeline:
 library(targets)
-library(crew) #for parallel workers
+# library(crew) #for parallel workers
 library(tarchetypes)
 library(arrow)
 
@@ -28,7 +28,7 @@ tar_option_set(
     "urca"
   ), 
   seed = 659,
-  controller = crew_controller_local(workers = 4),
+  # controller = crew_controller_local(workers = 4),
   format = "rds" # default storage format
 )
 
