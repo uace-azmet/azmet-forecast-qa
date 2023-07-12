@@ -1,7 +1,6 @@
 name|type|parent|branches|progress
 legacy_daily_file|stem|legacy_daily_file|0|skipped
-readme|stem|readme|0|started
-readme|stem|readme|0|built
+readme|stem|readme|0|skipped
 daily_pin|stem|daily_pin|0|started
 daily_pin|stem|daily_pin|0|built
 hourly_pin|stem|hourly_pin|0|started
@@ -76,5 +75,4 @@ resid_daily_1c18ae9c|branch|resid_daily|0|skipped
 resid_daily_cbdc1838|branch|resid_daily|0|skipped
 resid_daily_777086a1|branch|resid_daily|0|skipped
 resid_daily|pattern|resid_daily|15|skipped
-pin_fc|stem|pin_fc|0|started
-pin_fc|stem|pin_fc|0|built
+pin_fc|stem|pin_fc|0|skipped
