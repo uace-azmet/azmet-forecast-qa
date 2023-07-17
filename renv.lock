@@ -505,28 +505,6 @@
       ],
       "Hash": "e8a1e41acf02548751f45c718d55aa6a"
     },
-    "crew": {
-      "Package": "crew",
-      "Version": "0.4.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R6",
-        "data.table",
-        "getip",
-        "mirai",
-        "nanonext",
-        "processx",
-        "ps",
-        "rlang",
-        "stats",
-        "tibble",
-        "tidyselect",
-        "utils"
-      ],
-      "Hash": "92151a688f5c841873b9f31450363ce3"
-    },
     "curl": {
       "Package": "curl",
       "Version": "5.0.1",
@@ -1014,16 +992,6 @@
         "utils"
       ],
       "Hash": "07a91f99e56951818ab911366db77700"
-    },
-    "getip": {
-      "Package": "getip",
-      "Version": "0.1-3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "ceb49d19444b9b3acfce8ee34e23e2f5"
     },
     "ggdist": {
       "Package": "ggdist",
@@ -1609,17 +1577,6 @@
       ],
       "Hash": "18e9c28c1d3ca1560ce30658b22ce104"
     },
-    "mirai": {
-      "Package": "mirai",
-      "Version": "0.9.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "nanonext"
-      ],
-      "Hash": "5442f2c070d5e9b19f1b5e624643e2bf"
-    },
     "modelr": {
       "Package": "modelr",
       "Version": "0.1.9",
@@ -1660,16 +1617,6 @@
         "RcppArmadillo"
       ],
       "Hash": "4dd186dbe1c5ae3bc3ef326527b6a1e9"
-    },
-    "nanonext": {
-      "Package": "nanonext",
-      "Version": "0.9.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "6ace059b9be5e80d84a537f9180d441e"
     },
     "nlme": {
       "Package": "nlme",
