@@ -10,7 +10,32 @@ format: gfm
 [![targets-workflow](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml/badge.svg)](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml)
 <!-- badges: end -->
 
-This repository contains code to generate a dataset for doing timeseries forecast-based quality assurance checks for  [AZMET](https://ag.arizona.edu/azmet/) meterological data.  Daily resolution data is accessed via the [`azmetr`](https://github.com/cct-datascience/azmetr) R package. A timeseries model is fit to all but the last day of data and a forecast is made for the last day. This is then uploaded to a Posit Connect server and used downstream by a [validation report](https://github.com/cct-datascience/azmet-qa-dashboard).
+This repository contains code to generate a dataset for doing timeseries forecast-based quality assurance checks for  [AZMET](https://ag.arizona.edu/azmet/) meterological data.  Daily resolution data is accessed via the [`azmetr`](https://github.com/uace-azmet/azmetr) R package. A timeseries model is fit to all but the last day of data and a forecast is made for the last day. This is then uploaded to a Posit Connect server and used downstream by a [validation report](https://github.com/uace-azmet/azmet-qa-dashboard).
+
+Timeseries models are fit using a non-seasonal ARIMA model using a fourier terms to capture seasonality.
+The maximum order of the fourier terms (`K`) is estimated for each weather variable to minimize model AIC.
+An auto-ARIMA function is used for the non-seasonal ARIMA part of the model and the order of the coefficients $p$, $d$, and $q$ are estimated separately for each weather variable and each *station*.
+
+This is done using the `fable` package with something like the following (pseudo-code):
+
+``` r
+for (i in 1:25) {
+  fit <- df |> model(
+    ARIMA( ~ pdq() + PDQ(0,0,0) + xreg(fourier(period = '1 year', K = i)))
+  )
+  fit_aicc <- fit$AICc
+  if(fit_aicc < bestfit) {
+    bestfit <- fit_aicc
+  } else {
+    return(fit)
+  }
+}
+```
+
+The maximum order of the Fourier series, the order of the ARIMA coefficients, and the estimates for the coefficients are only estimated once per year.
+Each day, the model is re-fit to new data (but not re-estimated) before being used to forecast.
+
+A few variables are excluded from this validation because these timeseries models are inappropriate for them: `wind_vector_dir` is in polar coordinates, `sol_rad_total` and `precip_total_mm` because they are highly zero-inflated.
 
 ## Reproducibility
 
@@ -27,10 +52,14 @@ And you must have permission to publish to that pin.  Without this setup, other 
 
 **Targets workflow:**
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| results: asis
 cat(
   "```mermaid",
-  targets::tar_mermaid(targets_only = FALSE),
+  targets::tar_mermaid(targets_only = FALSE, reporter = "silent"),
   "```",
   sep = "\n"
 )
