@@ -8,6 +8,8 @@ format: gfm
 
 <!-- badges: start -->
 [![targets-workflow](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml/badge.svg)](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml)
+[![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
+
 <!-- badges: end -->
 
 This repository contains code to generate a dataset for doing timeseries forecast-based quality assurance checks for  [AZMET](https://ag.arizona.edu/azmet/) meterological data.  Daily resolution data is accessed via the [`azmetr`](https://github.com/uace-azmet/azmetr) R package. A timeseries model is fit to all but the last day of data and a forecast is made for the last day. This is then uploaded to a Posit Connect server and used downstream by a [validation report](https://github.com/uace-azmet/azmet-qa-dashboard).
