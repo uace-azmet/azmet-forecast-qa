@@ -7,6 +7,11 @@
 <!-- badges: start -->
 
 [![targets-workflow](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml/badge.svg)](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml)
+[![Project Status: Inactive – The project has reached a stable, usable
+state but is no longer being actively developed; support/maintenance
+will be provided as time
+allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
+
 <!-- badges: end -->
 
 This repository contains code to generate a dataset for doing timeseries
