@@ -71,5 +71,4 @@ resid_daily_1c18ae9c|branch|resid_daily|0|skipped
 resid_daily_cbdc1838|branch|resid_daily|0|skipped
 resid_daily_777086a1|branch|resid_daily|0|skipped
 resid_daily|pattern|resid_daily|15|skipped
-pin_fc|stem|pin_fc|0|started
-pin_fc|stem|pin_fc|0|built
+pin_fc|stem|pin_fc|0|skipped
