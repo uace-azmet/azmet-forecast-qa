@@ -98,13 +98,13 @@ tar_plan(
   # separate, static report that is published with plots and other model
   # diagnostics for each station.
   
-  tar_target(
-    resid_daily,
-    plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
-      patchwork::plot_annotation(title = forecast_qa_vars),
-    pattern = map(models_daily, forecast_qa_vars),
-    iteration = "list"
-  ),
+  # tar_target(
+  #   resid_daily,
+  #   plot_tsresids(models_daily |> filter(meta_station_id == "az01")) +
+  #     patchwork::plot_annotation(title = forecast_qa_vars),
+  #   pattern = map(models_daily, forecast_qa_vars),
+  #   iteration = "list"
+  # ),
   
   # Forecasting -------------------------------------------------------------
   # re-fit model with data up to yesterday, forecast today, return a tibble
