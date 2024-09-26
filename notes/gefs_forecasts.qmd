@@ -1,0 +1,183 @@
+---
+title: "Ensemble forecasts"
+author: "David LeBauer"
+format: html
+     df-print: paged
+editor: source
+---
+
+
+## Download ensemble forecasts for AZMET stations
+
+The goal here is to get a forecast for today that we can use to evaluate data streaming in from the AZMET stations.
+
+```{r}
+library(dplyr)
+## set path for gdal binary 
+Sys.setenv("GDAL_BIN"="/usr/bin/")
+#remotes::install_github("cct-datascience/azmetr")
+data(station_info, package = 'azmetr')
+
+library(gdalcubes) 
+# remotes::install_github("neon4cast/gefs4cast")
+#remotes::install_github('eco4cast/gefs4cast')
+library(gefs4cast) 
+library(stringr)
+library(lubridate)
+library(stars)
+library(viridisLite)
+library(tmap)
+
+gdalcubes_options(parallel = TRUE)#24)
+```
+
+
+Based on [gefs4cast vignette](https://projects.ecoforecast.org/gefs4cast/articles/gefs-cog.html)
+
+Download ensemble forecasts
+```{r}
+date <- Sys.Date() - lubridate::days(1)
+# may need to adjust for time zones?
+# yesterday's forecast starts today?
+
+gefsdir <- fs::dir_create(file.path("gefs", date))
+
+gefs_cog(gefsdir, 
+         ens_avg = FALSE,
+         max_horizon = 48, # get next 48 h. might only need 24h?          
+         date = date) |>
+  system.time()
+```
+
+```{r}
+gefs_cubes <- list()
+for (i in 1:30) { # ens 00 different?
+  ens <- stringr::str_pad(i, 2, pad = '0')
+  ens_id <- paste0('gep', ens)
+  .f <- fs::dir_ls(gefsdir, 
+                      type="file", 
+                      recurse = TRUE,
+                      regex = ens_id)[-1]
+  step <- .f |> str_extract("f\\d{3}\\.tif") |> str_extract("\\d{3}") 
+  datetime <- Sys.Date() + hours(step) 
+
+  fc <- stars::read_stars(.f[1]) 
+  bandnames <- 
+    stars::st_get_dimension_values(fc, 3) |>
+    stringr::str_extract("([A-Z]+):") |> str_remove(":")
+
+  gefs_cubes[[ens]] <- create_image_collection(.f,
+                                     date_time = datetime, 
+                                     band_names = bandnames)
+}
+```
+
+Create a view that downscales the data to 0.1 degree resolution, hourly.
+```{r}
+
+azmet_pts <- station_info %>% 
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+  
+azmet_box <- azmet_pts %>% 
+  sf::st_bbox() 
+
+iso <-"%Y-%m-%dT%H:%M:%S"
+ext <- list(t0 = as.character(min(datetime),iso), 
+              t1 = as.character(max(datetime),iso),
+              left = azmet_box[1], right = azmet_box[3],
+              top = azmet_box[4], bottom = azmet_box[2])
+v <- cube_view(srs = "EPSG:4326", 
+               extent = ext,
+              #dx = 0.5, dy = 0.5, # original resolution -- half-degree
+              dx = 0.1, 
+              dy = 0.1,
+              dt = "PT1H",
+              #dt = "PT3H",   # original resolution
+               aggregation = "mean", # will only aggregate if multiple ensemble members are viewed
+               resampling = "cubicspline"
+)
+```
+
+Now generate a dataframe of all the predictions.
+```{r}
+
+preds <- list()
+for(ens in names(gefs_cubes)){
+  gefs_cube <- gefs_cubes[[ens]]
+  x <- raster_cube(gefs_cube, v)  |> 
+         extract_geom(sf = azmet_pts)
+  p <- azmet_pts
+  p$FID <- rownames(azmet_pts)
+  y <- merge(p, x, by = "FID")
+  preds[[ens]] <- y
+}
+ens_forecast <- dplyr::bind_rows(preds, .id = 'ens')
+```
+
+
+Next step: long w/ summaries
+
+```{r}
+## create statistical summaries by station, variable, and time
+
+ens_stats <- ens_long %>% 
+  group_by(meta_station_name, var, time) %>% 
+  summarise(median = median(value),
+            min = min(value),
+            max = max(value),
+            ucl_95 = quantile(value, 0.975),
+            lcl_95 = quantile(value, 0.025),
+            ucl_99 = quantile(value, 0.995),
+            lcl_99 = quantile(value, 0.005)) %>% 
+  ungroup() %>% 
+  mutate(id = paste0(meta_station_name, var))
+# save above as csv
+readr::write_csv(ens_stats, 'ens_stats.csv')
+```
+
+```{r}
+## create a plot of ens_stats time vs. value, with color by station, and facet by variable
+library(ggplot2)
+
+a <- ggplot(data = ens_stats) +
+  geom_line(aes(x = time, y = median, color = meta_station_name)) +
+  geom_ribbon(aes(x = time, ymin = lcl_95, ymax = ucl_95, fill = meta_station_name), alpha = 0.25) +
+  geom_ribbon(aes(x = time, ymin = min, ymax = max, fill = meta_station_name), alpha = 0.05) +
+  facet_wrap(~var, ncol = 4, scales = 'free_y')
+# make plot above with wide aspect
+ggsave(a, width = 20, height = 10, filename = 'fig.pdf')
+
+# above plot but saved as one file per station, using a for loop
+plots <- list()
+for(stn in unique(ens_stats$meta_station_id)){
+  plots[[stn]] <- ggplot(data = ens_stats %>% filter(meta_station_name == stn)) +
+    geom_line(aes(x = time, y = median)) +
+    geom_ribbon(aes(x = time, ymin = lcl_95, ymax = ucl_95), alpha = 0.25) +
+    geom_ribbon(aes(x = time, ymin = min, ymax = max), alpha = 0.05) +
+    facet_wrap(~var, ncol = 4, scales = 'free_y')
+  ggsave(plots[[stn]], width = 20, height = 10, filename = paste0(stn, '.pdf'))
+}
+
+# with list above use cowplot to combine into one pdf
+library(cowplot)
+p <- plot_grid(plotlist = plots, ncol = 6, labels = names(plots))
+ggsave(p, width = 40, height = 20, filename = 'all.pdf')
+```
+
+```{r}
+```
+
+```{r}
+
+```
+
+
+Look at the data as a movie:
+- should add station points and maybe some county boundaries to this
+```{r}
+raster_cube(gefs_cube, v) |>
+  gdalcubes::select_bands("TMP") |>
+  animate( col = viridisLite::viridis, nbreaks=100,
+           fps=10, save_as = "temp.gif")
+```
+
