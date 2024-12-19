@@ -206,3 +206,6 @@ is with the `usethis` package and the `pr_*` functions.
 you create a new pull request, and after it is merged you can use
 `pr_finish()` to clean things up. More about this workflow
 [here](https://usethis.r-lib.org/articles/pr-functions.html).
+
+------------------------------------------------------------------------
+Developed in collaboration with the University of Arizona [CCT Data Science](https://datascience.cct.arizona.edu/) team
