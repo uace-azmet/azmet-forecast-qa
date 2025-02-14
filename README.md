@@ -1,5 +1,6 @@
 # README
 
+
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
 # azmet-qaqc
@@ -7,12 +8,17 @@
 <!-- badges: start -->
 
 [![targets-workflow](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml/badge.svg)](https://github.com/cct-datascience/azmet-qaqc/actions/workflows/targets.yaml)
-[![Project Status: Inactive – The project has reached a stable, usable
-state but is no longer being actively developed; support/maintenance
-will be provided as time
-allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
+[![Project Status: Abandoned – Initial development has started, but
+there has not yet been a stable, usable release; the project has been
+abandoned and the author(s) do not intend on continuing
+development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
 
 <!-- badges: end -->
+
+> [!NOTE]
+>
+> The GitHub action to run this has been disabled, as this project is no
+> longer in use.
 
 This repository contains code to generate a dataset for doing timeseries
 forecast-based quality assurance checks for
@@ -90,44 +96,42 @@ The following object is masked from ‘package:utils’:
 
 ``` mermaid
 graph LR
-  subgraph legend
+  style Legend fill:#FFFFFF00,stroke:#000000;
+  style Graph fill:#FFFFFF00,stroke:#000000;
+  subgraph Legend
     direction LR
-    x0a52b03877696646([""Outdated""]):::outdated --- x7420bd9270f8d27d([""Up to date""]):::uptodate
-    x7420bd9270f8d27d([""Up to date""]):::uptodate --- xbf4603d6c2c2ad6b([""Stem""]):::none
-    xbf4603d6c2c2ad6b([""Stem""]):::none --- x70a5fa6bea6f298d[""Pattern""]:::none
-    x70a5fa6bea6f298d[""Pattern""]:::none --- xf0bce276fe2b9d3e>""Function""]:::none
+    x2db1ec7a48f65a9b([""Outdated""]):::outdated --- xd03d7c7dd2ddda2b([""Stem""]):::none
+    xd03d7c7dd2ddda2b([""Stem""]):::none --- x6f7e04ea3427f824[""Pattern""]:::none
+    x6f7e04ea3427f824[""Pattern""]:::none --- xeb2d7cac8a1ce544>""Function""]:::none
   end
   subgraph Graph
     direction LR
-    x3d7b2a2ab5636113(["metadata_file"]):::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
-    x06ab7116eed66f15>"needs_qa"]:::uptodate --> xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate
-    xdfae9ea4e5207cef(["needs_qa_daily"]):::uptodate --> x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate
-    x1920bdb737e11d2e(["legacy_daily_file"]):::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
-    x842666df821db265>"read_wrangle_hist"]:::uptodate --> xff9b736edef41c8b(["legacy_daily"]):::uptodate
-    x6233d5fdb54d5242(["daily"]):::outdated --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x4bc7352f98499683>"forecast_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x4d3c4dcfeadc796d["models_daily"]:::uptodate --> xdd96ec4b0bb5ab6b["fc_daily"]:::outdated
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
-    x4d3c4dcfeadc796d["models_daily"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
-    x10e889bcd8b0fd60>"plot_tsresids"]:::uptodate --> x0bb4ecca77d3d4a0["resid_daily"]:::uptodate
-    x6233d5fdb54d5242(["daily"]):::outdated --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
-    x1f5572089e80d919>"fit_model_daily"]:::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
-    x601d3b0e7d261371(["forecast_qa_vars"]):::uptodate --> x4d3c4dcfeadc796d["models_daily"]:::uptodate
-    xdd96ec4b0bb5ab6b["fc_daily"]:::outdated --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
-    x82c22abbb211b5ee>"pin_forecast"]:::uptodate --> x8f5c47b9b7da7e75(["pin_fc"]):::outdated
-    xff9b736edef41c8b(["legacy_daily"]):::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
-    x8b3096a190996662>"update_daily_hist"]:::uptodate --> x6233d5fdb54d5242(["daily"]):::outdated
-    x6e52cb0f1668cc22(["readme"]):::outdated --> x6e52cb0f1668cc22(["readme"]):::outdated
+    x3a2c1e6b1a8919f9["fc_daily"]:::outdated --> x2dde479bf4afe5ba(["pin_fc"]):::outdated
+    xc7099a8821f6b08e>"pin_forecast"]:::outdated --> x2dde479bf4afe5ba(["pin_fc"]):::outdated
+    x80e05d6ea9d26489(["legacy_daily"]):::outdated --> xd7668d23fa76d501(["daily"]):::outdated
+    x92a7ad915bb17e4e>"update_daily_hist"]:::outdated --> xd7668d23fa76d501(["daily"]):::outdated
+    xd7668d23fa76d501(["daily"]):::outdated --> x3a2c1e6b1a8919f9["fc_daily"]:::outdated
+    x82d6b41eabe0119e>"forecast_daily"]:::outdated --> x3a2c1e6b1a8919f9["fc_daily"]:::outdated
+    x5748d452d6611609(["forecast_qa_vars"]):::outdated --> x3a2c1e6b1a8919f9["fc_daily"]:::outdated
+    xcb708460d8bb5c96["models_daily"]:::outdated --> x3a2c1e6b1a8919f9["fc_daily"]:::outdated
+    xd7668d23fa76d501(["daily"]):::outdated --> xcb708460d8bb5c96["models_daily"]:::outdated
+    xb6ddcbcf724c9bdd>"fit_model_daily"]:::outdated --> xcb708460d8bb5c96["models_daily"]:::outdated
+    x5748d452d6611609(["forecast_qa_vars"]):::outdated --> xcb708460d8bb5c96["models_daily"]:::outdated
+    xc87609a2c694f266(["needs_qa_daily"]):::outdated --> x5748d452d6611609(["forecast_qa_vars"]):::outdated
+    x49fc6b88600597f0(["legacy_daily_file"]):::outdated --> x80e05d6ea9d26489(["legacy_daily"]):::outdated
+    x03935871fc275574>"read_wrangle_hist"]:::outdated --> x80e05d6ea9d26489(["legacy_daily"]):::outdated
+    x98d244f393cdd7a9(["metadata_file"]):::outdated --> xc87609a2c694f266(["needs_qa_daily"]):::outdated
+    xe550334f5a0d993c>"needs_qa"]:::outdated --> xc87609a2c694f266(["needs_qa_daily"]):::outdated
+    xc11069275cfeb620(["readme"]):::outdated --> xc11069275cfeb620(["readme"]):::outdated
+    x944a1cde0b0bd189>"plot_tsresids"]:::outdated --> x944a1cde0b0bd189>"plot_tsresids"]:::outdated
   end
   classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
-  classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
   classDef none stroke:#000000,color:#000000,fill:#94a4ac;
   linkStyle 0 stroke-width:0px;
   linkStyle 1 stroke-width:0px;
   linkStyle 2 stroke-width:0px;
-  linkStyle 3 stroke-width:0px;
-  linkStyle 23 stroke-width:0px;
+  linkStyle 19 stroke-width:0px;
+  linkStyle 20 stroke-width:0px;
 ```
 
 ## Repo Structure
@@ -137,6 +141,8 @@ fs::dir_tree(recurse = 1)
 ```
 
     .
+    ├── CITATION.cff
+    ├── LICENSE.md
     ├── R
     │   ├── fit_model_daily.R
     │   ├── forecast_daily.R
@@ -148,10 +154,6 @@ fs::dir_tree(recurse = 1)
     ├── README.md
     ├── README.qmd
     ├── README.rmarkdown
-    ├── _targets
-    │   ├── meta
-    │   ├── objects
-    │   └── user
     ├── _targets.R
     ├── _targets_packages.R
     ├── azmet-qaqc.Rproj
@@ -170,7 +172,6 @@ fs::dir_tree(recurse = 1)
     ├── renv
     │   ├── activate.R
     │   ├── library
-    │   ├── sandbox
     │   ├── settings.dcf
     │   ├── settings.json
     │   └── staging
@@ -208,4 +209,6 @@ you create a new pull request, and after it is merged you can use
 [here](https://usethis.r-lib.org/articles/pr-functions.html).
 
 ------------------------------------------------------------------------
-Developed in collaboration with the University of Arizona [CCT Data Science](https://datascience.cct.arizona.edu/) team
+
+Developed in collaboration with the University of Arizona [CCT Data
+Science](https://datascience.cct.arizona.edu/) team
