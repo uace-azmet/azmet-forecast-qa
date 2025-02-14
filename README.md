@@ -12,6 +12,7 @@
 there has not yet been a stable, usable release; the project has been
 abandoned and the author(s) do not intend on continuing
 development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
+[![DOI](https://zenodo.org/badge/553212337.svg)](https://doi.org/10.5281/zenodo.14872854)
 
 <!-- badges: end -->
 
