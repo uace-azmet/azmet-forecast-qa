@@ -141,6 +141,8 @@ fs::dir_tree(recurse = 1)
 ```
 
     .
+    ├── CITATION.cff
+    ├── LICENSE.md
     ├── R
     │   ├── fit_model_daily.R
     │   ├── forecast_daily.R
